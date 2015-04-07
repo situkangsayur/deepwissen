@@ -24,4 +24,8 @@ libraryDependencies += "com.fasterxml.jackson.core" % "jackson-annotations" % "2
 
 libraryDependencies += "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.5.1"
 
-libraryDependencies += "org.apache.spark" %% "spark-core" % "1.3.0"
+libraryDependencies += "org.apache.hbase" % "hbase-client" % "1.0.0"
+
+libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.0.0"
+
+libraryDependencies += "org.apache.hbase" % "hbase-annotations" % "1.0.0"
