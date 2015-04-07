@@ -7,6 +7,10 @@ package com.deepwissen.ml.opendata
 
 import java.io.{File, FileOutputStream}
 
+import com.deepwissen.ml.algorithm.{Backpropagation, BackpropragationParameter}
+import com.deepwissen.ml.function.RangeThresholdFunction
+import com.deepwissen.ml.serialization.NetworkSerialization
+import com.deepwissen.ml.validation.Validation
 import org.scalatest.FunSuite
 
 /**
@@ -65,7 +69,7 @@ class OpenDataTest extends FunSuite {
     value.split(",").map(value => value.replaceAll(" ", "").toDouble)
   }.toList
 
-  val datasetClone = dataset.map { data => data.clone()}
+  val datasetClone = dataset.map { data => data.clone() }
   dataset.foreach(r => println(r.mkString(",")))
 
   (0 until dataset(0).length).foreach { i =>
@@ -84,7 +88,7 @@ class OpenDataTest extends FunSuite {
   println("-----")
   dataset.foreach(r => println(r.mkString(",")))
 
-  val parameter = TrainingParameter(
+  val parameter = BackpropragationParameter(
     hiddenLayerSize = 1,
     iteration = 70000,
     epsilon = 0.000000001,
@@ -96,7 +100,7 @@ class OpenDataTest extends FunSuite {
     val network = Backpropagation.train(dataset, parameter)
 
     val result = Validation.classification(network, Backpropagation, dataset)
-    val validate = Validation.validate(result, dataset, dataset(0).length - 1).map {
+    val validate = Validation.validate(result, dataset, dataset.head.length - 1).map {
       case (key, value) => (math.round(key * 100) / 100.0) -> (math.round(value * 100) / 100.0)
     }
     validate.foreach(data => println(s" prediksi ${data._1} => data asli ${data._2}"))

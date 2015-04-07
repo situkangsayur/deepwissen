@@ -22,7 +22,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, algorithm: Algorithm[Nothing, Array[Double], BackpropragationParameter, Network], dataset: List[Array[Double]]) =
+  def classification(network: Network, algorithm: Algorithm[_, Array[Double], BackpropragationParameter, Network], dataset: List[Array[Double]]) =
     dataset.map(data => algorithm.classification(data, network))
 
   /**
