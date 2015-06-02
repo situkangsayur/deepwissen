@@ -7,6 +7,10 @@ package com.deepwissen.ml.algorithm
 
 import java.io.{File, FileInputStream, FileOutputStream}
 
+import com.deepwissen.ml.function.EitherThresholdFunction
+import com.deepwissen.ml.normalization.StandardNormalization
+import com.deepwissen.ml.serialization.NetworkSerialization
+import com.deepwissen.ml.validation.{SplitValidation, Validation}
 import org.scalatest.FunSuite
 
 /**
@@ -84,7 +88,7 @@ class Backpropagation$Test extends FunSuite {
   /**
    * Training Parameter
    */
-  val parameter = TrainingParameter(
+  val parameter = BackpropragationParameter(
     hiddenLayerSize = 1,
     iteration = 70000,
     epsilon = 0.000000001,
