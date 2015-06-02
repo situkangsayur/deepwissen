@@ -12,14 +12,32 @@ package com.deepwissen.ml.function
  */
 trait ActivationFunction extends Serializable {
 
+  /**
+   * Activation function for t (weight)
+   * @param weight t
+   * @return function result
+   */
   def activation(weight: Double): Double
 
+  /**
+   * Derivation function for t (weight)
+   * @param weight t
+   * @return function result
+   */
   def derivation(weight: Double): Double
 
 }
 
 /**
- * Sigmoid Function
+ * A sigmoid function is a mathematical function having an "S" shape (sigmoid curve).
+ * Often, sigmoid function refers to the special case of the logistic function shown
+ * in the first figure and defined by the formula
+ *
+ * {{{
+ *   S(t) = 1.0 / 1.0 + e^-t
+ * }}}
+ *
+ * @see http://en.wikipedia.org/wiki/Sigmoid_function
  */
 object SigmoidFunction extends ActivationFunction {
 
