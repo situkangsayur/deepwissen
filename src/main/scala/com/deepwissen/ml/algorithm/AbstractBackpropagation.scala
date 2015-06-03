@@ -5,8 +5,6 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.function.ActivationFunction
-
 /**
  * Abstract implementation of Neural Network Backpropagation
  * @author Eko Khannedy
@@ -46,20 +44,6 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @param parameter training parameter
    */
   def doTrain(network: Network, dataset: DATASET, parameter: BackpropragationParameter): Unit
-
-  /**
-   * Get perceptron weight, calculate from all synapsies and perceptron source
-   * @param network network
-   * @param perceptron perceptron
-   * @return weight
-   */
-  def getPerceptronWeight(network: Network, perceptron: Perceptron): Double = {
-    val synapsies = network.getSynapsiesTo(perceptron.id)
-    val weight = synapsies.foldLeft(0.0) { (value, synapsys) =>
-      value + (synapsys.weight * synapsys.from.output)
-    }
-    weight
-  }
 
   /**
    * Get target class
@@ -126,7 +110,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      */
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = getPerceptronWeight(network, perceptron)
+        perceptron.weight = network.getPerceptronWeight(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
       }
     }
@@ -135,7 +119,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      * Update weight and output for output layer
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = getPerceptronWeight(network, perceptron)
+      perceptron.weight = network.getPerceptronWeight(perceptron)
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 
@@ -184,37 +168,6 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
       value + Math.pow(getTargetClass(data) - perceptron.output, 2)
     }
     sumError / network.outputLayer.perceptrons.length
-  }
-
-  /**
-   * Classification for given data with given network model
-   * @param data data
-   * @param network network model
-   * @param activationFunction activation function
-   * @return double
-   */
-  override def classification(data: Array[Double], network: Network, activationFunction: ActivationFunction): Double = {
-    // fill input layer
-    network.inputLayer.fillOutput(data)
-
-    // fill hidden layer
-    network.hiddenLayers.foreach { layer =>
-      layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = getPerceptronWeight(network, perceptron)
-        perceptron.output = activationFunction.activation(perceptron.weight)
-      }
-    }
-
-    // fill output layer
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = getPerceptronWeight(network, perceptron)
-      perceptron.output = activationFunction.activation(perceptron.weight)
-    }
-
-    // calculate result
-    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-      value + perceptron.output
-    }
   }
 
 }

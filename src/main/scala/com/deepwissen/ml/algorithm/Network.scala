@@ -67,6 +67,16 @@ class Network(val inputLayer: Layer,
    */
   def getSynapsiesTo(perceptronId: String) = synapsiesLookupTo(perceptronId)
 
+  /**
+   * Get perceptron weight, calculate from all synapsies and perceptron source
+   * @param perceptron perceptron
+   * @return weight
+   */
+  def getPerceptronWeight(perceptron: Perceptron): Double =
+    getSynapsiesTo(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
+      value + (synapsys.weight * synapsys.from.output)
+    }
+
 }
 
 object Network {
@@ -199,7 +209,7 @@ object Network {
         perceptrons = layer.perceptrons.map(newPerceptron).sortBy(_.index),
         bias = layer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
       )
-    }.toList
+    }
 
     // create output layer
     val outputLayer = new OutputLayer(

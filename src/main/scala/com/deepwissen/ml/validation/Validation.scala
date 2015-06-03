@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.validation
 
-import com.deepwissen.ml.algorithm.{BackpropragationParameter, Algorithm, Network}
+import com.deepwissen.ml.algorithm.{Classification, BackpropragationParameter, Algorithm, Network}
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
 
 /**
@@ -18,12 +18,12 @@ trait Validation {
   /**
    * Run classification with given dataset
    * @param network network model
-   * @param algorithm algorithm
+   * @param classification classification
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, algorithm: Algorithm[_, Array[Double], BackpropragationParameter, Network], dataset: List[Array[Double]], activationFunction: ActivationFunction) =
-    dataset.map(data => algorithm.classification(data, network, activationFunction))
+  def classification(network: Network, classification: Classification[Array[Double], Network], dataset: List[Array[Double]], activationFunction: ActivationFunction) =
+    dataset.map(data => classification(data, network, activationFunction))
 
   /**
    * Validate classification result

@@ -5,8 +5,6 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.function.ActivationFunction
-
 /**
  * Base trait for Deep Learning Algorithm
  * @author Eko Khannedy
@@ -23,14 +21,5 @@ trait Algorithm[DATASET, DATA, PARAM <: TrainingParameter, MODEL] {
    * @return model
    */
   def train(dataset: DATASET, parameter: PARAM): MODEL
-
-  /**
-   * Classification for given data with given network model
-   * @param data data
-   * @param model algorithm model
-   * @param activationFunction activation function
-   * @return double
-   */
-  def classification(data: DATA, model: MODEL, activationFunction: ActivationFunction): Double
 
 }
