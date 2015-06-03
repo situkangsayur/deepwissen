@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2015, DeepWissen and/or its affiliates. All rights reserved.
+ * DEEPWISSEN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
+ */
+
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
@@ -5,6 +10,7 @@ import com.deepwissen.ml.function.ActivationFunction
 import scala.concurrent.{ExecutionContext, Future}
 
 /**
+ * Base trait for classification
  * @author Eko Khannedy
  * @since 6/3/15
  */
@@ -35,6 +41,8 @@ trait Classification[DATA, MODEL] {
 
 /**
  * Basic implementation of classification for data array of double and network model
+ * @author Eko Khannedy
+ * @since 6/3/15
  */
 object BasicClassification extends Classification[Array[Double], Network] {
 
