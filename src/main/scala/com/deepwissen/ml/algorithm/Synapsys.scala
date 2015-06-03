@@ -9,11 +9,14 @@ package com.deepwissen.ml.algorithm
  * @author Eko Khannedy
  * @since 2/25/15
  */
-case class Synapsys(from: String,
-                    to: String,
+case class Synapsys(from: Perceptron,
+                    to: Perceptron,
                     var weight: Double,
                     var deltaWeight: Double = 0.0) {
 
-  val isFromBias = from.startsWith("bias_")
+  /**
+   * Is synspsys from bias perceptron
+   */
+  val isFromBias = from.id.startsWith("bias_")
 
 }

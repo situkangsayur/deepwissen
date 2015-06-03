@@ -21,7 +21,11 @@ object Backpropagation extends AbstractBackpropagation[List[Array[Double]]] {
    * @return network model
    */
   override def train(dataset: List[Array[Double]], parameter: BackpropragationParameter): Network = {
-    val network = Network(dataset.head.length - 1, parameter.hiddenLayerSize)
+    val network = Network(
+      inputPerceptronSize = dataset.head.length - 1,
+      hiddenSize = parameter.hiddenLayerSize,
+      synapsysFactory = parameter.synapsysFactory
+    )
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {

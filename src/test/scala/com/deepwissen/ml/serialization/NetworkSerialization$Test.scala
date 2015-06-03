@@ -6,7 +6,7 @@ package com.deepwissen.ml.serialization
 
 import java.io.StringWriter
 
-import com.deepwissen.ml.algorithm.Network
+import com.deepwissen.ml.algorithm.{RandomSynapsysFactory, Network}
 import org.apache.commons.io.output.WriterOutputStream
 import org.scalatest.FunSuite
 
@@ -18,7 +18,7 @@ class NetworkSerialization$Test extends FunSuite {
 
   test("save model") {
 
-    val network = Network(3, 2)
+    val network = Network(3, 2, RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
 

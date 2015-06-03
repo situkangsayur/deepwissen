@@ -5,7 +5,10 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.function.ActivationFunction
+
 /**
+ * Layer model class
  * @author Eko Khannedy
  * @since 2/25/15
  */
@@ -27,7 +30,7 @@ trait Layer {
    * Get first perceptrons
    * @return perceptron
    */
-  def perceptron: Perceptron = perceptrons(0)
+  def perceptron: Perceptron = perceptrons.head
 
   /**
    * Get map of index and perceptron
@@ -71,13 +74,14 @@ trait Layer {
    * Fill perceptrons weight with given dataset and automatically update output
    * with activation function, and update bias output
    * @param dataset dataset
+   * @param activationFunction activation function
    * @return this layer
    */
-  def fillWeight(dataset: List[Double]): Layer = {
+  def fillWeight(dataset: List[Double], activationFunction: ActivationFunction): Layer = {
     // update all perceptrons with given dataset
     perceptrons.foreach { perceptron =>
       perceptron.weight = dataset(perceptron.index)
-      perceptron.output = perceptron.activationFunction.activation(perceptron.weight)
+      perceptron.output = activationFunction.activation(perceptron.weight)
     }
     // update bias to 1.0
     bias.foreach(bias => bias.output = 1.0)

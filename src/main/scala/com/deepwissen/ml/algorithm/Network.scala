@@ -35,7 +35,7 @@ class Network(val inputLayer: Layer,
 
   @transient
   private val synapsiesLookupPair: Map[(String, String), Synapsys] = synapsies.map { synapsys =>
-    ((synapsys.from, synapsys.to), synapsys)
+    ((synapsys.from.id, synapsys.to.id), synapsys)
   }.toMap
 
   /**
@@ -48,7 +48,7 @@ class Network(val inputLayer: Layer,
     synapsiesLookupPair(fromPerceptronId -> toPerceptronId)
 
   @transient
-  private val synapsiesLookupFrom: Map[String, Seq[Synapsys]] = synapsies.groupBy(_.from)
+  private val synapsiesLookupFrom: Map[String, Seq[Synapsys]] = synapsies.groupBy(_.from.id)
 
   /**
    * Get all synapsies that go from source perceptron
@@ -58,7 +58,7 @@ class Network(val inputLayer: Layer,
   def getSynapsiesFrom(perceptronId: String) = synapsiesLookupFrom(perceptronId)
 
   @transient
-  private val synapsiesLookupTo: Map[String, Seq[Synapsys]] = synapsies.groupBy(_.to)
+  private val synapsiesLookupTo: Map[String, Seq[Synapsys]] = synapsies.groupBy(_.to.id)
 
   /**
    * Get all synapsies that go to target perceptron
@@ -113,7 +113,7 @@ object Network {
    * @param hiddenSize hidden layer size
    * @return
    */
-  def apply(inputPerceptronSize: Int, hiddenSize: Int): Network = {
+  def apply(inputPerceptronSize: Int, hiddenSize: Int, synapsysFactory: SynapsysFactory): Network = {
     val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
     val outputPerceptronSize = 1
 
@@ -165,11 +165,7 @@ object Network {
           // create perceptrom from prev layer to next layer
           val currentSynapsies = prevPerceptrons.flatMap { prevPerceptron =>
             nextPerceptrons.map { nextPerceptron =>
-              Synapsys(
-                from = prevPerceptron.id,
-                to = nextPerceptron.id,
-                weight = newSynapsysWeight()
-              )
+              synapsysFactory(prevPerceptron, nextPerceptron)
             }
           }
           // go to next layer
@@ -232,11 +228,16 @@ object Network {
       })
     }
 
+    // all perceptron in network
+    val allPerceptrons = ((inputLayer.bias.get :: inputLayer.perceptrons) :::
+      hiddenLayers.flatMap(layer => layer.bias.get :: layer.perceptrons) :::
+      outputLayer.perceptrons).map(p => (p.id, p)).toMap
+
     // create synapsies
     val synapsies = model.synapsies.map { synapsys =>
       Synapsys(
-        from = synapsys.from,
-        to = synapsys.to,
+        from = allPerceptrons(synapsys.from),
+        to = allPerceptrons(synapsys.to),
         weight = synapsys.weight,
         deltaWeight = synapsys.deltaWeight
       )

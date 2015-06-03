@@ -67,8 +67,8 @@ object NetworkModel {
 
     val synapsies = network.synapsies.map { synapsys =>
       SynapsysModel(
-        from = synapsys.from,
-        to = synapsys.to,
+        from = synapsys.from.id,
+        to = synapsys.to.id,
         weight = synapsys.weight,
         deltaWeight = synapsys.deltaWeight
       )

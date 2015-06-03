@@ -32,10 +32,4 @@ package object algorithm {
    */
   def uuid(): String = UUID.randomUUID().toString.replaceAll("-", "")
 
-  /**
-   * Generate random weight
-   * @return double
-   */
-  def newSynapsysWeight(): Double = 0.05 * Math.random()
-
 }

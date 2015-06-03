@@ -14,7 +14,7 @@ import org.scalatest.FunSuite
 class NetworkTest extends FunSuite {
 
   test("create network object") {
-    val network = Network(5, 2)
+    val network = Network(5, 2, RandomSynapsysFactory())
 
     network.inputLayer.perceptrons.foreach { perceptron =>
       println(network.inputLayer.id + " input layer => " + perceptron.id)

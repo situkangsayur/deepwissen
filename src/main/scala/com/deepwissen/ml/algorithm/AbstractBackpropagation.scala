@@ -5,6 +5,8 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.function.ActivationFunction
+
 /**
  * Abstract implementation of Neural Network Backpropagation
  * @author Eko Khannedy
@@ -21,7 +23,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
   def getPerceptronWeight(network: Network, perceptron: Perceptron): Double = {
     val synapsies = network.getSynapsiesTo(perceptron.id)
     val weight = synapsies.foldLeft(0.0) { (value, synapsys) =>
-      value + (synapsys.weight * network.getPerceptron(synapsys.from).output)
+      value + (synapsys.weight * synapsys.from.output)
     }
     weight
   }
@@ -69,7 +71,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     if (synapsys.isFromBias)
       (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
     else
-      (parameter.learningRate * perceptron.error * network.getPerceptron(synapsys.from).output) + (parameter.momentum * synapsys.deltaWeight)
+      (parameter.learningRate * perceptron.error * synapsys.from.output) + (parameter.momentum * synapsys.deltaWeight)
   }
 
   /**
@@ -92,7 +94,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
         perceptron.weight = getPerceptronWeight(network, perceptron)
-        perceptron.output = perceptron.activationFunction.activation(perceptron.weight)
+        perceptron.output = parameter.activationFunction.activation(perceptron.weight)
       }
     }
 
@@ -101,7 +103,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
       perceptron.weight = getPerceptronWeight(network, perceptron)
-      perceptron.output = perceptron.activationFunction.activation(perceptron.weight)
+      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 
     /**
@@ -155,9 +157,10 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * Classification for given data with given network model
    * @param data data
    * @param network network model
+   * @param activationFunction activation function
    * @return double
    */
-  override def classification(data: Array[Double], network: Network): Double = {
+  override def classification(data: Array[Double], network: Network, activationFunction: ActivationFunction): Double = {
     // fill input layer
     network.inputLayer.fillOutput(data)
 
@@ -165,14 +168,14 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
         perceptron.weight = getPerceptronWeight(network, perceptron)
-        perceptron.output = perceptron.activationFunction.activation(perceptron.weight)
+        perceptron.output = activationFunction.activation(perceptron.weight)
       }
     }
 
     // fill output layer
     network.outputLayer.perceptrons.foreach { perceptron =>
       perceptron.weight = getPerceptronWeight(network, perceptron)
-      perceptron.output = perceptron.activationFunction.activation(perceptron.weight)
+      perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
     // calculate result

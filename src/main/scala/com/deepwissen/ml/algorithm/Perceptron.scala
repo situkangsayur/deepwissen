@@ -5,9 +5,8 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.function.{SigmoidFunction, ActivationFunction}
-
 /**
+ * Perceptron model class
  * @author Eko Khannedy
  * @since 2/25/15
  */
@@ -15,5 +14,4 @@ case class Perceptron(id: String,
                       index: Int,
                       var output: Double = 0.0,
                       var weight: Double = 0.0,
-                      var error: Double = 0.0,
-                      var activationFunction: ActivationFunction = SigmoidFunction)
+                      var error: Double = 0.0)

@@ -5,6 +5,8 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.function.{SigmoidFunction, ActivationFunction}
+
 /**
  * Base trait for training parameter
  * @author Eko Khannedy
@@ -15,6 +17,10 @@ trait TrainingParameter
 /**
  * Parameter for backpropragation algorithm
  */
-case class BackpropragationParameter(hiddenLayerSize: Int = 2, learningRate: Double = 0.5,
-                                     momentum: Double = 0.75, epsilon: Double = 0.000001,
+case class BackpropragationParameter(hiddenLayerSize: Int = 2,
+                                     learningRate: Double = 0.5,
+                                     synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
+                                     activationFunction: ActivationFunction = SigmoidFunction,
+                                     momentum: Double = 0.75,
+                                     epsilon: Double = 0.000001,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter

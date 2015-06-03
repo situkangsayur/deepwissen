@@ -7,7 +7,7 @@ package com.deepwissen.ml.algorithm
 
 import java.io.{File, FileInputStream, FileOutputStream}
 
-import com.deepwissen.ml.function.EitherThresholdFunction
+import com.deepwissen.ml.function.{SigmoidFunction, EitherThresholdFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.validation.{SplitValidation, Validation}
@@ -93,14 +93,16 @@ class Backpropagation$Test extends FunSuite {
     iteration = 70000,
     epsilon = 0.000000001,
     momentum = 0.75,
-    learningRate = 0.5
+    learningRate = 0.5,
+    synapsysFactory = RandomSynapsysFactory(),
+    activationFunction = SigmoidFunction
   )
 
   test("traininig and classification and save model") {
     // training
     val network = Backpropagation.train(finalDataSet, parameter)
 
-    val result = Validation.classification(network, Backpropagation, finalDataSet)
+    val result = Validation.classification(network, Backpropagation, finalDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = Validation.validate(result, finalDataSet, 4)
@@ -112,7 +114,7 @@ class Backpropagation$Test extends FunSuite {
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = Backpropagation.classification(data, network)
+      val realScore = Backpropagation.classification(data, network, SigmoidFunction)
       val percent = Math.round(realScore * 100)
       val score = if (realScore > 0.7) 1.0 else 0.0
       println(s"real $realScore == percent $percent% == score $score == targetClass ${data(4)}")
@@ -132,7 +134,7 @@ class Backpropagation$Test extends FunSuite {
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = Backpropagation.classification(data, network)
+      val realScore = Backpropagation.classification(data, network, SigmoidFunction)
       val percent = Math.round(realScore * 100)
       val score = if (realScore > 0.7) 1.0 else 0.0
       println(s"real $realScore == percent $percent% == score $score == targetClass ${data(4)}")
@@ -145,7 +147,7 @@ class Backpropagation$Test extends FunSuite {
     val (trainDataSet, classificationDataSet) = SplitValidation.split(finalDataSet, 70 -> 30)
     val network = Backpropagation.train(trainDataSet, parameter)
 
-    val result = Validation.classification(network, Backpropagation, classificationDataSet)
+    val result = Validation.classification(network, Backpropagation, classificationDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = Validation.validate(result, classificationDataSet, 4)
