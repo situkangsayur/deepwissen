@@ -12,11 +12,10 @@ package com.deepwissen.ml.priorknowledge
  */
 case class StandardPriorKnowledge(dataset: List[Array[String]]) extends PriorKnowledge[String, Int] {
 
-  private val lookupData: Map[Int, Map[String, Int]] = (0 until dataset.head.length).map { i =>
+  private val lookupData: Map[Int, Map[String, Int]] = dataset.head.indices.map { i =>
     val columnData = dataset.map(array => array(i))
     val columnDataDistict = columnData.distinct
     val columnDataPair = columnDataDistict.zipWithIndex.toMap
-
     i -> columnDataPair
   }.toMap
 

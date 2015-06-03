@@ -18,7 +18,7 @@ object StandardNormalization extends Normalization[List[Array[Double]]] {
    * @return normal dataset
    */
   override def normalize(dataset: List[Array[Double]]): List[Array[Double]] = {
-    val minMax: Map[Int, (Double, Double)] = (0 until dataset(0).length).map { i =>
+    val minMax: Map[Int, (Double, Double)] = dataset.head.indices.map { i =>
       val min = dataset.foldLeft(Double.MaxValue) { (value, current) =>
         if (value > current(i)) current(i) else value
       }
@@ -30,7 +30,7 @@ object StandardNormalization extends Normalization[List[Array[Double]]] {
     }.toMap
 
     dataset.map { array =>
-      (0 until dataset.head.length).map { i =>
+      dataset.head.indices.map { i =>
         val min = minMax(i)._1
         val max = minMax(i)._2
         (array(i) - min) / (max - min)
