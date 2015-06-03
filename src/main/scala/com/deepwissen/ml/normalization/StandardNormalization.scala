@@ -33,7 +33,7 @@ object StandardNormalization extends Normalization[List[Array[Double]]] {
       dataset.head.indices.map { i =>
         val min = minMax(i)._1
         val max = minMax(i)._2
-        (array(i) - min) / (max - min)
+        normalize(array(i), min, max)
       }.toArray
     }
   }
