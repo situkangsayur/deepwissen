@@ -15,6 +15,39 @@ import com.deepwissen.ml.function.ActivationFunction
 abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network] {
 
   /**
+   * Run training with given dataset
+   * @param dataset dataset
+   * @param parameter parameter
+   * @return model
+   */
+  override def train(dataset: DATASET, parameter: BackpropragationParameter): Network = {
+    val network = newNetwork(dataset, parameter)
+    doTrain(network, dataset, parameter)
+    network
+  }
+
+  /**
+   * Create new network from dataset and training parameter
+   * @param dataset dataset
+   * @param parameter parameter
+   * @return network
+   */
+  def newNetwork(dataset: DATASET, parameter: BackpropragationParameter): Network =
+    Network(
+      inputPerceptronSize = parameter.inputPerceptronSize,
+      hiddenSize = parameter.hiddenLayerSize,
+      synapsysFactory = parameter.synapsysFactory
+    )
+
+  /**
+   * Train implementation
+   * @param network network
+   * @param dataset dataset
+   * @param parameter training parameter
+   */
+  def doTrain(network: Network, dataset: DATASET, parameter: BackpropragationParameter): Unit
+
+  /**
    * Get perceptron weight, calculate from all synapsies and perceptron source
    * @param network network
    * @param perceptron perceptron

@@ -93,7 +93,8 @@ class OpenDataTest extends FunSuite {
     iteration = 70000,
     epsilon = 0.000000001,
     momentum = 0.75,
-    learningRate = 0.5
+    learningRate = 0.5,
+    inputPerceptronSize = dataset.head.length - 1
   )
 
   test("create model") {

@@ -16,11 +16,20 @@ trait TrainingParameter
 
 /**
  * Parameter for backpropragation algorithm
+ * @param inputPerceptronSize total perceptron in input layer
+ * @param hiddenLayerSize total hidden layer in network model default is 1
+ * @param synapsysFactory synapsys factory default is random synapsys factory
+ * @param activationFunction activation function default is sigmoid function
+ * @param learningRate learning rate default is 0.5
+ * @param momentum momentum default is 0.75
+ * @param epsilon epsilon default is 0.000001
+ * @param iteration total maximum iteration, default is Int.MaxValue
  */
-case class BackpropragationParameter(hiddenLayerSize: Int = 2,
-                                     learningRate: Double = 0.5,
+case class BackpropragationParameter(inputPerceptronSize: Int,
+                                     hiddenLayerSize: Int = 1,
                                      synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
                                      activationFunction: ActivationFunction = SigmoidFunction,
+                                     learningRate: Double = 0.5,
                                      momentum: Double = 0.75,
                                      epsilon: Double = 0.000001,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter

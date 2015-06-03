@@ -95,7 +95,8 @@ class Backpropagation$Test extends FunSuite {
     momentum = 0.75,
     learningRate = 0.5,
     synapsysFactory = RandomSynapsysFactory(),
-    activationFunction = SigmoidFunction
+    activationFunction = SigmoidFunction,
+    inputPerceptronSize = dataset.head.length - 1
   )
 
   test("traininig and classification and save model") {
