@@ -101,7 +101,7 @@ case class InputLayer(id: String,
   /**
    * Input layer doesn't have previous layer, it will allways return None
    */
-  override val prev: Option[Layer] = None
+  override var prev: Option[Layer] = None
 }
 
 /**
