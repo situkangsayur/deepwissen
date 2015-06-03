@@ -9,6 +9,11 @@ package com.deepwissen.ml.algorithm
  * Perceptron model class
  * @author Eko Khannedy
  * @since 2/25/15
+ * @param id perceptron id
+ * @param index index position in layer
+ * @param output output value
+ * @param weight weight value
+ * @param error error value
  */
 case class Perceptron(id: String,
                       index: Int,
