@@ -7,7 +7,7 @@ package com.deepwissen.ml.opendata
 
 import java.io.{File, FileOutputStream}
 
-import com.deepwissen.ml.algorithm.{BasicClassification, Backpropagation, BackpropragationParameter}
+import com.deepwissen.ml.algorithm.{BasicClassification, BasicBackpropagation, BackpropragationParameter}
 import com.deepwissen.ml.function.{SigmoidFunction, RangeThresholdFunction}
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.validation.Validation
@@ -98,7 +98,7 @@ class OpenDataTest extends FunSuite {
   )
 
   test("create model") {
-    val network = Backpropagation.train(dataset, parameter)
+    val network = BasicBackpropagation.train(dataset, parameter)
 
     val result = Validation.classification(network, BasicClassification, dataset, SigmoidFunction)
     val validate = Validation.validate(result, dataset, dataset.head.length - 1).map {

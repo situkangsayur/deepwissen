@@ -12,7 +12,7 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/25/15
  */
-object Backpropagation extends AbstractBackpropagation[List[Array[Double]]] {
+object BasicBackpropagation extends AbstractBackpropagation[List[Array[Double]]] {
 
   /**
    * Run training with given dataset

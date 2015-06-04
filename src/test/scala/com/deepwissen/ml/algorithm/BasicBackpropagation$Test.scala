@@ -17,7 +17,7 @@ import org.scalatest.FunSuite
  * @author Eko Khannedy
  * @since 2/26/15
  */
-class Backpropagation$Test extends FunSuite {
+class BasicBackpropagation$Test extends FunSuite {
 
   val outlook = Map(
     "sunny" -> 0.0,
@@ -101,7 +101,7 @@ class Backpropagation$Test extends FunSuite {
 
   test("traininig and classification and save model") {
     // training
-    val network = Backpropagation.train(finalDataSet, parameter)
+    val network = BasicBackpropagation.train(finalDataSet, parameter)
 
     val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
     println(result)
@@ -146,7 +146,7 @@ class Backpropagation$Test extends FunSuite {
   test("split validation") {
 
     val (trainDataSet, classificationDataSet) = SplitValidation.split(finalDataSet, 70 -> 30)
-    val network = Backpropagation.train(trainDataSet, parameter)
+    val network = BasicBackpropagation.train(trainDataSet, parameter)
 
     val result = Validation.classification(network, BasicClassification, classificationDataSet, SigmoidFunction)
     println(result)
