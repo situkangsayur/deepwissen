@@ -1,16 +1,9 @@
-/*
- * Copyright (c) 2015, DeepWissen and/or its affiliates. All rights reserved.
- * DEEPWISSEN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.deepwissen.ml.algorithm
 
 /**
- * Abstract implementation of Neural Network Backpropagation
- * @author Eko Khannedy
- * @since 3/14/15
+ * Created by hendri_k on 6/13/15.
  */
-abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network] {
+abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network]{
 
   /**
    * Run training with given dataset

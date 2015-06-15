@@ -27,9 +27,32 @@ trait TrainingParameter
  */
 case class BackpropragationParameter(inputPerceptronSize: Int,
                                      hiddenLayerSize: Int = 1,
+                                     outputPerceptronSize: Int = 1,
+                                     targetClassPosition: Int = -1,
                                      synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
                                      activationFunction: ActivationFunction = SigmoidFunction,
                                      learningRate: Double = 0.5,
                                      momentum: Double = 0.75,
                                      epsilon: Double = 0.000001,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter
+
+case class RbmParamter(inputPerceptronSize: Int,
+                       hiddenLayerSize: Int = 1,
+                       gibbsStep: Int = 3000,
+                       targetClassPosition: Int = -1,
+                       synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
+                       activationFunction: ActivationFunction = SigmoidFunction,
+                       learningRate: Double = 0.75,
+                       epsilon: Double = 0.000001,
+                       iteration: Int = Int.MaxValue) extends TrainingParameter
+
+case class DbnParamter(inputPerceptronSize: Int,
+                       hiddenLayerSize: Int = 1,
+                       outputPerceptronSize: Int = 1,
+                       gibbsStep: Int = 3000,
+                       targetClassPosition: Int = -1,
+                       synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
+                       activationFunction: ActivationFunction = SigmoidFunction,
+                       learningRate: Double = 0.75,
+                       epsilon: Double = 0.000001,
+                       iteration: Int = Int.MaxValue) extends TrainingParameter

@@ -76,5 +76,4 @@ object StochasticGradientDescentRegression {
                        epsilon: Double = 0.00000001D,
                        maxEpoch: Int = 200000,
                        alpha: Double = 0.1D)
-
 }
