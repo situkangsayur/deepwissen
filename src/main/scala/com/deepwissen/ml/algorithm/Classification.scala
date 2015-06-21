@@ -53,7 +53,7 @@ object BasicClassification extends Classification[Array[Double], Network] {
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Double], network: Network, activationFunction: ActivationFunction): Double = {
+  override def apply(data: Array[Double], network: Network, activationFunction: ActivationFunction): List[Double] = {
 
     // fill input layer
     network.inputLayer.fillOutput(data)
@@ -72,9 +72,10 @@ object BasicClassification extends Classification[Array[Double], Network] {
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
+    network.outputLayer.perceptrons.map(x => x.output)
     // calculate result
-    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-      value + perceptron.output
-    }
+//    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
+//      value + perceptron.output
+//    }
   }
 }

@@ -58,12 +58,13 @@ trait Layer {
    * @param data dataset
    * @return this layer
    */
-  def fillOutput(data: Array[Double]): Layer = {
+  def fillOutput(data: Array[Any]): Layer = {
+    val tempData = data.filterNot(p => p.isInstanceOf[List[Double]])
     // update all perceptrons with given dataset
     perceptrons.foreach { perceptron =>
       // make sure non error ArrayIndexOutOfBoundsException
-      if (perceptron.index >= 0 && perceptron.index < data.length)
-        perceptron.output = data(perceptron.index)
+      if (perceptron.index >= 0 && perceptron.index < tempData.length)
+        perceptron.output = tempData(perceptron.index).asInstanceOf[Double]
     }
     // update bias to 1.0
     bias.foreach(bias => bias.output = 1.0)
@@ -77,10 +78,10 @@ trait Layer {
    * @param activationFunction activation function
    * @return this layer
    */
-  def fillWeight(data: List[Double], activationFunction: ActivationFunction): Layer = {
+  def fillWeight(data: List[Any], activationFunction: ActivationFunction): Layer = {
     // update all perceptrons with given dataset
     perceptrons.foreach { perceptron =>
-      perceptron.weight = data(perceptron.index)
+      perceptron.weight = data(perceptron.index).asInstanceOf[Double]
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
     // update bias to 1.0

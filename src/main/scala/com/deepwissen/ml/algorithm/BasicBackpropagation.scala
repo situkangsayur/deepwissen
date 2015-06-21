@@ -12,7 +12,7 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/25/15
  */
-object BasicBackpropagation extends AbstractBackpropagation[List[Array[Double]]] {
+object BasicBackpropagation extends AbstractBackpropagation[List[Array[Any]]] {
 
   /**
    * Run training with given dataset
@@ -20,7 +20,7 @@ object BasicBackpropagation extends AbstractBackpropagation[List[Array[Double]]]
    * @param parameter training parameter
    * @return network model
    */
-  override def doTrain(network: Network, dataset: List[Array[Double]], parameter: BackpropragationParameter): Unit = {
+  override def doTrain(network: Network, dataset: List[Array[Any]], parameter: BackpropragationParameter): Unit = {
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {

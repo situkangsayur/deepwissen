@@ -26,7 +26,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
     Network(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSize = parameter.outputPerceptronSize,
+      outputPerceptronSizeParam = parameter.outputPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 

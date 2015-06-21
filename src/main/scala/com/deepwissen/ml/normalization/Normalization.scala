@@ -17,7 +17,7 @@ trait Normalization[T] {
    * @param dataset dataset
    * @return normal dataset
    */
-  def normalize(dataset: T): T
+  def normalize(dataset: T, targetClass : Int): T
 
   /**
    * Normalize value
@@ -26,7 +26,7 @@ trait Normalization[T] {
    * @param minValue min value
    * @return normal value
    */
-  def normalize(value: Double, minValue: Double, maxValue: Double) =
+  def normalize(value: Double, minValue: Double, maxValue: Double, targetClass : Int) =
     (value - minValue) / (maxValue - minValue)
 
   /**
@@ -36,7 +36,7 @@ trait Normalization[T] {
    * @param dataset dataset
    * @return double
    */
-  def denormalize(normalValue: Double, index: Int, dataset: T): Double
+  def denormalize(normalValue: Double, index: Int, dataset: T, targetClass: Int): Double
 
   /**
    * Denormalize value
@@ -45,7 +45,7 @@ trait Normalization[T] {
    * @param maxValue max value
    * @return value
    */
-  def denormalize(normalValue: Double, minValue: Double, maxValue: Double) =
+  def denormalize(normalValue: Double, minValue: Double, maxValue: Double, targetClass: Int) =
     (normalValue * (maxValue - minValue)) + minValue
 
 }

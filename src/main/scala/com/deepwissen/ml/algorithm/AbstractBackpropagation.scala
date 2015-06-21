@@ -34,7 +34,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     Network(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSize = parameter.outputPerceptronSize,
+      outputPerceptronSizeParam = parameter.outputPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
@@ -51,7 +51,8 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @param data data
    * @return
    */
-  def getTargetClass(data: Array[Double]) = data(data.length - 1)
+  def getTargetClass(data: Array[Any], targetClass: Int):List[Double] =
+    if(targetClass == -1) data(data.length - 1).asInstanceOf[List[Double]] else data(targetClass).asInstanceOf[List[Double]]
 
   /**
    * Get perceptron error calculation
@@ -62,11 +63,11 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @param parameter train parameter
    * @return error
    */
-  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Double], parameter: TrainingParameter): Double = {
+  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Any], parameter: BackpropragationParameter): Double = {
     layer.next match {
       case None =>
         // output layer
-        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data) - fromPerceptron.output)
+        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data, parameter.targetClassPosition)(fromPerceptron.index) - fromPerceptron.output)
 
       case Some(nextLayer) =>
         // hidden or input layer
@@ -99,7 +100,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @param parameter train parameter
    * @return sum error
    */
-  def doTrainData(data: Array[Double], network: Network, parameter: BackpropragationParameter): Double = {
+  def doTrainData(data: Array[Any], network: Network, parameter: BackpropragationParameter): Double = {
 
     /**
      * Update output for all input layer
@@ -166,7 +167,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      * Sum squared error
      */
     val sumError = network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-      value + Math.pow(getTargetClass(data) - perceptron.output, 2)
+      value + Math.pow(getTargetClass(data, parameter.targetClassPosition)(perceptron.index) - perceptron.output, 2)
     }
     sumError / network.outputLayer.perceptrons.length
   }

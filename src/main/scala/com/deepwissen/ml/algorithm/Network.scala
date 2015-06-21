@@ -123,9 +123,9 @@ object Network {
    * @param hiddenSize hidden layer size
    * @return
    */
-  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): Network = {
+  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSizeParam : Int,synapsysFactory: SynapsysFactory): Network = {
     val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
-    val outputPerceptronSize = outputPerceptronSize
+    val outputPerceptronSize = outputPerceptronSizeParam
 
     // create input layer
     val inputLayer = InputLayer(
@@ -214,7 +214,7 @@ object Network {
     // create output layer
     val outputLayer = new OutputLayer(
       id = model.outputLayer.id,
-      perceptrons = model.outputLayer.perceptrons.map(newPerceptron)
+      perceptrons = model.outputLayer.perceptrons.map(newPerceptron).sortBy(_.index)
     )
 
     // crate layer relation

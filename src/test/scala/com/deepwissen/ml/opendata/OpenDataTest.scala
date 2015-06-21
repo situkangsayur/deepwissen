@@ -90,6 +90,8 @@ class OpenDataTest extends FunSuite {
 
   val parameter = BackpropragationParameter(
     hiddenLayerSize = 1,
+    outputPerceptronSize = 1,
+    targetClassPosition = -1,
     iteration = 70000,
     epsilon = 0.000000001,
     momentum = 0.75,

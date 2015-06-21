@@ -27,7 +27,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     Network(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSize = parameter.inputPerceptronSize,
+      outputPerceptronSizeParam = parameter.inputPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
