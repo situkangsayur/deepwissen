@@ -22,7 +22,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, classification: Classification[Array[Any], Network], dataset: List[Array[Any]], activationFunction: ActivationFunction) =
+  def classification(network: Network, classification: Classification[Array[Any], Network], dataset: List[Array[Any]], activationFunction: ActivationFunction): List[List[Double]] =
     dataset.map(data => classification(data, network, activationFunction))
 
   /**
@@ -32,9 +32,9 @@ trait Validation {
    * @param targetClass targetClass index
    * @return validate result
    */
-  def validate(result: List[Layer], dataset: List[Array[Any]], targetClass: Int): List[(Double, Double)] = {
+  def validate(result: List[List[Double]], dataset: List[Array[Any]], targetClass: Int): List[(List[Double], List[Double])] = {
     result.zipWithIndex.map { case (value, index) =>
-      value -> dataset(index)(targetClass)
+      value -> (dataset(index)(targetClass)).asInstanceOf[List[Double]]
     }
   }
 
@@ -44,10 +44,13 @@ trait Validation {
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  def accuration(validateResult: List[(Double, Double)])(implicit thresholdFunction: ThresholdFunction): Double = {
-    val compareResult = validateResult.map { case (score, target) =>
-      thresholdFunction.compare(score, target)
-    }
+  def accuration(validateResult: List[(List[Double], List[Double])])(implicit thresholdFunction: ThresholdFunction): Double = {
+    val compareResult = validateResult.map(x => x._1.zip(x._2)).map(x => {
+      val  temp = x.map { case (score, target) =>
+        thresholdFunction.compare(score, target)
+      } filter(p => p == false)
+      if(temp.size == 0) true else false
+    })
     val totalData = compareResult.length
     val totalCorrect = compareResult.count(b => b)
     val accuration = 100.0 / totalData * totalCorrect

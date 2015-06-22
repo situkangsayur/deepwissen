@@ -124,10 +124,12 @@ class BasicBackpropagation$Test extends FunSuite {
     // classification
     finalDataSet.foreach { data =>
       val realScore = BasicClassification(data, network, SigmoidFunction)
-      val percent = Math.round(realScore * 100)
-      val score = if (realScore > 0.7) 1.0 else 0.0
-      println(s"real $realScore == percent $percent% == score $score == targetClass ${data(4)}")
-      assert(score == data(4))
+      realScore.foreach( p => {
+        val percent = Math.round(p * 100)
+        val score = if (p > 0.7) 1.0 else 0.0
+        println(s"real $p== percent $percent% == score $score == targetClass ${data(4)}")
+        assert(score == data(4))
+      })
     }
 
     // save model

@@ -23,7 +23,7 @@ trait Classification[DATA, MODEL] {
    * @param activationFunction activation function
    * @return classification result
    */
-  def apply(data: DATA, model: MODEL, activationFunction: ActivationFunction): Double
+  def apply(data: DATA, model: MODEL, activationFunction: ActivationFunction): List[Double]
 
   /**
    * Run classification async
@@ -34,7 +34,7 @@ trait Classification[DATA, MODEL] {
    * @return
    */
   def async(data: DATA, model: MODEL, activationFunction: ActivationFunction)
-           (implicit executionContext: ExecutionContext): Future[Double] =
+           (implicit executionContext: ExecutionContext): Future[List[Double]] =
     Future(apply(data, model, activationFunction))
 
 }
@@ -44,7 +44,7 @@ trait Classification[DATA, MODEL] {
  * @author Eko Khannedy
  * @since 6/3/15
  */
-object BasicClassification extends Classification[Array[Double], Network] {
+object BasicClassification extends Classification[Array[Any], Network] {
 
   /**
    * Run classification
@@ -53,7 +53,7 @@ object BasicClassification extends Classification[Array[Double], Network] {
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Double], network: Network, activationFunction: ActivationFunction): List[Double] = {
+  override def apply(data: Array[Any], network: Network, activationFunction: ActivationFunction): List[Double] = {
 
     // fill input layer
     network.inputLayer.fillOutput(data)
