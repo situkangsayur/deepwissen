@@ -123,9 +123,8 @@ object Network {
    * @param hiddenSize hidden layer size
    * @return
    */
-  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSizeParam : Int,synapsysFactory: SynapsysFactory): Network = {
+  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): Network = {
     val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
-    val outputPerceptronSize = outputPerceptronSizeParam
 
     // create input layer
     val inputLayer = InputLayer(
