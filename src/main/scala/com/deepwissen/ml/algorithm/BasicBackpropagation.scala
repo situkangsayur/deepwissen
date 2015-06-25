@@ -5,6 +5,8 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.utils.Denomination
+
 import scala.annotation.tailrec
 
 /**
@@ -12,7 +14,7 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/25/15
  */
-object BasicBackpropagation extends AbstractBackpropagation[List[Array[Any]]] {
+object BasicBackpropagation extends AbstractBackpropagation[List[Array[Denomination[_]]]] {
 
   /**
    * Run training with given dataset
@@ -20,7 +22,7 @@ object BasicBackpropagation extends AbstractBackpropagation[List[Array[Any]]] {
    * @param parameter training parameter
    * @return network model
    */
-  override def doTrain(network: Network, dataset: List[Array[Any]], parameter: BackpropragationParameter): Unit = {
+  override def doTrain(network: Network, dataset: List[Array[Denomination[_]]], parameter: BackpropragationParameter): Unit = {
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {

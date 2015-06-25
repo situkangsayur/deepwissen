@@ -17,13 +17,13 @@ class DatasetTest extends FunSuite {
     Dataset.weatherLines.foreach(item => println(item))
     Dataset.weather.foreach(item => println(item.mkString(" | ")))
     Dataset.weatherRealDataset.foreach(item => println(item.mkString(" | ")))
-    Dataset.weatherDataset.foreach(item => println(item.mkString(" | ")))
+//    Dataset.weatherDataset.foreach(item => println(item.mkString(" | ")))
   }
 
   test("test gdp dataset") {
     Dataset.gdpLines.foreach(item => println(item))
     Dataset.gdpRealDataset.foreach(item => println(item.mkString(" | ")))
-    Dataset.gdpDataset.foreach(item => println(item.mkString(" | ")))
+//    Dataset.gdpDataset.foreach(item => println(item.mkString(" | ")))
   }
 
 }

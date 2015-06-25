@@ -5,6 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.utils.Denomination
 import org.apache.hadoop.hbase.client._
 
 import scala.annotation.tailrec
@@ -39,7 +40,7 @@ object HBaseBackpropagation extends AbstractBackpropagation[HBaseDataset] {
         def train(error: Double): Double = {
           if (iterator.hasNext) {
             val data = dataset.converter(iterator.next())
-            val trainResult = doTrainData(data, network, parameter)
+            val trainResult = doTrainData(data.asInstanceOf[Array[Denomination[_]]], network, parameter)
             train(error + trainResult)
           } else {
             error
@@ -68,4 +69,4 @@ object HBaseBackpropagation extends AbstractBackpropagation[HBaseDataset] {
  */
 case class HBaseDataset(resultScanner: () => ResultScanner,
                         length: Long,
-                        converter: Result => Array[Double])
+                        converter: Result => Array[Any])

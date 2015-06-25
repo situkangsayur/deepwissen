@@ -1,5 +1,7 @@
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.utils.{FieldValue, Denomination}
+
 /**
  * Created by hendri_k on 6/13/15.
  */
@@ -26,7 +28,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
     Network(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSizeParam = parameter.outputPerceptronSize,
+      outputPerceptronSize = parameter.outputPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
@@ -43,7 +45,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param data data
    * @return
    */
-  def getTargetClass(data: Array[Double]) = data(data.length - 1)
+  def getTargetClass(data: Array[Denomination[_]]) = data(data.length - 1).asInstanceOf[FieldValue]
 
   /**
    * Get perceptron error calculation
@@ -54,11 +56,11 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return error
    */
-  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Double], parameter: TrainingParameter): Double = {
+  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
     layer.next match {
       case None =>
         // output layer
-        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data) - fromPerceptron.output)
+        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data).get - fromPerceptron.output)
 
       case Some(nextLayer) =>
         // hidden or input layer
@@ -91,7 +93,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return sum error
    */
-  def doTrainData(data: Array[Double], network: Network, parameter: BackpropragationParameter): Double = {
+  def doTrainData(data: Array[Denomination[_]], network: Network, parameter: BackpropragationParameter): Double = {
 
     /**
      * Update output for all input layer
@@ -158,7 +160,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
      * Sum squared error
      */
     val sumError = network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-      value + Math.pow(getTargetClass(data) - perceptron.output, 2)
+      value + Math.pow(getTargetClass(data).get - perceptron.output, 2)
     }
     sumError / network.outputLayer.perceptrons.length
   }

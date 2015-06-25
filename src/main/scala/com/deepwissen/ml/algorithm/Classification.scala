@@ -6,6 +6,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
+import com.deepwissen.ml.utils.Denomination
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -44,7 +45,7 @@ trait Classification[DATA, MODEL] {
  * @author Eko Khannedy
  * @since 6/3/15
  */
-object BasicClassification extends Classification[Array[Any], Network] {
+object BasicClassification extends Classification[Array[Denomination[_]], Network] {
 
   /**
    * Run classification
@@ -53,7 +54,7 @@ object BasicClassification extends Classification[Array[Any], Network] {
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Any], network: Network, activationFunction: ActivationFunction): List[Double] = {
+  override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): List[Double] = {
 
     // fill input layer
     network.inputLayer.fillOutput(data)

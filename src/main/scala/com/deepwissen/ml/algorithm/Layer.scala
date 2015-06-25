@@ -6,6 +6,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
+import com.deepwissen.ml.utils.{FieldValue, TargetValue, Denomination}
 
 /**
  * Layer model class
@@ -58,13 +59,13 @@ trait Layer {
    * @param data dataset
    * @return this layer
    */
-  def fillOutput(data: Array[Any]): Layer = {
-    val tempData = data.filterNot(p => p.isInstanceOf[List[Double]])
+  def fillOutput(data: Array[Denomination[_]]): Layer = {
+    val tempData = data.filterNot(p => p.isInstanceOf[TargetValue])
     // update all perceptrons with given dataset
     perceptrons.foreach { perceptron =>
       // make sure non error ArrayIndexOutOfBoundsException
       if (perceptron.index >= 0 && perceptron.index < tempData.length)
-        perceptron.output = tempData(perceptron.index).asInstanceOf[Double]
+        perceptron.output = tempData(perceptron.index).get.asInstanceOf[FieldValue].get
     }
     // update bias to 1.0
     bias.foreach(bias => bias.output = 1.0)

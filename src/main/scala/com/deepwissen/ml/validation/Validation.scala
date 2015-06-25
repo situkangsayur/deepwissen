@@ -7,6 +7,7 @@ package com.deepwissen.ml.validation
 
 import com.deepwissen.ml.algorithm._
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
+import com.deepwissen.ml.utils.Denomination
 
 /**
  * Base trait for algorithm validation
@@ -22,7 +23,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, classification: Classification[Array[Any], Network], dataset: List[Array[Any]], activationFunction: ActivationFunction): List[List[Double]] =
+  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[List[Double]] =
     dataset.map(data => classification(data, network, activationFunction))
 
   /**
@@ -32,7 +33,7 @@ trait Validation {
    * @param targetClass targetClass index
    * @return validate result
    */
-  def validate(result: List[List[Double]], dataset: List[Array[Any]], targetClass: Int): List[(List[Double], List[Double])] = {
+  def validate(result: List[List[Double]], dataset: List[Array[Denomination[_]]], targetClass: Int): List[(List[Double], List[Double])] = {
     result.zipWithIndex.map { case (value, index) =>
       value -> (dataset(index)(targetClass)).asInstanceOf[List[Double]]
     }

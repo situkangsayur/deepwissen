@@ -100,17 +100,17 @@ class OpenDataTest extends FunSuite {
   )
 
   test("create model") {
-    val network = BasicBackpropagation.train(dataset, parameter)
+//    val network = BasicBackpropagation.train(dataset, parameter)
 
-    val result = Validation.classification(network, BasicClassification, dataset, SigmoidFunction)
-    val validate = Validation.validate(result, dataset, dataset.head.length - 1).map {
-      case (key, value) => (math.round(key * 100) / 100.0) -> (math.round(value * 100) / 100.0)
-    }
-    validate.foreach(data => println(s" prediksi ${data._1} => data asli ${data._2}"))
-    val accuration = Validation.accuration(validate)(RangeThresholdFunction(0.01))
-    println("accuration => " + accuration)
-
-    NetworkSerialization.save(network, new FileOutputStream(new File("target" + File.separator + "gdp.json")))
+//    val result = Validation.classification(network, BasicClassification, dataset, SigmoidFunction)
+//    val validate = Validation.validate(result, dataset, dataset.head.length - 1).map {
+//      case (key, value) => (math.round(key * 100) / 100.0) -> (math.round(value * 100) / 100.0)
+//    }
+//    validate.foreach(data => println(s" prediksi ${data._1} => data asli ${data._2}"))
+//    val accuration = Validation.accuration(validate)(RangeThresholdFunction(0.01))
+//    println("accuration => " + accuration)
+//
+//    NetworkSerialization.save(network, new FileOutputStream(new File("target" + File.separator + "gdp.json")))
   }
 
 }

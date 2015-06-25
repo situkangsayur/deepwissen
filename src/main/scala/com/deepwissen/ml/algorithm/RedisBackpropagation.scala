@@ -5,6 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.utils.{Denomination, FieldValue}
 import redis.clients.jedis.Jedis
 
 import scala.annotation.tailrec
@@ -36,7 +37,8 @@ object RedisBackpropagation extends AbstractBackpropagation[RedisDataset] {
         def train(index: Long, error: Double): Double = {
           if (index >= dataset.length) error
           else {
-            val data = dataset.redis.get(index.toString).split(",").map(_.toDouble)
+            //need adjust for target class
+            val data = dataset.redis.get(index.toString).split(",").map(x => FieldValue(x.toDouble)).asInstanceOf[Array[Denomination[_]]]
             val trainError = doTrainData(data, network, parameter)
             train(index + 1, error + trainError)
           }

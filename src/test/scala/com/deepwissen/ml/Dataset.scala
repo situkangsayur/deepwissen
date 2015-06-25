@@ -43,7 +43,7 @@ object Dataset {
     array.toArray
   }
 
-  val weatherDataset = StandardNormalization.normalize(weatherRealDataset)
+//  val weatherDataset = StandardNormalization.normalize(weatherRealDataset)
 
   val gdpLines =
     """
@@ -95,6 +95,6 @@ object Dataset {
     value.split(",").map(value => value.toDouble)
   }.toList
 
-  val gdpDataset = StandardNormalization.normalize(gdpRealDataset)
+//  val gdpDataset = StandardNormalization.normalize(gdpRealDataset)
 
 }
