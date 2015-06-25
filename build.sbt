@@ -12,6 +12,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 // Uncomment to use Akka
 //libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.3.9"
 
+libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.9"
+
 libraryDependencies += "org.specs2" %% "specs2-core" % "2.4.15" % "test"
 
 libraryDependencies += "org.apache.hadoop" % "hadoop-client" % "2.6.0"

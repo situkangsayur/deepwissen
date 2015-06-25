@@ -13,6 +13,7 @@ import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, TargetValue, FieldValue}
 import com.deepwissen.ml.validation.{SplitValidation, Validation}
 import org.scalatest.FunSuite
+import org.slf4j.LoggerFactory
 
 import scala.xml.MinimizeMode
 
@@ -109,35 +110,48 @@ class BasicBackpropagation$Test extends FunSuite {
   }
 
 
+  var logger  = LoggerFactory.getLogger("Main Objects")
 
   test("traininig and classification and save model") {
     // training
-    val network = BasicBackpropagation.train(finalDataSet, parameter)
+    try {
 
-    val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
-    println(result)
+      logger.info(finalDataSet.toString())
 
-    val validateResult = Validation.validate(result, finalDataSet, 4)
-    val accuration = Validation.accuration(validateResult) {
-      EitherThresholdFunction(0.7, 0.0, 1.0)
+      val network = BasicBackpropagation.train(finalDataSet, parameter)
+
+      logger.info(network.toString())
+
+      val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+      logger.info(result.toString())
+
+      val validateResult = Validation.validate(result, finalDataSet, 4)
+
+      logger.info(validateResult.toString())
+      val accuration = Validation.accuration(validateResult) {
+        EitherThresholdFunction(0.7, 0.0, 1.0)
+      }
+
+      logger.info(accuration.toString())
+
+      // classification
+      finalDataSet.foreach { data =>
+        val realScore = BasicClassification(data, network, SigmoidFunction)
+        realScore.foreach(p => {
+          val percent = Math.round(p * 100)
+          val score = if (p > 0.7) 1.0 else 0.0
+          println(s"real $p== percent $percent% == score $score == targetClass ${data(4)}")
+          assert(score == data(4))
+        })
+      }
+
+      // save model
+      NetworkSerialization.save(network, new FileOutputStream(
+        new File("target" + File.separator + "cuaca.json")))
+    }catch {
+      case npe : NullPointerException => npe.printStackTrace()
+      case e : Exception => e.printStackTrace()
     }
-
-    println(accuration)
-
-    // classification
-    finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, network, SigmoidFunction)
-      realScore.foreach( p => {
-        val percent = Math.round(p * 100)
-        val score = if (p > 0.7) 1.0 else 0.0
-        println(s"real $p== percent $percent% == score $score == targetClass ${data(4)}")
-        assert(score == data(4))
-      })
-    }
-
-    // save model
-    NetworkSerialization.save(network, new FileOutputStream(
-      new File("target" + File.separator + "cuaca.json")))
   }
 
 //  test("load model and classification") {
