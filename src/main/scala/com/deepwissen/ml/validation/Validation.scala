@@ -7,7 +7,7 @@ package com.deepwissen.ml.validation
 
 import com.deepwissen.ml.algorithm._
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
-import com.deepwissen.ml.utils.Denomination
+import com.deepwissen.ml.utils.{TargetValue, Denomination}
 
 /**
  * Base trait for algorithm validation
@@ -23,7 +23,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[List[Double]] =
+  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
     dataset.map(data => classification(data, network, activationFunction))
 
   /**
@@ -33,9 +33,9 @@ trait Validation {
    * @param targetClass targetClass index
    * @return validate result
    */
-  def validate(result: List[List[Double]], dataset: List[Array[Denomination[_]]], targetClass: Int): List[(List[Double], List[Double])] = {
+  def validate(result: List[Denomination[_]], dataset: List[Array[Denomination[_]]], targetClass: Int): List[(Denomination[_], Denomination[_])] = {
     result.zipWithIndex.map { case (value, index) =>
-      value -> (dataset(index)(targetClass)).asInstanceOf[List[Double]]
+      value -> (dataset(index)(targetClass))
     }
   }
 
@@ -45,8 +45,8 @@ trait Validation {
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  def accuration(validateResult: List[(List[Double], List[Double])])(implicit thresholdFunction: ThresholdFunction): Double = {
-    val compareResult = validateResult.map(x => x._1.zip(x._2)).map(x => {
+  def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
+    val compareResult = validateResult.map(x => x._1.asInstanceOf[TargetValue].get.zip(x._2.asInstanceOf[TargetValue].get)).map(x => {
       val  temp = x.map { case (score, target) =>
         thresholdFunction.compare(score, target)
       } filter(p => p == false)

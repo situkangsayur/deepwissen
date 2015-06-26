@@ -6,7 +6,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
-import com.deepwissen.ml.utils.Denomination
+import com.deepwissen.ml.utils.{TargetValue, Denomination}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -24,7 +24,7 @@ trait Classification[DATA, MODEL] {
    * @param activationFunction activation function
    * @return classification result
    */
-  def apply(data: DATA, model: MODEL, activationFunction: ActivationFunction): List[Double]
+  def apply(data: DATA, model: MODEL, activationFunction: ActivationFunction): Denomination[_]
 
   /**
    * Run classification async
@@ -35,7 +35,7 @@ trait Classification[DATA, MODEL] {
    * @return
    */
   def async(data: DATA, model: MODEL, activationFunction: ActivationFunction)
-           (implicit executionContext: ExecutionContext): Future[List[Double]] =
+           (implicit executionContext: ExecutionContext): Future[Denomination[_]] =
     Future(apply(data, model, activationFunction))
 
 }
@@ -54,7 +54,7 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): List[Double] = {
+  override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): Denomination[_] = {
 
     // fill input layer
     network.inputLayer.fillOutput(data)
@@ -73,7 +73,7 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
-    network.outputLayer.perceptrons.map(x => x.output)
+    TargetValue(network.outputLayer.perceptrons.map(x => x.output))
     // calculate result
 //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
 //      value + perceptron.output

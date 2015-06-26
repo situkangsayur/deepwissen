@@ -118,11 +118,12 @@ class AutoEncoder$Test extends FunSuite{
     // classification
     finalDataSet.foreach { data =>
       val realScore = BasicClassification(data, network, SigmoidFunction)
-      realScore.foreach( p => {
-        val percent = Math.round(p * 100)
-        val score = if (p > 0.7) 1.0 else 0.0
-        println(s"real $p== percent $percent% == score $score == targetClass ${data(4)}")
-        assert(score == data(4))
+      realScore.asInstanceOf[TargetValue].get.zipWithIndex.foreach(p => {
+        val percent = Math.round(p._1 * 100.0)
+        val score = if (p._1 > 0.7) 1.0 else 0.0
+        val originalClass = data(targetClass).asInstanceOf[TargetValue].get(p._2)
+        println(s"real $p== percent $percent% == score $score == targetClass ${originalClass}")
+        assert(score == originalClass)
       })
     }
 
