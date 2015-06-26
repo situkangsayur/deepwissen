@@ -34,12 +34,13 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
 
     dataset.map { array =>
       dataset.head.indices.map { i =>
-        if(i != targetClass) {
+        val temp: Denomination[_] = if(i != targetClass) {
           val min = minMax(i)._1
           val max = minMax(i)._2
           normalize(array(i).asInstanceOf[FieldValue].get, min, max, targetClass)
-        }else array(i).asInstanceOf[TargetValue]
-      }.toArray.asInstanceOf[Array[Denomination[_]]]
+        } else array(i)
+        temp
+      }.toArray
     }
   }
 

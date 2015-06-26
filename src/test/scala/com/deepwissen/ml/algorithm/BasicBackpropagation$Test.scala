@@ -46,8 +46,8 @@ class BasicBackpropagation$Test extends FunSuite {
   )
 
   val play = Map(
-    "no" -> TargetValue(List(0.0,1.0)),
-    "yes" -> TargetValue(List(1.0, 0.0))
+    "no" -> TargetValue(List(0.0,0.0)),
+    "yes" -> TargetValue(List(0.0,1.0))
   )
 
   val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
@@ -71,6 +71,15 @@ class BasicBackpropagation$Test extends FunSuite {
     """.stripMargin.trim.split("\n")
 
 
+
+
+  val dataset = strings.map { string =>
+    string.split(",").zipWithIndex.map {
+      case (value, index) =>
+        (index, value)
+    }
+  }
+
   /**
    * Training Parameter
    */
@@ -84,15 +93,9 @@ class BasicBackpropagation$Test extends FunSuite {
     learningRate = 0.5,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
-    inputPerceptronSize = dataset.head.length - 2
+    inputPerceptronSize = dataset.head.length - 1
   )
 
-  val dataset = strings.map { string =>
-    string.split(",").zipWithIndex.map {
-      case (value, index) =>
-        (index, value)
-    }
-  }
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
 
   val finalDataSet = StandardNormalization.normalize(
@@ -120,19 +123,18 @@ class BasicBackpropagation$Test extends FunSuite {
 
       val network = BasicBackpropagation.train(finalDataSet, parameter)
 
-      logger.info(network.toString())
-
       val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
-      logger.info(result.toString())
+      logger.info("result finding : "+ result.toString())
 
       val validateResult = Validation.validate(result, finalDataSet, 4)
 
-      logger.info(validateResult.toString())
+      logger.info("after validation result : "+validateResult.toString())
+
       val accuration = Validation.accuration(validateResult) {
         EitherThresholdFunction(0.7, 0.0, 1.0)
       }
 
-      logger.info(accuration.toString())
+      logger.info("after accuration counting : "+accuration.toString())
 
       // classification
       finalDataSet.foreach { data =>

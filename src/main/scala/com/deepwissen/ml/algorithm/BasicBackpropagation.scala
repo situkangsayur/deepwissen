@@ -34,7 +34,7 @@ object BasicBackpropagation extends AbstractBackpropagation[List[Array[Denominat
         // run training
         val trainError = dataset.foldLeft(0.0)((value, data) => value + doTrainData(data, network, parameter))
         // next iteration
-        iterate(iteration + 1, trainError / dataset.length)
+        iterate(iteration + 1, trainError / (2 * dataset.length * parameter.outputPerceptronSize))
       }
     }
 

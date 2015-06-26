@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.utils.{TargetValue, Denomination}
+import com.deepwissen.ml.utils.{LogPrint, TargetValue, Denomination}
 
 /**
  * Abstract implementation of Neural Network Backpropagation
@@ -66,17 +66,23 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @return error
    */
   def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: BackpropragationParameter): Double = {
+
     layer.next match {
       case None =>
+        val tempError = fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data, parameter.targetClassPosition).get(fromPerceptron.index) - fromPerceptron.output)
+        LogPrint.printLogDebug("Output layeroutput --> output " + fromPerceptron.index + " :> "+ fromPerceptron.output + " - " + getTargetClass(data, parameter.targetClassPosition).get(fromPerceptron.index) + " = "+ tempError)
+
         // output layer
-        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data, parameter.targetClassPosition).get(fromPerceptron.index) - fromPerceptron.output)
+        tempError
 
       case Some(nextLayer) =>
         // hidden or input layer
         val sigmaError = nextLayer.perceptrons.foldLeft(0.0) { (value, toPerceptron) =>
           value + toPerceptron.error * network.getSynapsys(fromPerceptron.id, toPerceptron.id).weight
         }
-        fromPerceptron.output * (1 - fromPerceptron.output) * sigmaError
+        val tempErrorHidden = fromPerceptron.output * (1 - fromPerceptron.output) * sigmaError
+        LogPrint.printLogDebug("output layer ---> output " + fromPerceptron.index + " :> " + tempErrorHidden)
+        tempErrorHidden
     }
   }
 
@@ -109,13 +115,18 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      */
     network.inputLayer.fillOutput(data)
 
+
     /**
      * Update weight and output for all hidden layers
      */
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = network.getPerceptronWeight(perceptron)
-        perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+        val tempWeight = network.getPerceptronWeight(perceptron)
+//        parameter.activationFunction.activation(perceptron.weight)
+        val tempOutput = parameter.activationFunction.activation(tempWeight)
+        LogPrint.printLogDebug("hidden layer :> "+ layer.id + " --> "+ perceptron.index + " :> " + tempWeight + " & " + tempOutput)
+        perceptron.weight = tempWeight
+        perceptron.output = tempOutput
       }
     }
 
@@ -123,8 +134,12 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      * Update weight and output for output layer
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeight(perceptron)
-      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+      val tempWeight = network.getPerceptronWeight(perceptron)
+//      parameter.activationFunction.activation(perceptron.weight)
+      val tempOutput = parameter.activationFunction.activation(tempWeight)
+      LogPrint.printLogDebug("Output layer :> " + " --> "+ perceptron.index + " :> " + tempWeight + " & " + tempOutput)
+      perceptron.weight = tempWeight
+      perceptron.output = tempOutput
     }
 
     /**
@@ -171,7 +186,10 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     val sumError = network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
       value + Math.pow(getTargetClass(data, parameter.targetClassPosition).get(perceptron.index) - perceptron.output, 2)
     }
-    sumError / network.outputLayer.perceptrons.length
+//    val tempSumOfError = sumError / network.outputLayer.perceptrons.length
+    val tempSumOfError = sumError
+    LogPrint.printLogDebug("<--------------------------->"+tempSumOfError+"<--------------------------->")
+    tempSumOfError
   }
 
 }

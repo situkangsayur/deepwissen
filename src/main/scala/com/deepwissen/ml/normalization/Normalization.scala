@@ -5,6 +5,8 @@
 
 package com.deepwissen.ml.normalization
 
+import com.deepwissen.ml.utils.FieldValue
+
 /**
  * @author Eko Khannedy
  * @since 3/1/15
@@ -27,7 +29,7 @@ trait Normalization[T] {
    * @return normal value
    */
   def normalize(value: Double, minValue: Double, maxValue: Double, targetClass : Int) =
-    (value - minValue) / (maxValue - minValue)
+    FieldValue((value - minValue) / (maxValue - minValue))
 
   /**
    * Denormalize normal value
