@@ -8,6 +8,7 @@ import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, TargetValue, FieldValue}
 import com.deepwissen.ml.validation.{SplitValidation, Validation}
 import org.scalatest.FunSuite
+import org.slf4j.LoggerFactory
 
 /**
  * Created by hendri_k on 6/21/15.
@@ -37,8 +38,8 @@ class AutoEncoder$Test extends FunSuite{
   )
 
   val play = Map(
-    "no" -> TargetValue(List(0.0,1.0)),
-    "yes" -> TargetValue(List(1.0, 0.0))
+    "no" -> TargetValue(List(0.0,0.0)),
+    "yes" -> TargetValue(List(0.0,1.0))
   )
 
   val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
@@ -62,12 +63,21 @@ class AutoEncoder$Test extends FunSuite{
     """.stripMargin.trim.split("\n")
 
 
+
+
+  val dataset = strings.map { string =>
+    string.split(",").zipWithIndex.map {
+      case (value, index) =>
+        (index, value)
+    }
+  }
+
   /**
    * Training Parameter
    */
   val parameter = BackpropragationParameter(
     hiddenLayerSize = 1,
-    outputPerceptronSize = 1,
+    outputPerceptronSize = 2,
     targetClassPosition = -1,
     iteration = 70000,
     epsilon = 0.000000001,
@@ -78,12 +88,6 @@ class AutoEncoder$Test extends FunSuite{
     inputPerceptronSize = dataset.head.length - 1
   )
 
-  val dataset = strings.map { string =>
-    string.split(",").zipWithIndex.map {
-      case (value, index) =>
-        (index, value)
-    }
-  }
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
 
   val finalDataSet = StandardNormalization.normalize(
@@ -99,6 +103,9 @@ class AutoEncoder$Test extends FunSuite{
   finalDataSet.foreach { array =>
     println(array.mkString(","))
   }
+
+  var logger  = LoggerFactory.getLogger("Main Objects")
+
 
 
   test("traininig and classification and save model") {
@@ -121,7 +128,7 @@ class AutoEncoder$Test extends FunSuite{
       realScore.asInstanceOf[TargetValue].get.zipWithIndex.foreach(p => {
         val percent = Math.round(p._1 * 100.0)
         val score = if (p._1 > 0.7) 1.0 else 0.0
-        val originalClass = data(targetClass).asInstanceOf[TargetValue].get(p._2)
+        val originalClass = data(p._2).asInstanceOf[FieldValue].get
         println(s"real $p== percent $percent% == score $score == targetClass ${originalClass}")
         assert(score == originalClass)
       })
@@ -132,7 +139,7 @@ class AutoEncoder$Test extends FunSuite{
       new File("target" + File.separator + "cuaca.json")))
   }
 //
-//  test("load model and classification") {
+//  test("load model and classifications") {
 //
 //    // load model
 //    val network = NetworkSerialization.load(new FileInputStream(

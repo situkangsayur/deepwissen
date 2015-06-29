@@ -19,7 +19,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     network
   }
 
-  /**
+  /**n
    * Create new network from dataset and training parameter
    * @param dataset dataset
    * @param parameter parameter
