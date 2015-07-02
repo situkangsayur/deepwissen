@@ -1,40 +1,39 @@
 package com.deepwissen.ml.algorithm
 
-import java.io.{FileInputStream, File, FileOutputStream}
+import java.io.{File, FileOutputStream}
 
-import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFunction, SigmoidFunction}
+import com.deepwissen.ml.function.{EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{SplitValidation, Validation}
+import com.deepwissen.ml.validation.Validation
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
 /**
- * Created by hendri_k on 6/21/15.
+ * Created by hendri_k on 6/30/15.
  */
-class AutoEncoder$Test extends FunSuite{
-
+class AutoEncoderBinary$Test extends FunSuite{
   val outlook = Map(
-    "sunny" -> ContValue(0.0),
-    "overcast" -> ContValue(1.0),
-    "rainy" -> ContValue(2.0)
+    "sunny" -> BinaryValue(List(0.0,0.0)),
+    "overcast" -> BinaryValue(List(0.0,1.0)),
+    "rainy" -> BinaryValue(List(1.0,0.0))
   )
 
   val temperature = Map(
-    "hot" -> ContValue(0.0),
-    "mild" -> ContValue(1.0),
-    "cool" -> ContValue(2.0)
+    "hot" -> BinaryValue(List(0.0,0.0)),
+    "mild" -> BinaryValue(List(0.0,1.0)),
+    "cool" -> BinaryValue(List(1.0,0.0))
   )
 
   val humidity = Map(
-    "high" -> ContValue(0.0),
-    "normal" -> ContValue(1.0)
+    "high" -> BinaryValue(List(0.0,0.0)),
+    "normal" -> BinaryValue(List(0.0,1.0))
   )
 
   val windy = Map(
-    "TRUE" -> ContValue(0.0),
-    "FALSE" -> ContValue(1.0)
+    "TRUE" -> BinaryValue(List(0.0,0.0)),
+    "FALSE" -> BinaryValue(List(0.0,1.0))
   )
 
   val play = Map(
@@ -79,10 +78,10 @@ class AutoEncoder$Test extends FunSuite{
     hiddenLayerSize = 1,
     outputPerceptronSize = 2,
     targetClassPosition = -1,
-    iteration = 100000,
-    epsilon = 0.000001,
-    momentum = 0.50,
-    learningRate = 0.50,
+    iteration = 70000,
+    epsilon = 0.000000001,
+    momentum = 0.75,
+    learningRate = 0.5,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
     inputPerceptronSize = dataset.head.length - 1
@@ -108,7 +107,7 @@ class AutoEncoder$Test extends FunSuite{
 
 
 
-  test("traininig and classification and save model") {
+  test("traininig and classification using binary and save model") {
     // training
     val network = Autoencoder.train(finalDataSet, parameter)
 
@@ -122,68 +121,21 @@ class AutoEncoder$Test extends FunSuite{
 
     println(accuration)
 
-    val threshold = RangeThresholdFunction(0.15)
-
-    var trueCounter = 0
-    var allData = 0
-
     // classification
     finalDataSet.foreach { data =>
       val realScore = BasicClassification(data, network, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+        val percent = Math.round(p._1 * 100.0)
+        val score = if (p._1 > 1/3) 1.0 else 0.0
         val originalClass = data(p._2).asInstanceOf[ContValue].get
-        val result = p._1
-        val compare = threshold.compare(p._1, originalClass)
-        println(s"real $p == score $compare == targetClass ${originalClass}")
-        trueCounter = if(compare) trueCounter + 1 else trueCounter
-        allData += 1
+        println(s"real $p== percent $percent% == score $score == targetClass ${originalClass}")
+        assert(score == originalClass)
       })
-      println("------------------------------------------------------------")
     }
-
-    val percent = trueCounter * (100.0 / allData)
-
-    println("result comparation : " + trueCounter + " :> in percent : " + percent)
-
-    assert(percent >= 80)
 
 
     // save model
     NetworkSerialization.save(network, new FileOutputStream(
       new File("target" + File.separator + "cuaca.json")))
   }
-//
-//  test("load model and classifications") {
-//
-//    // load model
-//    val network = NetworkSerialization.load(new FileInputStream(
-//      new File("target" + File.separator + "cuaca.json")))
-//
-//    // classification
-//    finalDataSet.foreach { data =>
-//      val realScore = BasicClassification(data, network, SigmoidFunction)
-//      val percent = Math.round(realScore * 100)
-//      val score = if (realScore > 0.7) 1.0 else 0.0
-//      println(s"real $realScore == percent $percent% == score $score == targetClass ${data(4)}")
-//      assert(score == data(4))
-//    }
-//  }
-//
-//  test("split validation") {
-//
-//    val (trainDataSet, classificationDataSet) = SplitValidation.split(finalDataSet, 70 -> 30)
-//    val network = BasicBackpropagation.train(trainDataSet, parameter)
-//
-//    val result = Validation.classification(network, BasicClassification, classificationDataSet, SigmoidFunction)
-//    println(result)
-//
-//    val validateResult = Validation.validate(result, classificationDataSet, 4)
-//    println(validateResult)
-//    val accuration = Validation.accuration(validateResult) {
-//      EitherThresholdFunction(0.7, 0.0, 1.0)
-//    }
-//
-//    println(accuration)
-//  }
-
 }

@@ -6,7 +6,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
-import com.deepwissen.ml.utils.{TargetValue, Denomination}
+import com.deepwissen.ml.utils.{BinaryValue, Denomination}
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -73,7 +73,7 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
-    TargetValue(network.outputLayer.perceptrons.map(x => x.output))
+    BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
     // calculate result
 //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
 //      value + perceptron.output

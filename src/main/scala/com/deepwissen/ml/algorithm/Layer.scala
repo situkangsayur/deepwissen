@@ -6,7 +6,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.function.ActivationFunction
-import com.deepwissen.ml.utils.{LogPrint, FieldValue, TargetValue, Denomination}
+import com.deepwissen.ml.utils.{LogPrint, ContValue, BinaryValue, Denomination}
 
 /**
  * Layer model class
@@ -60,7 +60,7 @@ trait Layer {
    * @return this layer
    */
   def fillOutput(data: Array[Denomination[_]]): Layer = {
-    val tempData = data.filterNot(p => p.isInstanceOf[TargetValue])
+    val tempData = data.filterNot(p => p.isInstanceOf[BinaryValue])
 //    print("----------------------")
 //    tempData.foreach(x => print(","+x.get))
 //    println()
@@ -70,8 +70,8 @@ trait Layer {
       // make sure non error ArrayIndexOutOfBoundsException
       if (perceptron.index >= 0 && perceptron.index <= tempData.length) {
         LogPrint.printLogDebug("Print Input Layer Perceptron --> "+
-          perceptron.index + " :> " + tempData(perceptron.index).asInstanceOf[FieldValue].get)
-        perceptron.output = tempData(perceptron.index).asInstanceOf[FieldValue].get
+          perceptron.index + " :> " + tempData(perceptron.index).asInstanceOf[ContValue].get)
+        perceptron.output = tempData(perceptron.index).asInstanceOf[ContValue].get
       }
     }
     // update bias to 1.0

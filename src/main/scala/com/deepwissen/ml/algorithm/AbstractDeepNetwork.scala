@@ -1,6 +1,6 @@
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.utils.{FieldValue, Denomination}
+import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**
  * Created by hendri_k on 6/13/15.
@@ -45,7 +45,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param data data
    * @return
    */
-  def getTargetClass(data: Array[Denomination[_]]) = data(data.length - 1).asInstanceOf[FieldValue]
+  def getTargetClass(data: Array[Denomination[_]]) = data(data.length - 1).asInstanceOf[ContValue]
 
   /**
    * Get perceptron error calculation

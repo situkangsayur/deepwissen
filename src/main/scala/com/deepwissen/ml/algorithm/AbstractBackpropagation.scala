@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.utils.{LogPrint, TargetValue, Denomination}
+import com.deepwissen.ml.utils.{LogPrint, BinaryValue, Denomination}
 
 /**
  * Abstract implementation of Neural Network Backpropagation
@@ -53,8 +53,8 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
    * @param data data
    * @return
    */
-  def getTargetClass(data: Array[Denomination[_]], targetClass: Int):TargetValue =
-    if(targetClass == -1) data(data.length - 1).asInstanceOf[TargetValue] else data(targetClass).asInstanceOf[TargetValue]
+  def getTargetClass(data: Array[Denomination[_]], targetClass: Int):BinaryValue =
+    if(targetClass == -1) data(data.length - 1).asInstanceOf[BinaryValue] else data(targetClass).asInstanceOf[BinaryValue]
 
   /**
    * Get perceptron error calculation

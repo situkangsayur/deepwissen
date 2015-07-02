@@ -7,7 +7,7 @@ package com.deepwissen.ml.validation
 
 import com.deepwissen.ml.algorithm._
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
-import com.deepwissen.ml.utils.{TargetValue, Denomination}
+import com.deepwissen.ml.utils.{BinaryValue, Denomination}
 
 /**
  * Base trait for algorithm validation
@@ -46,7 +46,7 @@ trait Validation {
    * @return accuration
    */
   def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
-    val compareResult = validateResult.map(x => x._1.asInstanceOf[TargetValue].get.zip(x._2.asInstanceOf[TargetValue].get)).map(x => {
+    val compareResult = validateResult.map(x => x._1.asInstanceOf[BinaryValue].get.zip(x._2.asInstanceOf[BinaryValue].get)).map(x => {
       val  temp = x.map { case (score, target) =>
         thresholdFunction.compare(score, target)
       } filter(p => p == false)

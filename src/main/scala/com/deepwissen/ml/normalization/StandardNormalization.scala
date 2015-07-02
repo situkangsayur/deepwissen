@@ -6,7 +6,7 @@
 package com.deepwissen.ml.normalization
 
 import com.deepwissen.ml.algorithm.TrainingParameter
-import com.deepwissen.ml.utils.{TargetValue, FieldValue, Denomination}
+import com.deepwissen.ml.utils.{BinaryValue, ContValue, Denomination}
 
 /**
  * Normalization for List[Array[Double]]
@@ -23,10 +23,10 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
   override def normalize(dataset: List[Array[Denomination[_]]], targetClass: Int): List[Array[Denomination[_]]] = {
     val minMax: Map[Int, (Double, Double)] = dataset.head.indices.filter(p => p != targetClass).map { i =>
       val min = dataset.foldLeft(Double.MaxValue) { (value, current) =>
-        if (value > current(i).asInstanceOf[FieldValue].get) current(i).asInstanceOf[FieldValue].get else value
+        if (value > current(i).asInstanceOf[ContValue].get) current(i).asInstanceOf[ContValue].get else value
       }
       val max = dataset.foldLeft(Double.MinValue) { (value, current) =>
-        if (value > current(i).asInstanceOf[FieldValue].get) value else current(i).asInstanceOf[FieldValue].get
+        if (value > current(i).asInstanceOf[ContValue].get) value else current(i).asInstanceOf[ContValue].get
       }
 
       i ->(min, max)
@@ -37,7 +37,7 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
         val temp: Denomination[_] = if(i != targetClass) {
           val min = minMax(i)._1
           val max = minMax(i)._2
-          normalize(array(i).asInstanceOf[FieldValue].get, min, max, targetClass)
+          normalize(array(i).asInstanceOf[ContValue].get, min, max, targetClass)
         } else array(i)
         temp
       }.toArray
@@ -53,10 +53,10 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
    */
   override def denormalize(normalValue: Double, index: Int, dataset: List[Array[Denomination[_]]], targetClass: Int): Double = {
     val min = dataset.foldLeft(Double.MaxValue) { (value, current) =>
-      if (value > current(index).asInstanceOf[FieldValue].get) current(index).asInstanceOf[FieldValue].get else value
+      if (value > current(index).asInstanceOf[ContValue].get) current(index).asInstanceOf[ContValue].get else value
     }
     val max = dataset.foldLeft(Double.MinValue) { (value, current) =>
-      if (value > current(index).asInstanceOf[FieldValue].get) value else current(index).asInstanceOf[FieldValue].get
+      if (value > current(index).asInstanceOf[ContValue].get) value else current(index).asInstanceOf[ContValue].get
     }
 
     denormalize(normalValue, min, max, targetClass)

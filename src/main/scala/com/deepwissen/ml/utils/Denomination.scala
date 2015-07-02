@@ -8,11 +8,11 @@ trait Denomination[T]{
 }
 
 
-case class FieldValue(n : Double) extends Denomination[Double]{
+case class ContValue(n : Double) extends Denomination[Double]{
   override def get = n
 }
 
-case class TargetValue(n : List[Double]) extends Denomination[List[Double]]{
+case class BinaryValue(n : List[Double]) extends Denomination[List[Double]]{
   override def get = n
 }
 //

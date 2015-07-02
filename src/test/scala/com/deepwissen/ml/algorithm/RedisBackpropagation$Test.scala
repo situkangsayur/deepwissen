@@ -10,7 +10,7 @@ import java.io.{File, FileInputStream, FileOutputStream}
 import com.deepwissen.ml.function.SigmoidFunction
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
-import com.deepwissen.ml.utils.{Denomination, TargetValue, FieldValue}
+import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
 import org.scalatest.FunSuite
 import redis.clients.jedis.Jedis
 
@@ -21,30 +21,30 @@ import redis.clients.jedis.Jedis
 class RedisBackpropagation$Test extends FunSuite {
 
   val outlook = Map(
-    "sunny" -> FieldValue(0.0),
-    "overcast" -> FieldValue(1.0),
-    "rainy" -> FieldValue(2.0)
+    "sunny" -> ContValue(0.0),
+    "overcast" -> ContValue(1.0),
+    "rainy" -> ContValue(2.0)
   )
 
   val temperature = Map(
-    "hot" -> FieldValue(0.0),
-    "mild" -> FieldValue(1.0),
-    "cool" -> FieldValue(2.0)
+    "hot" -> ContValue(0.0),
+    "mild" -> ContValue(1.0),
+    "cool" -> ContValue(2.0)
   )
 
   val humidity = Map(
-    "high" -> FieldValue(0.0),
-    "normal" -> FieldValue(1.0)
+    "high" -> ContValue(0.0),
+    "normal" -> ContValue(1.0)
   )
 
   val windy = Map(
-    "TRUE" -> FieldValue(0.0),
-    "FALSE" -> FieldValue(1.0)
+    "TRUE" -> ContValue(0.0),
+    "FALSE" -> ContValue(1.0)
   )
 
   val play = Map(
-    "no" -> TargetValue(List(0.0,1.0)),
-    "yes" -> TargetValue(List(1.0, 0.0))
+    "no" -> BinaryValue(List(0.0,1.0)),
+    "yes" -> BinaryValue(List(1.0, 0.0))
   )
 
   val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
