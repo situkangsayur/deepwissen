@@ -1,0 +1,136 @@
+{
+  "input_layer" : {
+    "id" : "layer_7784a9c37c444a84b944ee4f7035230c",
+    "perceptrons" : [ {
+      "id" : "perceptron_676b78600d77407daa22af9a011dbf97",
+      "index" : 0
+    }, {
+      "id" : "perceptron_9f1abd27ef624249ac14d638fa94ecda",
+      "index" : 1
+    }, {
+      "id" : "perceptron_a2ca208d83e9447789c6c693aff09aec",
+      "index" : 2
+    } ],
+    "bias" : "bias_8dd1872e792f41908c9d0f1216f48d86",
+    "next_layer" : "layer_f8afea47c938423c8b7d609ee2dbcdf7"
+  },
+  "hidden_layers" : [ {
+    "id" : "layer_f8afea47c938423c8b7d609ee2dbcdf7",
+    "perceptrons" : [ {
+      "id" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+      "index" : 0
+    }, {
+      "id" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+      "index" : 1
+    } ],
+    "bias" : "bias_a702c075f9db4c0389b2be2334863dd8",
+    "next_layer" : "layer_453b0a37495f4631834b25d784c46b6e",
+    "prev_layer" : "layer_7784a9c37c444a84b944ee4f7035230c"
+  }, {
+    "id" : "layer_453b0a37495f4631834b25d784c46b6e",
+    "perceptrons" : [ {
+      "id" : "perceptron_b9715f83bfc442e8a3287f1ec3698b34",
+      "index" : 0
+    }, {
+      "id" : "perceptron_ce19cdb59ac045838182172d996c8063",
+      "index" : 1
+    } ],
+    "bias" : "bias_cd79f98fe1d944b8a834dc75c4b26ad7",
+    "next_layer" : "layer_bd11e1018e654c2b883db70b5af63c53",
+    "prev_layer" : "layer_f8afea47c938423c8b7d609ee2dbcdf7"
+  } ],
+  "output_layer" : {
+    "id" : "layer_bd11e1018e654c2b883db70b5af63c53",
+    "perceptrons" : [ {
+      "id" : "perceptron_a5714b34c2ef4b1aa4bb1681b5fec7bc",
+      "index" : 0
+    } ],
+    "prev_layer" : "layer_453b0a37495f4631834b25d784c46b6e"
+  },
+  "synapsies" : [ {
+    "from" : "bias_8dd1872e792f41908c9d0f1216f48d86",
+    "to" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "weight" : 0.02616559013397797,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "bias_8dd1872e792f41908c9d0f1216f48d86",
+    "to" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "weight" : 0.04540415937597952,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_676b78600d77407daa22af9a011dbf97",
+    "to" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "weight" : 0.011490502200945475,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_676b78600d77407daa22af9a011dbf97",
+    "to" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "weight" : 0.003119473002772594,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_9f1abd27ef624249ac14d638fa94ecda",
+    "to" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "weight" : 0.03014944354561971,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_9f1abd27ef624249ac14d638fa94ecda",
+    "to" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "weight" : 0.007613425292755416,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_a2ca208d83e9447789c6c693aff09aec",
+    "to" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "weight" : 0.04202978230871293,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_a2ca208d83e9447789c6c693aff09aec",
+    "to" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "weight" : 0.010167476898101508,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "bias_a702c075f9db4c0389b2be2334863dd8",
+    "to" : "perceptron_b9715f83bfc442e8a3287f1ec3698b34",
+    "weight" : 0.040615618872024764,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "bias_a702c075f9db4c0389b2be2334863dd8",
+    "to" : "perceptron_ce19cdb59ac045838182172d996c8063",
+    "weight" : 0.013726512853957441,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "to" : "perceptron_b9715f83bfc442e8a3287f1ec3698b34",
+    "weight" : 0.028681423149584002,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_c9eff598a65a4984be7e03ad22f634d9",
+    "to" : "perceptron_ce19cdb59ac045838182172d996c8063",
+    "weight" : 0.02208729547728492,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "to" : "perceptron_b9715f83bfc442e8a3287f1ec3698b34",
+    "weight" : 0.0022991097026181517,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_9522f69a0d834dfa9b297de38a6aceac",
+    "to" : "perceptron_ce19cdb59ac045838182172d996c8063",
+    "weight" : 0.030403006517125256,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "bias_cd79f98fe1d944b8a834dc75c4b26ad7",
+    "to" : "perceptron_a5714b34c2ef4b1aa4bb1681b5fec7bc",
+    "weight" : 0.015646005643056207,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_b9715f83bfc442e8a3287f1ec3698b34",
+    "to" : "perceptron_a5714b34c2ef4b1aa4bb1681b5fec7bc",
+    "weight" : 0.010961861666586177,
+    "delta_weight" : 0.0
+  }, {
+    "from" : "perceptron_ce19cdb59ac045838182172d996c8063",
+    "to" : "perceptron_a5714b34c2ef4b1aa4bb1681b5fec7bc",
+    "weight" : 0.04968036429417537,
+    "delta_weight" : 0.0
+  } ]
+}

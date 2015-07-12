@@ -158,8 +158,8 @@ class BasicBackpropagation$Test extends FunSuite {
   test("load model and classification") {
 
     // load model
-    val network = NetworkSerialization.load(new FileInputStream(
-      new File("target" + File.separator + "cuaca.json")))
+    val network = NetworkSerialization.load(inputStream = new FileInputStream(
+      new File("target" + File.separator + "cuaca.json")), typeOfInference = "NeuralNet").asInstanceOf[Network]
 
     // classification
     finalDataSet.foreach { data =>

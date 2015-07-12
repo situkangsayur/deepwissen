@@ -56,3 +56,10 @@ case class DbnParamter(inputPerceptronSize: Int,
                        learningRate: Double = 0.75,
                        epsilon: Double = 0.000001,
                        iteration: Int = Int.MaxValue) extends TrainingParameter
+
+case class GibbsParameter(k : Int,
+                          synapsysFactory: SynapsysFactory = RandomSynapsysFactory(),
+                          activationFunction: ActivationFunction = SigmoidFunction,
+                          learningRate: Double = 0.75,
+                          epsilon: Double = 0.000001,
+                          iteration: Int = Int.MaxValue) extends TrainingParameter

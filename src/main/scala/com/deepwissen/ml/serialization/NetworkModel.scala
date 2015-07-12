@@ -5,7 +5,13 @@
 
 package com.deepwissen.ml.serialization
 
-import com.deepwissen.ml.algorithm.Network
+import com.deepwissen.ml.algorithm.{MarkovChain, Network}
+
+
+/**
+ * Created by hendri_k on 7/13/15.
+ */
+trait InferencesNetworkModel
 
 /**
  * @author Eko Khannedy
@@ -14,7 +20,11 @@ import com.deepwissen.ml.algorithm.Network
 case class NetworkModel(inputLayer: LayerModel,
                         hiddenLayers: List[LayerModel],
                         outputLayer: LayerModel,
-                        synapsies: List[SynapsysModel])
+                        synapsies: List[SynapsysModel]) extends InferencesNetworkModel
+
+case class MarkovChainModel(inputLayer: LayerModel,
+                        outputLayer: LayerModel,
+                        synapsies: List[SynapsysModel]) extends InferencesNetworkModel
 
 case class LayerModel(id: String,
                       perceptrons: List[PerceptronModel],
@@ -75,6 +85,48 @@ object NetworkModel {
     }
 
     NetworkModel(inputLayer, hiddenLayers, outputLayer, synapsies)
+  }
+
+}
+
+/**
+ * Created by hendri_k on 7/13/15.
+ */
+object MarkovChainModel {
+
+  /**
+   * Convert from Network to NetworkModel
+   * @param network Network
+   * @return NetworkModel
+   */
+  def apply(network: MarkovChain): MarkovChainModel = {
+
+    val inputLayer = new LayerModel(
+      id = network.inputLayer.id,
+      perceptrons = network.inputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+      bias = network.inputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      nextLayer = network.inputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+      prevLayer = network.inputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+    )
+
+    val outputLayer = new LayerModel(
+      id = network.outputLayer.id,
+      perceptrons = network.outputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+      bias = network.outputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      nextLayer = network.outputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+      prevLayer = network.outputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+    )
+
+    val synapsies = network.synapsies.map { synapsys =>
+      SynapsysModel(
+        from = synapsys.from.id,
+        to = synapsys.to.id,
+        weight = synapsys.weight,
+        deltaWeight = synapsys.deltaWeight
+      )
+    }
+
+    MarkovChainModel(inputLayer, outputLayer, synapsies)
   }
 
 }

@@ -1,29 +1,19 @@
-/*
- * Copyright (c) 2015, DeepWissen and/or its affiliates. All rights reserved.
- * DEEPWISSEN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.serialization.{PerceptronModel, NetworkModel}
+import com.deepwissen.ml.serialization.{LayerModel, MarkovChainModel, NetworkModel, PerceptronModel}
 
 import scala.annotation.tailrec
 
 /**
- * Network model for Neural Network Algorithm
- *
- * @author Eko Khannedy
- * @since 2/25/15
+ * Created by hendri_k on 7/8/15.
  */
-class Network(val inputLayer: Layer,
-              val hiddenLayers: List[Layer],
-              val outputLayer: Layer,
-              val synapsies: List[Synapsys]) extends InferencesNetwork{
+class MarkovChain (val inputLayer: Layer,
+                   val outputLayer: Layer,
+                   val synapsies: List[Synapsys]) extends InferencesNetwork{
 
   @transient
   private val allPerceptrons: Map[String, Perceptron] =
-    ((inputLayer.bias.get :: inputLayer.perceptrons) :::
-      hiddenLayers.flatMap(layer => layer.bias.get :: layer.perceptrons) :::
+    ((inputLayer.bias.get :: inputLayer.perceptrons)  :::
       outputLayer.perceptrons).map(p => (p.id, p)).toMap
 
   /**
@@ -44,7 +34,7 @@ class Network(val inputLayer: Layer,
    * @param toPerceptronId target perceptron
    * @return synapsys
    */
-  def getSynapsys(fromPerceptronId: String, toPerceptronId: String):Synapsys =
+  def getSynapsys(fromPerceptronId: String, toPerceptronId: String) =
     synapsiesLookupPair(fromPerceptronId -> toPerceptronId)
 
   @transient
@@ -55,7 +45,7 @@ class Network(val inputLayer: Layer,
    * @param perceptronId source perceptron
    * @return list of synapsies
    */
-  def getSynapsiesFrom(perceptronId: String) = synapsiesLookupFrom(perceptronId)
+  def getSynapsiesFrom(perceptronId: String):Seq[Synapsys] = synapsiesLookupFrom(perceptronId)
 
   @transient
   private val synapsiesLookupTo: Map[String, Seq[Synapsys]] = synapsies.groupBy(_.to.id)
@@ -65,7 +55,7 @@ class Network(val inputLayer: Layer,
    * @param perceptronId target perceptron
    * @return list of synapsies
    */
-  def getSynapsiesTo(perceptronId: String) = synapsiesLookupTo(perceptronId)
+  def getSynapsiesTo(perceptronId: String):Seq[Synapsys] = synapsiesLookupTo(perceptronId)
 
   /**
    * Get perceptron weight, calculate from all synapsies and perceptron source
@@ -79,8 +69,8 @@ class Network(val inputLayer: Layer,
 
 }
 
-object Network {
 
+object MarkovChain{
   /**
    * Create new Perceptron from given Model
    * @param model Perceptron model
@@ -120,10 +110,9 @@ object Network {
   /**
    * Create new Network with given perceptron input size and hidden layer size
    * @param inputPerceptronSize input perceptron size
-   * @param hiddenSize hidden layer size
    * @return
    */
-  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): Network = {
+  def apply(inputPerceptronSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): MarkovChain = {
     val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
 
     // create input layer
@@ -133,33 +122,13 @@ object Network {
       bias = Some(newBias())
     )
 
-    // create prev layer
-    var prevLayer: Layer = inputLayer
-
-    // create hidden layer
-    val hiddenLayers = (1 to hiddenSize).map { i =>
-      val hiddenLayer = HiddenLayer(
-        id = newLayerId(),
-        perceptrons = newPerceptrons(hiddenPerceptronSize),
-        bias = Some(newBias())
-      )
-
-      // create relation from prev layer to next layer
-      prevLayer.next = Some(hiddenLayer)
-      hiddenLayer.prev = Some(prevLayer)
-
-      // assign next layer to prev layer for next iteration
-      prevLayer = hiddenLayer
-      hiddenLayer // return hidden layer
-    }.toList
-
     // create output layer
     val outputLayer = new OutputLayer(
       id = newLayerId(),
       perceptrons = newPerceptrons(outputPerceptronSize),
-      prev = Some(prevLayer)
+      prev = Some(inputLayer)
     )
-    prevLayer.next = Some(outputLayer)
+//    prevLayer.next = Some(inputLayer)
 
     // create synapsies
     @tailrec
@@ -184,7 +153,7 @@ object Network {
     val synapsies = createSynapsies(inputLayer, List())
 
     // create network
-    new Network(inputLayer, hiddenLayers, outputLayer, synapsies)
+    new MarkovChain(inputLayer, outputLayer, synapsies)
   }
 
   /**
@@ -192,7 +161,7 @@ object Network {
    * @param model NetworkModel
    * @return Network
    */
-  def apply(model: NetworkModel): Network = {
+  def apply(model: MarkovChainModel): MarkovChain = {
 
     // create input layer
     val inputLayer = InputLayer(
@@ -202,13 +171,13 @@ object Network {
     )
 
     // create hidden layer
-    val hiddenLayers = model.hiddenLayers.map { layer =>
-      HiddenLayer(
-        id = layer.id,
-        perceptrons = layer.perceptrons.map(newPerceptron).sortBy(_.index),
-        bias = layer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
-      )
-    }
+//    val hiddenLayers = model.hiddenLayers.map { layer =>
+//      HiddenLayer(
+//        id = layer.id,
+//        perceptrons = layer.perceptrons.map(newPerceptron).sortBy(_.index),
+//        bias = layer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
+//      )
+//    }
 
     // create output layer
     val outputLayer = new OutputLayer(
@@ -217,8 +186,8 @@ object Network {
     )
 
     // crate layer relation
-    val allLayers = inputLayer :: outputLayer :: hiddenLayers
-    val allModelLayers = model.inputLayer :: model.outputLayer :: model.hiddenLayers
+    val allLayers = List(inputLayer, outputLayer)
+    val allModelLayers = List(model.inputLayer , model.outputLayer)
 
     def findLayerModel(id: String) = allModelLayers.find(_.id == id)
     def findLayer(id: String) = allLayers.find(_.id == id)
@@ -239,7 +208,6 @@ object Network {
 
     // all perceptron in network
     val allPerceptrons = ((inputLayer.bias.get :: inputLayer.perceptrons) :::
-      hiddenLayers.flatMap(layer => layer.bias.get :: layer.perceptrons) :::
       outputLayer.perceptrons).map(p => (p.id, p)).toMap
 
     // create synapsies
@@ -252,7 +220,6 @@ object Network {
       )
     }
 
-    new Network(inputLayer, hiddenLayers, outputLayer, synapsies)
+    new MarkovChain(inputLayer, outputLayer, synapsies)
   }
-
 }
