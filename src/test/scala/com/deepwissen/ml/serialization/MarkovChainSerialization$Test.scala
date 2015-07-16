@@ -19,7 +19,7 @@ class MarkovChainSerialization$Test extends FunSuite{
     NetworkSerialization.save(network, outputStream)
 
     NetworkSerialization.save(network, new FileOutputStream(
-      new File("target" + File.separator + "network-model.json")))
+      new File("target" + File.separator + "markov-chain-model.json")))
 
 
     val json = writer.toString
@@ -30,11 +30,8 @@ class MarkovChainSerialization$Test extends FunSuite{
 
     //    val inputStream = getClass.getResourceAsStream("target" + File.separator + "network-model.json")
     val network = NetworkSerialization.load(inputStream = new FileInputStream(
-      new File("target" + File.separator + "network-model.json")), typeOfInference = "MarkovChain").asInstanceOf[MarkovChain]
-    //    println("before print input stream")
-    //    println(inputStream.toString)
-    //    println("load model json")
-    //    val network = NetworkSerialization.load(inputStream = inputStream,typeOfInference = "NeuralNet").asInstanceOf[Network]
+      new File("target" + File.separator + "markov-chain-model.json")), typeOfInference = "MarkovChain").asInstanceOf[MarkovChain]
+
     println("converter model network to network object")
     network.inputLayer.perceptrons.foreach { perceptron =>
       println(network.inputLayer.id + " input layer => " + perceptron.id)
@@ -43,7 +40,7 @@ class MarkovChainSerialization$Test extends FunSuite{
     }
     println(network.inputLayer.id + " bias => " + network.inputLayer.bias.get.id)
     assert(network.inputLayer.bias.isDefined)
-    assert(network.inputLayer.perceptrons.length == 3)
+    assert(network.inputLayer.perceptrons.length == 7)
     assert(network.inputLayer.prev.isEmpty)
     assert(network.inputLayer.next.isDefined)
 
@@ -66,7 +63,7 @@ class MarkovChainSerialization$Test extends FunSuite{
       assert(network.outputLayer.id != null)
     }
     assert(network.outputLayer.bias.isEmpty)
-    assert(network.outputLayer.perceptrons.length == 1)
+    assert(network.outputLayer.perceptrons.length == 5)
     assert(network.outputLayer.prev.isDefined)
     assert(network.outputLayer.next.isEmpty)
 
@@ -76,6 +73,6 @@ class MarkovChainSerialization$Test extends FunSuite{
       assert(synapsys.to != null)
     }
     println("total synapsys => " + network.synapsies.length)
-    assert(network.synapsies.length == 17)
+    assert(network.synapsies.length == 40)
   }
 }

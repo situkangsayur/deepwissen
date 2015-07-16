@@ -25,7 +25,7 @@ object NetworkSerialization {
    */
   def save(network: InferencesNetwork, outputStream: OutputStream, closeStream: Boolean = true): Unit = {
     val model = if(network.isInstanceOf[Network]) NetworkModel(network.asInstanceOf[Network])
-                else if(network.isInstanceOf[MarkovChainModel]) MarkovChainModel(network.asInstanceOf[MarkovChain])
+                else if(network.isInstanceOf[MarkovChain]) MarkovChainModel(network.asInstanceOf[MarkovChain])
 
     NetworkMapper.writeValue(outputStream, model)
     if (closeStream) IOUtils.closeQuietly(outputStream)
@@ -42,7 +42,7 @@ object NetworkSerialization {
       case "MarkovChain" =>
         val model = NetworkMapper.readValue(inputStream, classOf[MarkovChainModel])
         if (closeStream) IOUtils.closeQuietly(inputStream)
-        MarkovChain(model.asInstanceOf[MarkovChainModel])
+        MarkovChain(model)
       case "NeuralNet" =>
         val model = NetworkMapper.readValue(inputStream, classOf[NetworkModel])
         if (closeStream) IOUtils.closeQuietly(inputStream)

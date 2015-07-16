@@ -122,13 +122,15 @@ object MarkovChain{
       bias = Some(newBias())
     )
 
+    var prevLayer: Layer = inputLayer
+
     // create output layer
     val outputLayer = new OutputLayer(
       id = newLayerId(),
       perceptrons = newPerceptrons(outputPerceptronSize),
       prev = Some(inputLayer)
     )
-//    prevLayer.next = Some(inputLayer)
+    prevLayer.next = Some(outputLayer)
 
     // create synapsies
     @tailrec
