@@ -23,7 +23,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: InferencesNetwork, classification: Classification[Array[Denomination[_]], InferencesNetwork], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
+  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
     dataset.map(data => classification(data, network, activationFunction))
 
   /**
