@@ -44,28 +44,16 @@ class MarkovChainSerialization$Test extends FunSuite{
     assert(network.inputLayer.prev.isEmpty)
     assert(network.inputLayer.next.isDefined)
 
-//    network.hiddenLayers.foreach { layer =>
-//      layer.perceptrons.foreach { perceptron =>
-//        println(layer.id + " hidden layer => " + perceptron.id)
-//        assert(perceptron.id != null)
-//        assert(layer.id != null)
-//      }
-//      println(layer.id + " bias => " + layer.bias.get.id)
-//      assert(layer.bias.isDefined)
-//      assert(layer.perceptrons.length == 2)
-//      assert(layer.prev.isDefined)
-//      assert(layer.next.isDefined)
-//    }
-
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      println(network.outputLayer.id + " output layer => " + perceptron.id)
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+      println(network.hiddenLayer.id + " output layer => " + perceptron.id)
       assert(perceptron.id != null)
-      assert(network.outputLayer.id != null)
+      assert(network.hiddenLayer.id != null)
     }
-    assert(network.outputLayer.bias.isEmpty)
-    assert(network.outputLayer.perceptrons.length == 5)
-    assert(network.outputLayer.prev.isDefined)
-    assert(network.outputLayer.next.isEmpty)
+    assert(network.hiddenLayer.bias.isDefined)
+    println(network.inputLayer.id + " bias => " + network.inputLayer.bias.get.id)
+    assert(network.hiddenLayer.perceptrons.length == 5)
+    assert(network.hiddenLayer.prev.isDefined)
+    assert(network.hiddenLayer.next.isEmpty)
 
     network.synapsies.foreach { synapsys =>
       println(s"synapsys from ${synapsys.from} to ${synapsys.to} with weight ${synapsys.weight}")

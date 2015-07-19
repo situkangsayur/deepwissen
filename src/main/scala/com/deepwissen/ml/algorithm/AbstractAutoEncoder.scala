@@ -106,7 +106,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
      */
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = network.getPerceptronWeight(perceptron)
+        perceptron.weight = network.getPerceptronWeightTo(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
       }
     }
@@ -115,7 +115,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
      * Update weight and output for output layer
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeight(perceptron)
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 

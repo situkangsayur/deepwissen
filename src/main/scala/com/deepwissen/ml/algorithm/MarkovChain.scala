@@ -7,14 +7,14 @@ import scala.annotation.tailrec
 /**
  * Created by hendri_k on 7/8/15.
  */
-class MarkovChain (val inputLayer: Layer,
-                   val outputLayer: Layer,
-                   val synapsies: List[Synapsys]) extends InferencesNetwork{
+class MarkovChain (var inputLayer: Layer,
+                   var hiddenLayer: Layer,
+                   var synapsies: List[Synapsys]) extends InferencesNetwork{
 
   @transient
   private val allPerceptrons: Map[String, Perceptron] =
     ((inputLayer.bias.get :: inputLayer.perceptrons)  :::
-      outputLayer.perceptrons).map(p => (p.id, p)).toMap
+      (hiddenLayer.bias.get :: hiddenLayer.perceptrons)).map(p => (p.id, p)).toMap
 
   /**
    * Get perceptron by id
@@ -62,11 +62,15 @@ class MarkovChain (val inputLayer: Layer,
    * @param perceptron perceptron
    * @return weight
    */
-  def getPerceptronWeight(perceptron: Perceptron): Double =
+  def getPerceptronWeightTo(perceptron: Perceptron): Double =
     getSynapsiesTo(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
       value + (synapsys.weight * synapsys.from.output)
     }
 
+  def getPerceptronWeightFrom(perceptron: Perceptron): Double =
+    getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
+      value + (synapsys.weight * synapsys.from.output)
+    }
 }
 
 
@@ -125,12 +129,13 @@ object MarkovChain{
     var prevLayer: Layer = inputLayer
 
     // create output layer
-    val outputLayer = new OutputLayer(
+    val hiddenLayer = new HiddenLayer(
       id = newLayerId(),
       perceptrons = newPerceptrons(outputPerceptronSize),
+      bias = Some(newBias()),
       prev = Some(inputLayer)
     )
-    prevLayer.next = Some(outputLayer)
+    prevLayer.next = Some(hiddenLayer)
 
     // create synapsies
     @tailrec
@@ -155,7 +160,7 @@ object MarkovChain{
     val synapsies = createSynapsies(inputLayer, List())
 
     // create network
-    new MarkovChain(inputLayer, outputLayer, synapsies)
+    new MarkovChain(inputLayer, hiddenLayer, synapsies)
   }
 
   /**
@@ -182,14 +187,15 @@ object MarkovChain{
 //    }
 
     // create output layer
-    val outputLayer = new OutputLayer(
-      id = model.outputLayer.id,
-      perceptrons = model.outputLayer.perceptrons.map(newPerceptron).sortBy(_.index)
+    val hiddenLayer = new HiddenLayer(
+      id = model.hiddenLayer.id,
+      perceptrons = model.hiddenLayer.perceptrons.map(newPerceptron).sortBy(_.index),
+      bias = model.hiddenLayer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
     )
 
     // crate layer relation
-    val allLayers = List(inputLayer, outputLayer)
-    val allModelLayers = List(model.inputLayer , model.outputLayer)
+    val allLayers = List(inputLayer, hiddenLayer)
+    val allModelLayers = List(model.inputLayer , model.hiddenLayer)
 
     def findLayerModel(id: String) = allModelLayers.find(_.id == id)
     def findLayer(id: String) = allLayers.find(_.id == id)
@@ -210,7 +216,7 @@ object MarkovChain{
 
     // all perceptron in network
     val allPerceptrons = ((inputLayer.bias.get :: inputLayer.perceptrons) :::
-      outputLayer.perceptrons).map(p => (p.id, p)).toMap
+      (hiddenLayer.bias.get :: hiddenLayer.perceptrons)).map(p => (p.id, p)).toMap
 
     // create synapsies
     val synapsies = model.synapsies.map { synapsys =>
@@ -222,6 +228,6 @@ object MarkovChain{
       )
     }
 
-    new MarkovChain(inputLayer, outputLayer, synapsies)
+    new MarkovChain(inputLayer, hiddenLayer, synapsies)
   }
 }

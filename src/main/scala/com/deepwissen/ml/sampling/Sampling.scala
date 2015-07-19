@@ -20,10 +20,9 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
    * @return model
    */
   override def train(dataset: DATASET, parameter: GibbsParameter): MarkovChain = {
-//    val network = newNetwork(dataset, parameter)
-//    doTrain(network, dataset, parameter)
-//    network
-    null
+    val network = newNetwork(dataset, parameter)
+    doTrain(network, dataset, parameter)
+    network
   }
 
   override def doSampling : Layer ={
@@ -40,12 +39,12 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
     * @param parameter parameter
     * @return network
     */
-  def newNetwork(dataset: DATASET, parameter: GibbsParameter): MarkovChain= null
-//    MarkovChain(
-//      inputPerceptronSize = parameter.inputPerceptronSize,
-//      outputPerceptronSize = parameter.inputPerceptronSize,
-//      synapsysFactory = parameter.synapsysFactory
-//    )
+  def newNetwork(dataset: DATASET, parameter: GibbsParameter): MarkovChain =
+    MarkovChain(
+      inputPerceptronSize = parameter.inputPerceptronSize,
+      outputPerceptronSize = parameter.hiddenPerceptronSize,
+      synapsysFactory = parameter.synapsysFactory
+    )
 
   /**
    * Train implementation
@@ -77,12 +76,12 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
         // output layer
         fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data,fromPerceptron.index).get - fromPerceptron.output)
 
-//      case Some(nextLayer) =>
-//        // hidden or input layer
-//        val sigmaError = nextLayer.perceptrons.foldLeft(0.0) { (value, toPerceptron) =>
-//          value + toPerceptron.error * network.getSynapsys(fromPerceptron.id, toPerceptron.id).weight
-//        }
-//        fromPerceptron.output * (1 - fromPerceptron.output) * sigmaError
+      case Some(nextLayer) =>
+        // hidden or input layer
+        val sigmaError = nextLayer.perceptrons.foldLeft(0.0) { (value, toPerceptron) =>
+          value + toPerceptron.error * network.getSynapsys(fromPerceptron.id, toPerceptron.id).weight
+        }
+        fromPerceptron.output * (1 - fromPerceptron.output) * sigmaError
     }
   }
 
@@ -95,11 +94,11 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
    * @return delta weight
    */
   def getSynapsysDeltaWeight(network: MarkovChain, perceptron: Perceptron, synapsys: Synapsys, parameter: GibbsParameter): Double = {
-//    if (synapsys.isFromBias)
-//      (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
-//    else
-//      (parameter.learningRate * perceptron.error * synapsys.from.output) + (parameter.momentum * synapsys.deltaWeight)
-    0.0D
+    if (synapsys.isFromBias)
+      (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
+    else
+      (parameter.learningRate * perceptron.error * synapsys.from.output) + (parameter.momentum * synapsys.deltaWeight)
+//    0.0D
   }
 
   /**
@@ -116,6 +115,18 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
      */
     network.inputLayer.fillOutput(data)
 
+
+
+    var originalData = InputLayer(
+      id = network.inputLayer.id,
+      perceptrons = network.inputLayer.perceptrons.map( x => Perceptron(x.id,x.index,x.output, x.weight, x.error)),
+      bias = Some(MarkovChain.newBias(network.inputLayer.bias.get.id))
+    )
+    originalData.bias.get.output = network.inputLayer.bias.get.output
+    originalData.bias.get.weight = network.inputLayer.bias.get.weight
+
+//    originalData.fillOutput(data)
+
     /**
      * Update weight and output for all hidden layers
      */
@@ -126,58 +137,84 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
 //      }
 //    }
 
-    /**
-     * Update weight and output for output layer
-     */
-//    network.outputLayer.perceptrons.foreach { perceptron =>
-//      perceptron.weight = network.getPerceptronWeight(perceptron)
-//      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-//    }
+    for(i <- 1 to parameter.k){
+      /**
+       * Update weight and output for output layer
+       */
+      network.hiddenLayer.perceptrons.foreach { perceptron =>
+        perceptron.weight = network.getPerceptronWeightTo(perceptron)
+        perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+      }
 
-    /**
-     * Update error for output layer
-     */
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.error = getPerceptronError(network, network.outputLayer, perceptron, data, parameter)
-    }
-
-    /**
-     * Update errors for all hidden layers
-     */
-//    network.hiddenLayers.reverse.foreach { layer =>
-//      layer.perceptrons.foreach { perceptron =>
-//        perceptron.error = getPerceptronError(network, layer, perceptron, data, parameter)
-//      }
-//    }
-
-    /**
-     * Update weight all synapsies to hidden layers
-     */
-//    network.hiddenLayers.foreach { layer =>
-//      layer.perceptrons.foreach { perceptron =>
-//        network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
-//          synapsys.deltaWeight = getSynapsysDeltaWeight(network, perceptron, synapsys, parameter)
-//          synapsys.weight = synapsys.weight + synapsys.deltaWeight
-//        }
-//      }
-//    }
-
-    /**
-     * Update weight all synapsies to output layer
-     */
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
-        synapsys.deltaWeight = getSynapsysDeltaWeight(network, perceptron, synapsys, parameter)
-        synapsys.weight = synapsys.weight + synapsys.deltaWeight
+      /**
+       * update input layer
+       */
+      network.inputLayer.perceptrons.foreach { perceptron =>
+        perceptron.weight = network.getPerceptronWeightFrom(perceptron)
+        perceptron.output = parameter.activationFunction.activation(perceptron.weight)
       }
     }
 
     /**
-     * Sum squared error
+     * Update weight and output for output layer
      */
-    val sumError = network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-      value + Math.pow(getTargetClass(data, perceptron.index).get - perceptron.output, 2)
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
-    sumError / network.outputLayer.perceptrons.length
+
+
+    var tempXTilt = InputLayer(
+      id = network.inputLayer.id,
+      perceptrons = network.inputLayer.perceptrons.map( x => Perceptron(x.id,x.index,x.output, x.weight, x.error)),
+      bias = Some(MarkovChain.newBias(network.inputLayer.bias.get.id))
+    )
+
+    tempXTilt.bias.get.output = network.inputLayer.bias.get.output
+    tempXTilt.bias.get.weight = network.inputLayer.bias.get.weight
+
+    var hXTotal = 0.0D;
+    var hxTiltTotal = 0.0D;
+
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+
+      val hXTilt = perceptron.output
+      hxTiltTotal += hXTilt
+
+      network.inputLayer = originalData
+      val hX = parameter.activationFunction.activation(network.getPerceptronWeightTo(perceptron))
+      hXTotal += hX
+
+      network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
+
+        synapsys.deltaWeight = parameter.learningRate * ((hX * originalData.perceptrons.find( p => p.id == synapsys.from.id).get.output)
+          - (hXTilt * tempXTilt.perceptrons.find( p => p.id == synapsys.from.id).get.output))
+        synapsys.weight = synapsys.weight + synapsys.deltaWeight
+      }
+    }
+
+    network.hiddenLayer.bias.get.output = network.hiddenLayer.bias.get.output + (parameter.learningRate *
+      (hXTotal/network.hiddenLayer.perceptrons.size) - (hxTiltTotal/network.hiddenLayer.perceptrons.size))
+
+    network.inputLayer.bias.get.output = network.hiddenLayer.bias.get.output + (parameter.learningRate *
+      (originalData.perceptrons.zip(tempXTilt.perceptrons).map(p => (p._1.output - p._2.output)).foldLeft(0.0D)((temp, x) => temp + x))/originalData.perceptrons.size)
+
+    network.inputLayer = tempXTilt
+
+    /**
+     * Update weight and output for output layer
+     */
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+    }
+
+    /**
+     * Lost function before partial funtion adding
+     */
+    val freeEnergy = Math.exp(network.inputLayer.perceptrons.map( p => p.output * network.hiddenLayer.bias.get.output).foldLeft(0.0D)((temp, value) => temp + value) +
+    network.hiddenLayer.perceptrons.map(p => Math.log(1 + p.output)).foldLeft(0.0D)((temp, value) => temp + value))
+
+    freeEnergy
   }
 }

@@ -1,19 +1,21 @@
 package com.deepwissen.ml.algorithm
 
-import java.io.{FileInputStream, File, FileOutputStream}
+import java.io.{File, FileOutputStream}
 
 import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
+import com.deepwissen.ml.sampling.GibbsAlgorithm
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{SplitValidation, Validation}
+import com.deepwissen.ml.validation.Validation
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
 /**
- * Created by hendri_k on 6/21/15.
+ * Created by hendri_k on 7/18/15.
  */
-class AutoEncoder$Test extends FunSuite{
+class RBMAlgorithm$Test extends FunSuite {
+
 
   val outlook = Map(
     "sunny" -> ContValue(0.0),
@@ -63,6 +65,8 @@ class AutoEncoder$Test extends FunSuite{
     """.stripMargin.trim.split("\n")
 
 
+
+
   val dataset = strings.map { string =>
     string.split(",").zipWithIndex.map {
       case (value, index) =>
@@ -73,17 +77,16 @@ class AutoEncoder$Test extends FunSuite{
   /**
    * Training Parameter
    */
-  val parameter = BackpropragationParameter(
-    hiddenLayerSize = 1,
-    outputPerceptronSize = 2,
-    targetClassPosition = -1,
-    iteration = 100000,
-    epsilon = 0.000001,
+  val parameter = GibbsParameter(
+    inputPerceptronSize = dataset.head.length - 1,
+    hiddenPerceptronSize = dataset.head.length - 2,
+    k = 1000,
+    iteration = 10000,
+    epsilon = 0.00001,
     momentum = 0.50,
     learningRate = 0.50,
     synapsysFactory = RandomSynapsysFactory(),
-    activationFunction = SigmoidFunction,
-    inputPerceptronSize = dataset.head.length - 1
+    activationFunction = SigmoidFunction
   )
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
@@ -105,12 +108,78 @@ class AutoEncoder$Test extends FunSuite{
   var logger  = LoggerFactory.getLogger("Main Objects")
 
 
+  test("Testing for RBM Algorithm") {
 
-  test("traininig and classification and save model") {
-    // training
-    val network = Autoencoder.train(finalDataSet, parameter)
+    def createNewNetwork(network: MarkovChain) : Network = {
+      val inputLayer = new InputLayer(
+        id = newLayerId(),
+        perceptrons = network.inputLayer.perceptrons.map( p => p),
+        bias = Some(Network.newBias(network.inputLayer.bias.get.id))
+      )
 
-    val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+      //    classifyNetwork.inputLayer = inpuLayer
+      var prevLayer: Layer = inputLayer
+
+
+      val hiddenLayer = List(new HiddenLayer(
+        id = newLayerId(),
+        perceptrons = network.hiddenLayer.perceptrons.map( p => p),
+        bias = Some(Network.newBias(network.hiddenLayer.bias.get.id))
+      ))
+
+      prevLayer.next = Some(hiddenLayer(0))
+      hiddenLayer(0).prev = Some(prevLayer)
+
+//      val hiddenLayers = (1 to 1).map { i =>
+//        val hiddenLayer = HiddenLayer(
+//          id = newLayerId(),
+//          perceptrons = newPerceptrons(hiddenPerceptronSize),
+//          bias = Some(newBias())
+//        )
+//
+//        // create relation from prev layer to next layer
+//        prevLayer.next = Some(hiddenLayer)
+//        hiddenLayer.prev = Some(prevLayer)
+//
+//        // assign next layer to prev layer for next iteration
+//        prevLayer = hiddenLayer
+//        hiddenLayer // return hidden layer
+//      }.toList
+
+      prevLayer = hiddenLayer(0)
+      val outputLayer = new OutputLayer(
+        id = newLayerId(),
+        perceptrons = network.inputLayer.perceptrons.map( p => p),
+        prev = Some(prevLayer)
+      )
+      prevLayer.next = Some(outputLayer)
+
+      val tempListOfSynapsys = network.synapsies.map { synapsys =>
+        Synapsys(
+          from = synapsys.from,
+          to = synapsys.to,
+          weight = synapsys.weight,
+          deltaWeight = synapsys.deltaWeight
+        )
+      }
+
+      val listOfSynapsys = tempListOfSynapsys ::: network.synapsies.map(p => Synapsys(
+        from = p.to,
+        to = p.from,
+        weight = p.weight,
+        deltaWeight = p.deltaWeight
+      ))
+
+
+      new Network(inputLayer, hiddenLayer, outputLayer, listOfSynapsys)
+    }
+
+
+    val tempNetwork = GibbsAlgorithm.train(finalDataSet, parameter)
+
+    val newNetwork = createNewNetwork(network = tempNetwork)
+
+    val result = Validation.classification(newNetwork, BasicClassification, finalDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = Validation.validate(result, finalDataSet, 4)
@@ -127,7 +196,7 @@ class AutoEncoder$Test extends FunSuite{
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, network, SigmoidFunction)
+      val realScore = BasicClassification(data, newNetwork, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val originalClass = data(p._2).asInstanceOf[ContValue].get
         val result = p._1
@@ -147,41 +216,12 @@ class AutoEncoder$Test extends FunSuite{
 
 
     // save model
-    NetworkSerialization.save(network, new FileOutputStream(
+    NetworkSerialization.save(tempNetwork, new FileOutputStream(
       new File("target" + File.separator + "cuaca.json")))
   }
-//
-//  test("load model and classifications") {
-//
-//    // load model
-//    val network = NetworkSerialization.load(new FileInputStream(
-//      new File("target" + File.separator + "cuaca.json")))
-//
-//    // classification
-//    finalDataSet.foreach { data =>
-//      val realScore = BasicClassification(data, network, SigmoidFunction)
-//      val percent = Math.round(realScore * 100)
-//      val score = if (realScore > 0.7) 1.0 else 0.0
-//      println(s"real $realScore == percent $percent% == score $score == targetClass ${data(4)}")
-//      assert(score == data(4))
-//    }
-//  }
-//
-//  test("split validation") {
-//
-//    val (trainDataSet, classificationDataSet) = SplitValidation.split(finalDataSet, 70 -> 30)
-//    val network = BasicBackpropagation.train(trainDataSet, parameter)
-//
-//    val result = Validation.classification(network, BasicClassification, classificationDataSet, SigmoidFunction)
-//    println(result)
-//
-//    val validateResult = Validation.validate(result, classificationDataSet, 4)
-//    println(validateResult)
-//    val accuration = Validation.accuration(validateResult) {
-//      EitherThresholdFunction(0.7, 0.0, 1.0)
-//    }
-//
-//    println(accuration)
-//  }
+
+  test("Testing for Gibbs Sampling") {
+
+  }
 
 }

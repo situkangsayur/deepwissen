@@ -15,10 +15,10 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/25/15
  */
-class Network(val inputLayer: Layer,
-              val hiddenLayers: List[Layer],
-              val outputLayer: Layer,
-              val synapsies: List[Synapsys]) extends InferencesNetwork{
+class Network(var inputLayer: Layer,
+              var hiddenLayers: List[Layer],
+              var outputLayer: Layer,
+              var synapsies: List[Synapsys]) extends InferencesNetwork{
 
   @transient
   private val allPerceptrons: Map[String, Perceptron] =
@@ -72,7 +72,7 @@ class Network(val inputLayer: Layer,
    * @param perceptron perceptron
    * @return weight
    */
-  def getPerceptronWeight(perceptron: Perceptron): Double =
+  def getPerceptronWeightTo(perceptron: Perceptron): Double =
     getSynapsiesTo(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
       value + (synapsys.weight * synapsys.from.output)
     }
@@ -123,8 +123,8 @@ object Network {
    * @param hiddenSize hidden layer size
    * @return
    */
-  def apply(inputPerceptronSize: Int, hiddenSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): Network = {
-    val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
+  def apply(inputPerceptronSize: Int, hiddenSize: Int, hiddenNodeSize : Int = -1, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory[_]): Network = {
+    val hiddenPerceptronSize = if(hiddenNodeSize != -1) hiddenNodeSize else Math.round(inputPerceptronSize * 2 / 3.0).toInt
 
     // create input layer
     val inputLayer = InputLayer(
@@ -181,7 +181,17 @@ object Network {
           createSynapsies(nextLayer, synapsies ::: currentSynapsies)
       }
 
-    val synapsies = createSynapsies(inputLayer, List())
+    val synapsies = if(synapsysFactory.isInstanceOf[CopySynapsysFactory]){
+      val tempListOfSynapsys = synapsysFactory.asInstanceOf[CopySynapsysFactory]
+      tempListOfSynapsys.getSynapsys().map { synapsys =>
+        Synapsys(
+          from = synapsys.from,
+          to = synapsys.to,
+          weight = synapsys.weight,
+          deltaWeight = synapsys.deltaWeight
+        )
+      }
+    } else createSynapsies(inputLayer, List())
 
     // create network
     new Network(inputLayer, hiddenLayers, outputLayer, synapsies)

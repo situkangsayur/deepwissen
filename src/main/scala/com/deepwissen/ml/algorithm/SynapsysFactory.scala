@@ -10,7 +10,7 @@ package com.deepwissen.ml.algorithm
  * @author Eko Khannedy
  * @since 6/3/15
  */
-trait SynapsysFactory {
+trait SynapsysFactory[T] {
 
   /**
    * Create new synapsys from perceptron to perceptron
@@ -19,6 +19,8 @@ trait SynapsysFactory {
    * @return synapsys
    */
   def apply(from: Perceptron, to: Perceptron): Synapsys
+  def apply(listOfSynapsys: List[Synapsys]): List[Synapsys]
+  def getSynapsys() : T
 
 }
 
@@ -28,7 +30,7 @@ trait SynapsysFactory {
  *              for generate new synapsys weight
  * @author Eko Khannedy
  */
-case class RandomSynapsysFactory(value: Double = 0.05) extends SynapsysFactory {
+case class RandomSynapsysFactory(value: Double = 0.05) extends SynapsysFactory[Synapsys] {
 
   /**
    * Create new synapsys from perceptron to perceptron with random synapsys
@@ -41,4 +43,25 @@ case class RandomSynapsysFactory(value: Double = 0.05) extends SynapsysFactory {
     to = to,
     weight = value * Math.random()
   )
+
+//  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys]
+
+  override def getSynapsys() : Synapsys = null
+}
+
+
+case class CopySynapsysFactory(listOfSynapsyses: List[Synapsys]) extends SynapsysFactory[List[Synapsys]] {
+
+//  override def apply(from: Perceptron, to: Perceptron): Synapsys
+  /**
+   * Create new synapsys from perceptron to perceptron with random synapsys
+   * @param listOfSynapsys from another network
+   * @return synapsys
+   */
+  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys] = {
+    this(listOfSynapsys)
+    listOfSynapsys
+  }
+
+  override def getSynapsys() : List[Synapsys] = listOfSynapsyses
 }

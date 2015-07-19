@@ -62,14 +62,14 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
     // fill hidden layer
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = network.getPerceptronWeight(perceptron)
+        perceptron.weight = network.getPerceptronWeightTo(perceptron)
         perceptron.output = activationFunction.activation(perceptron.weight)
       }
     }
 
     // fill output layer
     network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeight(perceptron)
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
@@ -78,5 +78,52 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
 //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
 //      value + perceptron.output
 //    }
+  }
+}
+
+object RBMClassification extends Classification[Array[Denomination[_]], MarkovChain]{
+
+  override def apply(data: Array[Denomination[_]], network: MarkovChain, activationFunction: ActivationFunction): Denomination[_] = {
+
+
+    var classifyNetwork = Network(
+//      inputPerceptronSize = network.inputLayer.perceptrons.size,
+//      hiddenSize = 1,
+//      outputPerceptronSize = network.inputLayer.perceptrons.size,
+//      synapsysFactory = CopySynapsysFactory(network.synapsies)
+//    )
+
+
+    val inputLayer = new InputLayer(
+      id = newLayerId(),
+      perceptrons = network.inputLayer.perceptrons.map( p => p),
+      bias = Some(Network.newBias(network.inputLayer.bias.get.id))
+    )
+
+//    classifyNetwork.inputLayer = inpuLayer
+    var prevLayer: Layer = inputLayer
+
+
+    val hiddenLayer = new HiddenLayer(
+      id = newLayerId(),
+      perceptrons = network.hiddenLayer.perceptrons.map( p => p),
+      bias = Some(Network.newBias(network.hiddenLayer.bias.get.id))
+    )
+
+    prevLayer.next = Some(hiddenLayer)
+    hiddenLayer.prev = Some(prevLayer)
+
+    prevLayer = hiddenLayer
+    val outputLayer = new OutputLayer(
+      id = newLayerId(),
+      perceptrons = network.inputLayer.perceptrons.map( p => p),
+      prev = Some(prevLayer)
+    )
+    prevLayer.next = Some(outputLayer)
+
+
+    val newNetwork = new Network(inputLayer, hiddenLayers, outputLayer, synapsies)
+
+    BinaryValue(classifyNetwork.outputLayer.perceptrons.map(x => x.output))
   }
 }

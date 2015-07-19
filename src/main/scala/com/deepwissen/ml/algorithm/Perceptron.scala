@@ -15,8 +15,8 @@ package com.deepwissen.ml.algorithm
  * @param weight weight value
  * @param error error value
  */
-case class Perceptron(id: String,
-                      index: Int,
+case class Perceptron(var id: String,
+                      var index: Int,
                       var output: Double = 0.0,
                       var weight: Double = 0.0,
                       var error: Double = 0.0)

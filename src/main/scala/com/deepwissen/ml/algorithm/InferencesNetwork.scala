@@ -50,6 +50,6 @@ trait InferencesNetwork {
    * @param perceptron perceptron
    * @return weight
    */
-  def getPerceptronWeight(perceptron: Perceptron): Double
+  def getPerceptronWeightTo(perceptron: Perceptron): Double
 
 }

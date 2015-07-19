@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.serialization
 
-import com.deepwissen.ml.algorithm.{MarkovChain, Network}
+import com.deepwissen.ml.algorithm.{HiddenLayer, MarkovChain, Network}
 
 
 /**
@@ -23,7 +23,7 @@ case class NetworkModel(inputLayer: LayerModel,
                         synapsies: List[SynapsysModel]) extends InferencesNetworkModel
 
 case class MarkovChainModel(inputLayer: LayerModel,
-                        outputLayer: LayerModel,
+                        hiddenLayer: LayerModel,
                         synapsies: List[SynapsysModel]) extends InferencesNetworkModel
 
 case class LayerModel(id: String,
@@ -109,12 +109,12 @@ object MarkovChainModel {
       prevLayer = network.inputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
     )
 
-    val outputLayer = new LayerModel(
-      id = network.outputLayer.id,
-      perceptrons = network.outputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
-      bias = network.outputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
-      nextLayer = network.outputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
-      prevLayer = network.outputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+    val hiddenLayer = new LayerModel(
+      id = network.hiddenLayer.id,
+      perceptrons = network.hiddenLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+      bias = network.hiddenLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      nextLayer = network.hiddenLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+      prevLayer = network.hiddenLayer.prev.fold[Option[String]](None)(l => Some(l.id))
     )
 
     val synapsies = network.synapsies.map { synapsys =>
@@ -126,7 +126,7 @@ object MarkovChainModel {
       )
     }
 
-    MarkovChainModel(inputLayer, outputLayer, synapsies)
+    MarkovChainModel(inputLayer, hiddenLayer, synapsies)
   }
 
 }

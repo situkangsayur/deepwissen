@@ -121,7 +121,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      */
     network.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        val tempWeight = network.getPerceptronWeight(perceptron)
+        val tempWeight = network.getPerceptronWeightTo(perceptron)
 //        parameter.activationFunction.activation(perceptron.weight)
         val tempOutput = parameter.activationFunction.activation(tempWeight)
         LogPrint.printLogDebug("hidden layer :> "+ layer.id + " --> "+ perceptron.index + " :> " + tempWeight + " & " + tempOutput)
@@ -134,7 +134,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
      * Update weight and output for output layer
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
-      val tempWeight = network.getPerceptronWeight(perceptron)
+      val tempWeight = network.getPerceptronWeightTo(perceptron)
 //      parameter.activationFunction.activation(perceptron.weight)
       val tempOutput = parameter.activationFunction.activation(tempWeight)
       LogPrint.printLogDebug("Output layer :> " + " --> "+ perceptron.index + " :> " + tempWeight + " & " + tempOutput)
