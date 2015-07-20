@@ -9,8 +9,8 @@ package com.deepwissen.ml.algorithm
  * @author Eko Khannedy
  * @since 2/25/15
  */
-case class Synapsys(from: Perceptron,
-                    to: Perceptron,
+case class Synapsys(var from: Perceptron,
+                    var to: Perceptron,
                     var weight: Double,
                     var deltaWeight: Double = 0.0) {
 

@@ -18,7 +18,7 @@ class NetworkSerialization$Test extends FunSuite {
 
   test("save model") {
 
-    val network = Network(3, 2,1, RandomSynapsysFactory())
+    val network = Network(inputPerceptronSize = 3, hiddenSize =  2, outputPerceptronSize = 1, synapsysFactory = RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
 

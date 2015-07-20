@@ -114,37 +114,34 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
      * Update output for all input layer
      */
     network.inputLayer.fillOutput(data)
+    val oldNetwork = MarkovChain(network)
 
+    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.id+"-"+p.output+"; "))
+    println()
+    println()
+    oldNetwork.hiddenLayer.perceptrons.foreach( p => print(p.id+"-"+p.output+"; "))
 
+    println()
+    println()
 
-    var originalData = InputLayer(
-      id = network.inputLayer.id,
-      perceptrons = network.inputLayer.perceptrons.map( x => Perceptron(x.id,x.index,x.output, x.weight, x.error)),
-      bias = Some(MarkovChain.newBias(network.inputLayer.bias.get.id))
-    )
-    originalData.bias.get.output = network.inputLayer.bias.get.output
-    originalData.bias.get.weight = network.inputLayer.bias.get.weight
-
-//    originalData.fillOutput(data)
-
-    /**
-     * Update weight and output for all hidden layers
-     */
-//    network.hiddenLayers.foreach { layer =>
-//      layer.perceptrons.foreach { perceptron =>
-//        perceptron.weight = network.getPerceptronWeight(perceptron)
-//        perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-//      }
-//    }
+    oldNetwork.synapsies.foreach(p => print(p.from.id + " - "+p.to.id + " - " + p.weight+"; \n"))
+    println()
+    println()
 
     for(i <- 1 to parameter.k){
+      println("===========================================================================================>>" + i)
+      println("output hidden layer ")
       /**
        * Update weight and output for output layer
        */
       network.hiddenLayer.perceptrons.foreach { perceptron =>
         perceptron.weight = network.getPerceptronWeightTo(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+        print(perceptron.output + ",")
       }
+      println()
+
+      println("input balik : ")
 
       /**
        * update input layer
@@ -152,8 +149,19 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
       network.inputLayer.perceptrons.foreach { perceptron =>
         perceptron.weight = network.getPerceptronWeightFrom(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+        print(perceptron.output + ",")
       }
+      println("next iteration ------->>")
     }
+
+    oldNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
+      println(perceptron)
+      perceptron.weight = oldNetwork.getPerceptronWeightTo(perceptron)
+      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+      print("original data : "+perceptron.output + ",")
+    }
+
+    println()
 
     /**
      * Update weight and output for output layer
@@ -164,31 +172,57 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
     }
 
 
-    var tempXTilt = InputLayer(
-      id = network.inputLayer.id,
-      perceptrons = network.inputLayer.perceptrons.map( x => Perceptron(x.id,x.index,x.output, x.weight, x.error)),
-      bias = Some(MarkovChain.newBias(network.inputLayer.bias.get.id))
-    )
+    println("k : " + parameter.k)
+    println("original ::")
+    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.output + "," + p.id + "; "))
+    println()
+    println()
 
-    tempXTilt.bias.get.output = network.inputLayer.bias.get.output
-    tempXTilt.bias.get.weight = network.inputLayer.bias.get.weight
+    println("x tilt  ::")
+    network.inputLayer.perceptrons.foreach( p => print(p.output + "," + p.id + "; "))
+    println()
+    println()
 
-    var hXTotal = 0.0D;
-    var hxTiltTotal = 0.0D;
+    println("original ::")
+    network.synapsies.foreach( p => print(p.from.output +"-"+p.from.id+";" + p.to.output+"-"+p.to.id+"; ---- \n"))
+    println()
+    println()
+
+
+    println("original ::")
+    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.output + ","))
+    println()
+
+    var hXTotal = 0.0D
+    var hxTiltTotal = 0.0D
 
     network.hiddenLayer.perceptrons.foreach { perceptron =>
 
+      print("X-tilt :: ")
+      print(perceptron.output)
+      println()
       val hXTilt = perceptron.output
       hxTiltTotal += hXTilt
 
-      network.inputLayer = originalData
-      val hX = parameter.activationFunction.activation(network.getPerceptronWeightTo(perceptron))
+      println("get act function hX")
+      val hX = oldNetwork.hiddenLayer.perceptrons.find(p => p.id.equals(perceptron.id)).get.output
       hXTotal += hX
+      print("hX :: ")
+      print(hX)
+      println()
+
+      println("original ::")
+      oldNetwork.inputLayer.perceptrons.foreach( p => print(p + ","))
+      println()
+
+      println("====="+network.getSynapsiesTo(perceptron.id)+"-----")
 
       network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
-
-        synapsys.deltaWeight = parameter.learningRate * ((hX * originalData.perceptrons.find( p => p.id == synapsys.from.id).get.output)
-          - (hXTilt * tempXTilt.perceptrons.find( p => p.id == synapsys.from.id).get.output))
+//        println(":>>>"+synapsys.from)
+//        println(":>> "+(oldNetwork.inputLayer.bias.get::oldNetwork.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get)
+        synapsys.deltaWeight = parameter.learningRate * ((hX *
+          (oldNetwork.inputLayer.bias.get::oldNetwork.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get.output)
+          - (hXTilt * (network.inputLayer.bias.get::network.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get.output))
         synapsys.weight = synapsys.weight + synapsys.deltaWeight
       }
     }
@@ -197,17 +231,10 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
       (hXTotal/network.hiddenLayer.perceptrons.size) - (hxTiltTotal/network.hiddenLayer.perceptrons.size))
 
     network.inputLayer.bias.get.output = network.hiddenLayer.bias.get.output + (parameter.learningRate *
-      (originalData.perceptrons.zip(tempXTilt.perceptrons).map(p => (p._1.output - p._2.output)).foldLeft(0.0D)((temp, x) => temp + x))/originalData.perceptrons.size)
+      (oldNetwork.inputLayer.perceptrons.zip(network.inputLayer.perceptrons).map(p => (p._1.output - p._2.output)).foldLeft(0.0D)((temp, x) => temp + x))/
+      oldNetwork.inputLayer.perceptrons.size)
 
-    network.inputLayer = tempXTilt
 
-    /**
-     * Update weight and output for output layer
-     */
-    network.hiddenLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeightTo(perceptron)
-      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-    }
 
     /**
      * Lost function before partial funtion adding
@@ -215,6 +242,7 @@ abstract class GibbSampling[DATASET] extends Sampling[Layer] with Algorithm[DATA
     val freeEnergy = Math.exp(network.inputLayer.perceptrons.map( p => p.output * network.hiddenLayer.bias.get.output).foldLeft(0.0D)((temp, value) => temp + value) +
     network.hiddenLayer.perceptrons.map(p => Math.log(1 + p.output)).foldLeft(0.0D)((temp, value) => temp + value))
 
+    println("free energy : " + freeEnergy)
     freeEnergy
   }
 }

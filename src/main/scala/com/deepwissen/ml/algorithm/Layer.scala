@@ -100,7 +100,7 @@ trait Layer {
  * Input Layer
  */
 case class InputLayer(id: String,
-                      perceptrons: List[Perceptron],
+                      var perceptrons: List[Perceptron],
                       bias: Option[Perceptron],
                       var next: Option[Layer] = None) extends Layer {
 
@@ -114,8 +114,8 @@ case class InputLayer(id: String,
  * Hidden Layer
  */
 case class HiddenLayer(id: String,
-                       perceptrons: List[Perceptron],
-                       bias: Option[Perceptron],
+                       var perceptrons: List[Perceptron],
+                       var bias: Option[Perceptron],
                        var prev: Option[Layer] = None,
                        var next: Option[Layer] = None) extends Layer
 

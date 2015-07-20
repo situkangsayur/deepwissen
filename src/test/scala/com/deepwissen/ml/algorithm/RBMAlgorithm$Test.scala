@@ -80,7 +80,7 @@ class RBMAlgorithm$Test extends FunSuite {
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
     hiddenPerceptronSize = dataset.head.length - 2,
-    k = 1000,
+    k = 10,
     iteration = 10000,
     epsilon = 0.00001,
     momentum = 0.50,
@@ -129,22 +129,6 @@ class RBMAlgorithm$Test extends FunSuite {
 
       prevLayer.next = Some(hiddenLayer(0))
       hiddenLayer(0).prev = Some(prevLayer)
-
-//      val hiddenLayers = (1 to 1).map { i =>
-//        val hiddenLayer = HiddenLayer(
-//          id = newLayerId(),
-//          perceptrons = newPerceptrons(hiddenPerceptronSize),
-//          bias = Some(newBias())
-//        )
-//
-//        // create relation from prev layer to next layer
-//        prevLayer.next = Some(hiddenLayer)
-//        hiddenLayer.prev = Some(prevLayer)
-//
-//        // assign next layer to prev layer for next iteration
-//        prevLayer = hiddenLayer
-//        hiddenLayer // return hidden layer
-//      }.toList
 
       prevLayer = hiddenLayer(0)
       val outputLayer = new OutputLayer(
@@ -220,8 +204,8 @@ class RBMAlgorithm$Test extends FunSuite {
       new File("target" + File.separator + "cuaca.json")))
   }
 
-  test("Testing for Gibbs Sampling") {
-
-  }
+//  test("Testing for Gibbs Sampling") {
+//
+//  }
 
 }

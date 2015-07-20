@@ -83,6 +83,13 @@ object MarkovChain{
   def newPerceptron(model: PerceptronModel) = Perceptron(model.id, model.index)
 
   /**
+   * Create new Perceptron from given non serializable Model
+   * @param model Standard Perceptron
+   * @return Perceptron
+   */
+  def newPerceptron(model: Perceptron) = Perceptron(model.id, model.index)
+
+  /**
    * Create new Perceptron with unique id
    * @return Perceptron
    */
@@ -116,7 +123,7 @@ object MarkovChain{
    * @param inputPerceptronSize input perceptron size
    * @return
    */
-  def apply(inputPerceptronSize: Int, outputPerceptronSize : Int,synapsysFactory: SynapsysFactory): MarkovChain = {
+  def apply(inputPerceptronSize: Int, outputPerceptronSize : Int, synapsysFactory: SynapsysFactory[_]): MarkovChain = {
     val hiddenPerceptronSize = Math.round(inputPerceptronSize * 2 / 3.0).toInt
 
     // create input layer
@@ -157,10 +164,58 @@ object MarkovChain{
           createSynapsies(nextLayer, synapsies ::: currentSynapsies)
       }
 
-    val synapsies = createSynapsies(inputLayer, List())
+    val synapsies = if(synapsysFactory.isInstanceOf[CopySynapsysFactory]){
+      val tempListOfSynapsys = synapsysFactory.asInstanceOf[CopySynapsysFactory]
+      tempListOfSynapsys.getSynapsys().map { synapsys =>
+        Synapsys(
+          from = synapsys.from,
+          to = synapsys.to,
+          weight = synapsys.weight,
+          deltaWeight = synapsys.deltaWeight
+        )
+      }
+    } else createSynapsies(inputLayer, List())
 
     // create network
     new MarkovChain(inputLayer, hiddenLayer, synapsies)
+  }
+
+
+
+  /**
+   * Create new network from another network
+   * @param model Standard Network Model
+   * @return
+   */
+  def apply(model: MarkovChain) : MarkovChain = {
+    val inputLayer = InputLayer(
+        id = model.inputLayer.id,
+        perceptrons = model.inputLayer.perceptrons.map(p => new Perceptron(p.id,p.index,p.output,p.weight,p.error)).sortBy(_.index),
+        bias = model.inputLayer.bias.fold[Option[Perceptron]](None)( p => Some(new Perceptron(p.id, p.index,p.output, p.weight, p.error))
+      )
+    )
+
+    var prevLayer: Layer = inputLayer
+
+    val hiddenLayer = new HiddenLayer(
+        id = model.hiddenLayer.id,
+        perceptrons = model.hiddenLayer.perceptrons.map(p => new Perceptron(p.id,p.index,p.output,p.weight,p.error)).sortBy(_.index),
+        bias = model.hiddenLayer.bias.fold[Option[Perceptron]](None)(p => Some(new Perceptron(p.id, p.index,p.output, p.weight, p.error))),
+        prev = Some(prevLayer)
+      )
+
+    prevLayer.next = Some(hiddenLayer)
+
+    val tempSynapsies = model.synapsies.map { synapsys =>
+      Synapsys(
+        from = new Perceptron(synapsys.from.id,synapsys.from.index,synapsys.from.output,synapsys.from.weight,synapsys.from.error),
+        to = new Perceptron(synapsys.to.id,synapsys.to.index,synapsys.to.output,synapsys.to.weight,synapsys.to.error),
+        weight = synapsys.weight,
+        deltaWeight = synapsys.deltaWeight
+      )
+    }
+
+    new MarkovChain(inputLayer, hiddenLayer, tempSynapsies)
   }
 
   /**
@@ -176,15 +231,6 @@ object MarkovChain{
       perceptrons = model.inputLayer.perceptrons.map(newPerceptron).sortBy(_.index),
       bias = model.inputLayer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
     )
-
-    // create hidden layer
-//    val hiddenLayers = model.hiddenLayers.map { layer =>
-//      HiddenLayer(
-//        id = layer.id,
-//        perceptrons = layer.perceptrons.map(newPerceptron).sortBy(_.index),
-//        bias = layer.bias.fold[Option[Perceptron]](None)(id => Some(newBias(id)))
-//      )
-//    }
 
     // create output layer
     val hiddenLayer = new HiddenLayer(

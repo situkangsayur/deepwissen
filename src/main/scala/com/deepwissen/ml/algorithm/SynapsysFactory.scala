@@ -43,6 +43,7 @@ case class RandomSynapsysFactory(value: Double = 0.05) extends SynapsysFactory[S
     to = to,
     weight = value * Math.random()
   )
+  def apply(listOfSynapsys: List[Synapsys]): List[Synapsys] = null
 
 //  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys]
 
@@ -62,6 +63,8 @@ case class CopySynapsysFactory(listOfSynapsyses: List[Synapsys]) extends Synapsy
     this(listOfSynapsys)
     listOfSynapsys
   }
+
+  override def apply(from: Perceptron, to: Perceptron): Synapsys = null
 
   override def getSynapsys() : List[Synapsys] = listOfSynapsyses
 }
