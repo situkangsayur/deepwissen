@@ -5,7 +5,6 @@
 package com.deepwissen.ml.serialization
 
 import java.io.{FileInputStream, File, FileOutputStream, StringWriter}
-
 import com.deepwissen.ml.algorithm.{RandomSynapsysFactory, Network}
 import org.apache.commons.io.output.WriterOutputStream
 import org.scalatest.FunSuite
@@ -34,13 +33,8 @@ class NetworkSerialization$Test extends FunSuite {
 
   test("load model") {
 
-//    val inputStream = getClass.getResourceAsStream("target" + File.separator + "network-model.json")
     val network = NetworkSerialization.load(inputStream = new FileInputStream(
           new File("target" + File.separator + "network-model.json")), typeOfInference = "NeuralNet").asInstanceOf[Network]
-//    println("before print input stream")
-//    println(inputStream.toString)
-//    println("load model json")
-//    val network = NetworkSerialization.load(inputStream = inputStream,typeOfInference = "NeuralNet").asInstanceOf[Network]
     println("converter model network to network object")
     network.inputLayer.perceptrons.foreach { perceptron =>
       println(network.inputLayer.id + " input layer => " + perceptron.id)

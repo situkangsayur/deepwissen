@@ -69,7 +69,7 @@ class MarkovChain (var inputLayer: Layer,
 
   def getPerceptronWeightFrom(perceptron: Perceptron): Double =
     getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
-      value + (synapsys.weight * synapsys.from.output)
+      value + (synapsys.weight * synapsys.to.output)
     }
 }
 

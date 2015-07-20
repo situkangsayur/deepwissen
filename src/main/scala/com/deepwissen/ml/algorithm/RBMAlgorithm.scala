@@ -22,16 +22,19 @@ object RBMAlgorithm extends AbstractRestrictedBoltzmannMachine[List[Array[Denomi
         if (error < parameter.epsilon || iteration > parameter.iteration) {
           // stop iteration
         } else {
-          // print information
-          println(s"###### error : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
+          println("##########################################################################################################################")
           // run training
           val listOfPartialFreeEnergy = dataset.map( data => doTrainData(data, network, parameter))
 //          val partialFreeEnergy = dataset.foldLeft(0.0)((value, data) => value + doTrainData(data, network, parameter))
 
           val partialFunction = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => temp + value)
-          val freeEnergy = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => temp + (value/partialFunction))
+          val lostFunction = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => temp + (value/partialFunction))/listOfPartialFreeEnergy.size
           // next iteration
-          iterate(iteration + 1, freeEnergy)
+          // print information
+          println(s"###### error : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
+          println("--------------------------------------------------------------------------------------------------------------------------")
+
+          iterate(iteration + 1, lostFunction)
         }
       }
 

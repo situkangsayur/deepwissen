@@ -102,49 +102,29 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
     network.inputLayer.fillOutput(data)
     val oldNetwork = MarkovChain(network)
 
-    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.id+"-"+p.output+"; "))
-    println()
-    println()
-    oldNetwork.hiddenLayer.perceptrons.foreach( p => print(p.id+"-"+p.output+"; "))
-
-    println()
-    println()
-
-    oldNetwork.synapsies.foreach(p => print(p.from.id + " - "+p.to.id + " - " + p.weight+"; \n"))
-    println()
-    println()
-
+    /**
+     * Gibbs sampling for k-step
+     */
     for(i <- 1 to parameter.k){
-      println("===========================================================================================>>" + i)
-      println("output hidden layer ")
       /**
        * Update weight and output for output layer
        */
       network.hiddenLayer.perceptrons.foreach { perceptron =>
         perceptron.weight = network.getPerceptronWeightTo(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-        print(perceptron.output + ",")
       }
-      println()
-
-      println("input balik : ")
-
       /**
        * update input layer
        */
       network.inputLayer.perceptrons.foreach { perceptron =>
         perceptron.weight = network.getPerceptronWeightFrom(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-        print(perceptron.output + ",")
       }
-      println("next iteration ------->>")
     }
 
     oldNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
-      println(perceptron)
       perceptron.weight = oldNetwork.getPerceptronWeightTo(perceptron)
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
-      print("original data : "+perceptron.output + ",")
     }
 
     println()
@@ -158,60 +138,40 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
     }
 
 
-    println("k : " + parameter.k)
     println("original ::")
-    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.output + "," + p.id + "; "))
+    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.id + " : " + p.output + "; "))
     println()
     println()
 
     println("x tilt  ::")
-    network.inputLayer.perceptrons.foreach( p => print(p.output + "," + p.id + "; "))
+    network.inputLayer.perceptrons.foreach( p => print(p.id + " : " + p.output + "; "))
     println()
-    println()
-
-    println("original ::")
-    network.synapsies.foreach( p => print(p.from.output +"-"+p.from.id+";" + p.to.output+"-"+p.to.id+"; ---- \n"))
-    println()
-    println()
-
-
-    println("original ::")
-    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.output + ","))
     println()
 
     var hXTotal = 0.0D
     var hxTiltTotal = 0.0D
 
+    println("get update\n")
     network.hiddenLayer.perceptrons.foreach { perceptron =>
 
-      print("X-tilt :: ")
-      print(perceptron.output)
-      println()
       val hXTilt = perceptron.output
+      print(" || X-tilt :: " + hXTilt + " -- ")
       hxTiltTotal += hXTilt
 
-      println("get act function hX")
+
       val hX = oldNetwork.hiddenLayer.perceptrons.find(p => p.id.equals(perceptron.id)).get.output
       hXTotal += hX
-      print("hX :: ")
-      print(hX)
-      println()
-
-      println("original ::")
-      oldNetwork.inputLayer.perceptrons.foreach( p => print(p + ","))
-      println()
-
-      println("====="+network.getSynapsiesTo(perceptron.id)+"-----")
+      print("hX :: " + hX)
 
       network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
-//        println(":>>>"+synapsys.from)
-//        println(":>> "+(oldNetwork.inputLayer.bias.get::oldNetwork.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get)
         synapsys.deltaWeight = parameter.learningRate * ((hX *
           (oldNetwork.inputLayer.bias.get::oldNetwork.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get.output)
           - (hXTilt * (network.inputLayer.bias.get::network.inputLayer.perceptrons).find( p => p.id.equals(synapsys.from.id)).get.output))
         synapsys.weight = synapsys.weight + synapsys.deltaWeight
       }
     }
+
+    println()
 
     network.hiddenLayer.bias.get.output = network.hiddenLayer.bias.get.output + (parameter.learningRate *
       (hXTotal/network.hiddenLayer.perceptrons.size) - (hxTiltTotal/network.hiddenLayer.perceptrons.size))

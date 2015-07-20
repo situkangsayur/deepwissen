@@ -4,7 +4,6 @@ import java.io.{File, FileOutputStream}
 
 import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
-import RBMAlgorithm
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
 import com.deepwissen.ml.validation.Validation
@@ -80,8 +79,8 @@ class RBMAlgorithm$Test extends FunSuite {
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
     hiddenPerceptronSize = dataset.head.length - 2,
-    k = 10,
-    iteration = 10000,
+    k = 1000,
+    iteration = 70000,
     epsilon = 0.00001,
     momentum = 0.50,
     learningRate = 0.50,
