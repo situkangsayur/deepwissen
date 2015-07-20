@@ -1,7 +1,5 @@
-package com.deepwissen.ml.sampling
+package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.algorithm.Autoencoder._
-import com.deepwissen.ml.algorithm._
 import com.deepwissen.ml.utils.Denomination
 
 import scala.annotation.tailrec
@@ -9,7 +7,7 @@ import scala.annotation.tailrec
 /**
  * Created by hendri_k on 7/17/15.
  */
-object GibbsAlgorithm extends GibbSampling[List[Array[Denomination[_]]]]{
+object RBMAlgorithm extends AbstractRestrictedBoltzmannMachine[List[Array[Denomination[_]]]]{
 
     /**
      * Run training with given dataset

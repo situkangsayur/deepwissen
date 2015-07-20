@@ -4,7 +4,7 @@ import java.io.{File, FileOutputStream}
 
 import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
-import com.deepwissen.ml.sampling.GibbsAlgorithm
+import RBMAlgorithm
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
 import com.deepwissen.ml.validation.Validation
@@ -159,7 +159,7 @@ class RBMAlgorithm$Test extends FunSuite {
     }
 
 
-    val tempNetwork = GibbsAlgorithm.train(finalDataSet, parameter)
+    val tempNetwork = RBMAlgorithm.train(finalDataSet, parameter)
 
     val newNetwork = createNewNetwork(network = tempNetwork)
 
