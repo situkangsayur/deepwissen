@@ -79,8 +79,8 @@ class RBMAlgorithm$Test extends FunSuite {
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
     hiddenPerceptronSize = dataset.head.length - 2,
-    k = 1000,
-    iteration = 1000,
+    k = 3000,
+    iteration = 2,
     epsilon = 0.00001,
     momentum = 0.50,
     learningRate = 0.50,

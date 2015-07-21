@@ -72,13 +72,22 @@ trait Layer {
     perceptrons.foreach { perceptron =>
       // make sure non error ArrayIndexOutOfBoundsException
       if (perceptron.index >= 0 && perceptron.index <= tempData.length) {
-        LogPrint.printLogDebug("Print Input Layer Perceptron --> "+
-          perceptron.index + " :> " + tempData(perceptron.index).asInstanceOf[ContValue].get)
         perceptron.output = tempData(perceptron.index).asInstanceOf[ContValue].get
       }
     }
-    // update bias to 1.0
-    bias.foreach(bias => bias.output = 1.0)
+
+    this
+  }
+
+  /**
+   * Fill perceptrons output with given dataset and update bias output to 1.0
+   * @param data one list of perceptron
+   * @return this layer
+   */
+  def fillOutput(data: List[Perceptron]) : Layer = {
+    perceptrons.foreach { pn =>
+      pn.output = data.find(d => d.id.equals(pn.id)).get.output
+    }
     this
   }
 
@@ -95,8 +104,7 @@ trait Layer {
       perceptron.weight = data(perceptron.index).asInstanceOf[Double]
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
-    // update bias to 1.0
-    bias.foreach(bias => bias.output = 1.0)
+
     this
   }
 

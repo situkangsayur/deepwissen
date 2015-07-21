@@ -19,6 +19,7 @@ trait SynapsysFactory[T] {
    * @return synapsys
    */
   def apply(from: Perceptron, to: Perceptron): Synapsys
+  def apply(from: Perceptron, to: Perceptron, value : Double): Synapsys
   def apply(listOfSynapsys: List[Synapsys]): List[Synapsys]
   def getSynapsys() : T
 
@@ -43,14 +44,38 @@ case class RandomSynapsysFactory(value: Double = 0.05) extends SynapsysFactory[S
     to = to,
     weight = value * Math.random()
   )
-  def apply(listOfSynapsys: List[Synapsys]): List[Synapsys] = null
+  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys] = null
 
-//  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys]
+  override def apply(from: Perceptron, to: Perceptron, value : Double): Synapsys = null
 
   override def getSynapsys() : Synapsys = null
 }
 
+case class SetSynapsysFactory() extends SynapsysFactory[Synapsys] {
 
+  /**
+   * Create new synapsys from perceptron to perceptron with random synapsys
+   * @param from from perceptron
+   * @param to to perceptron
+   * @return synapsys
+   */
+  override def apply(from: Perceptron, to: Perceptron, value : Double): Synapsys = Synapsys(
+    from = from,
+    to = to,
+    weight = value
+  )
+
+  override def apply(from: Perceptron, to: Perceptron): Synapsys = null
+
+  override def apply(listOfSynapsys: List[Synapsys]): List[Synapsys] = null
+
+  override def getSynapsys() : Synapsys = null
+}
+
+/**
+ * Factory object for create synapsis with copied weight
+ * @param listOfSynapsyses
+ */
 case class CopySynapsysFactory(listOfSynapsyses: List[Synapsys]) extends SynapsysFactory[List[Synapsys]] {
 
 //  override def apply(from: Perceptron, to: Perceptron): Synapsys
@@ -65,6 +90,8 @@ case class CopySynapsysFactory(listOfSynapsyses: List[Synapsys]) extends Synapsy
   }
 
   override def apply(from: Perceptron, to: Perceptron): Synapsys = null
+
+  override def apply(from: Perceptron, to: Perceptron, value : Double): Synapsys = null
 
   override def getSynapsys() : List[Synapsys] = listOfSynapsyses
 }

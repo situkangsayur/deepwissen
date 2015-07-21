@@ -7,6 +7,7 @@ import com.deepwissen.ml.utils.{ContValue, Denomination}
  */
 abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DATASET, Array[Double], GibbsParameter, MarkovChain]{
 
+  var xTiltBefore: List[Perceptron] = null
   /**
    * Run training with given dataset
    * @param dataset dataset
@@ -94,13 +95,38 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
    * @param parameter train parameter
    * @return sum error
    */
-  def doTrainData(data: Array[Denomination[_]], network: MarkovChain, parameter: GibbsParameter): Double = {
+  def doTrainData(data: Array[Denomination[_]], xTiltParam: List[Perceptron] , network: MarkovChain, parameter: GibbsParameter): (Double, List[Perceptron]) = {
 
     /**
      * Update output for all input layer
      */
-    network.inputLayer.fillOutput(data)
-    val oldNetwork = MarkovChain(network)
+
+    if(xTiltParam == null)
+      network.inputLayer.fillOutput(data)
+    else
+      network.inputLayer.fillOutput(xTiltParam)
+
+    var oldNetwork = MarkovChain(network, synapsysFactory = SetSynapsysFactory())
+
+    oldNetwork.inputLayer.fillOutput(data)
+
+
+    oldNetwork.hiddenLayer.biases.foreach { perceptron =>
+      perceptron.output = network.getBias(perceptron.id).output
+      print(perceptron.output + ",")
+    }
+    println(";")
+
+    oldNetwork.inputLayer.biases.foreach { perceptron =>
+      perceptron.output = network.getBias(perceptron.id).output
+      print(perceptron.output + ",")
+    }
+    println(";")
+
+    oldNetwork.synapsies.foreach { s =>
+      s.weight = network.getSynapsys(s.from.id, s.to.id).weight
+    }
+
 
     /**
      * Gibbs sampling for k-step
@@ -137,33 +163,26 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 
-
-    println("original ::")
-    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.id + " : " + p.output + "; "))
+    println()
+    print("input: ")
+    oldNetwork.inputLayer.perceptrons.foreach( p => print(p.output + "; "))
+    println()
+    print("xtilt: ")
+    network.inputLayer.perceptrons.foreach( p => print(p.output + "; "))
     println()
     println()
-
-    println("x tilt  ::")
-    network.inputLayer.perceptrons.foreach( p => print(p.id + " : " + p.output + "; "))
-    println()
-    println()
-
-    var hXTotal = 0.0D
-    var hxTiltTotal = 0.0D
 
     println("get update\n")
-    oldNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
 
-      val hXTilt = oldNetwork.hiddenLayer.perceptrons.find(p => p.id.equals(perceptron.id)).get.output
-      print(" || X-tilt :: " + hXTilt + " -- ")
-      hxTiltTotal += hXTilt
+      val hXTilt = perceptron.output
 
 
-      val hX = perceptron.output
-      hXTotal += hX
-      print("hX :: " + hX)
+      val hX = oldNetwork.hiddenLayer.perceptrons.find(p => p.id.equals(perceptron.id)).get.output
 
-      oldNetwork.getSynapsiesTo(perceptron.id).foreach { synapsys =>
+      println("X-tilt: " + hXTilt + " --> hX: " + hX+" | next | ")
+
+      network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
         synapsys.deltaWeight = parameter.learningRate * ((hX *
           oldNetwork.inputLayer.perceptrons.find( p => p.id.equals(synapsys.from.id)).get.output)
           - (hXTilt * network.inputLayer.perceptrons.find( p => p.id.equals(synapsys.from.id)).get.output))
@@ -173,14 +192,14 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
 
     println()
 
-    oldNetwork.hiddenLayer.biases.foreach { p =>
+    network.hiddenLayer.biases.foreach { p =>
       p.output = p.output + (parameter.learningRate *
         oldNetwork.getPerceptron(p.id.replace("bias","perceptron")).output -
         network.getPerceptron(p.id.replace("bias","perceptron")).output)
     }
 //    network.hiddenLayer.bias.get.output = network.hiddenLayer.biases +
 
-    oldNetwork.inputLayer.biases.foreach { p =>
+    network.inputLayer.biases.foreach { p =>
       p.output = p.output + (oldNetwork.getPerceptron(p.id.replace("bias","perceptron")).output -
         network.getPerceptron(p.id.replace("bias","perceptron")).output)
     }
@@ -189,14 +208,43 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
 //      (oldNetwork.inputLayer.perceptrons.zip(network.inputLayer.perceptrons).map(p => (p._1.output - p._2.output)).foldLeft(0.0D)((temp, x) => temp + x))/
 //      oldNetwork.inputLayer.perceptrons.size)
 
+
+    /**
+     * update all real biases values
+     */
+    oldNetwork.hiddenLayer.biases.foreach { perceptron =>
+      perceptron.output = network.getBias(perceptron.id).output
+      print(perceptron.output + ",")
+    }
+    println(";")
+
+    oldNetwork.inputLayer.biases.foreach { perceptron =>
+      perceptron.output = network.getBias(perceptron.id).output
+      print(perceptron.output + ",")
+    }
+    println(";\n")
+
+    oldNetwork.synapsies.foreach { s =>
+      s.weight = network.getSynapsys(s.from.id, s.to.id).weight
+    }
+
     /**
      * Update weight and output for output layer
      */
-    oldNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = oldNetwork.getPerceptronWeightTo(perceptron)
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 
+    oldNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = parameter.activationFunction.activation(perceptron.weight)
+    }
+
+//    println("After ==>> ")
+//    oldNetwork.synapsies.foreach {s =>
+//      println("synapsis: "+s.from + " -> "+ s.to +" = " + s.weight)
+//    }
 
     /**
      * Lost function before partial funtion adding
@@ -206,6 +254,7 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
       oldNetwork.hiddenLayer.perceptrons.map(p => Math.log(1 + p.output)).foldLeft(0.0D)((temp, value) => temp + value))
 
     println("free energy : " + freeEnergy)
-    freeEnergy
+    println("----------------------------------------------")
+    (freeEnergy, network.inputLayer.perceptrons.map( p => Perceptron(p.id, p.index, p.output, p.weight, p.error)))
   }
 }

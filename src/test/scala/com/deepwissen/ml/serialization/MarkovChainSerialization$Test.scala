@@ -12,7 +12,7 @@ import org.scalatest.FunSuite
 class MarkovChainSerialization$Test extends FunSuite{
   test("save model markov chain") {
 
-    val network = MarkovChain(7,5, RandomSynapsysFactory())
+    val network = MarkovChain(7,5, synapsysFactory = RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
 
