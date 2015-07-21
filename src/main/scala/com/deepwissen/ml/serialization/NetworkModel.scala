@@ -29,6 +29,7 @@ case class MarkovChainModel(inputLayer: LayerModel,
 case class LayerModel(id: String,
                       perceptrons: List[PerceptronModel],
                       bias: Option[String],
+                      biases : List[PerceptronModel] = null,
                       nextLayer: Option[String],
                       prevLayer: Option[String])
 
@@ -38,7 +39,8 @@ case class SynapsysModel(from: String,
                          deltaWeight: Double)
 
 case class PerceptronModel(id: String,
-                           index: Int)
+                           index: Int,
+                           output : Double = 0.0)
 
 object NetworkModel {
 
@@ -105,6 +107,7 @@ object MarkovChainModel {
       id = network.inputLayer.id,
       perceptrons = network.inputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
       bias = network.inputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      biases = network.inputLayer.biases.map(p => PerceptronModel(p.id, p.index, p.output)),
       nextLayer = network.inputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
       prevLayer = network.inputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
     )
@@ -113,6 +116,7 @@ object MarkovChainModel {
       id = network.hiddenLayer.id,
       perceptrons = network.hiddenLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
       bias = network.hiddenLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      biases = network.hiddenLayer.biases.map(p => PerceptronModel(p.id, p.index, p.output)),
       nextLayer = network.hiddenLayer.next.fold[Option[String]](None)(l => Some(l.id)),
       prevLayer = network.hiddenLayer.prev.fold[Option[String]](None)(l => Some(l.id))
     )

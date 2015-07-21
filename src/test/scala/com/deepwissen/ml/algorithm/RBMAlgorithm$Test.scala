@@ -80,7 +80,7 @@ class RBMAlgorithm$Test extends FunSuite {
     inputPerceptronSize = dataset.head.length - 1,
     hiddenPerceptronSize = dataset.head.length - 2,
     k = 1000,
-    iteration = 70000,
+    iteration = 1000,
     epsilon = 0.00001,
     momentum = 0.50,
     learningRate = 0.50,

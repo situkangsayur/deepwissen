@@ -28,6 +28,12 @@ trait Layer {
   def perceptrons: List[Perceptron]
 
   /**
+   * Get list of biases
+   * @return list of biases
+   */
+  def biases: List[Perceptron]
+
+  /**
    * Get first perceptrons
    * @return perceptron
    */
@@ -102,7 +108,8 @@ trait Layer {
 case class InputLayer(id: String,
                       var perceptrons: List[Perceptron],
                       bias: Option[Perceptron],
-                      var next: Option[Layer] = None) extends Layer {
+                      var next: Option[Layer] = None,
+                      var biases : List[Perceptron] = null) extends Layer {
 
   /**
    * Input layer doesn't have previous layer, it will allways return None
@@ -115,9 +122,10 @@ case class InputLayer(id: String,
  */
 case class HiddenLayer(id: String,
                        var perceptrons: List[Perceptron],
-                       var bias: Option[Perceptron],
+                       bias: Option[Perceptron],
                        var prev: Option[Layer] = None,
-                       var next: Option[Layer] = None) extends Layer
+                       var next: Option[Layer] = None,
+                       var biases : List[Perceptron] = null) extends Layer
 
 /**
  * Output Layer
@@ -125,7 +133,8 @@ case class HiddenLayer(id: String,
 case class OutputLayer(id: String,
                        perceptrons: List[Perceptron],
                        var prev: Option[Layer] = None,
-                       var next: Option[Layer] = None) extends Layer {
+                       var next: Option[Layer] = None,
+                       var biases: List[Perceptron] = null) extends Layer {
 
   /**
    * Output layer doesn't have bias, it will always return None

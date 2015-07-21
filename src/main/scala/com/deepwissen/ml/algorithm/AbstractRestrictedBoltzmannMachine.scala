@@ -28,7 +28,7 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
   def newNetwork(dataset: DATASET, parameter: GibbsParameter): MarkovChain =
     MarkovChain(
       inputPerceptronSize = parameter.inputPerceptronSize,
-      outputPerceptronSize = parameter.hiddenPerceptronSize,
+      hiddenPerceptronSize = parameter.hiddenPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
@@ -71,21 +71,21 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
     }
   }
 
-  /**
-   * Get synapsys delta weight calculation
-   * @param network network
-   * @param perceptron perceptron
-   * @param synapsys synapsys
-   * @param parameter parameter
-   * @return delta weight
-   */
-  def getSynapsysDeltaWeight(network: MarkovChain, perceptron: Perceptron, synapsys: Synapsys, parameter: GibbsParameter): Double = {
-    if (synapsys.isFromBias)
-      (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
-    else
-      (parameter.learningRate * perceptron.error * synapsys.from.output) + (parameter.momentum * synapsys.deltaWeight)
-//    0.0D
-  }
+//  /**
+//   * Get synapsys delta weight calculation
+//   * @param network network
+//   * @param perceptron perceptron
+//   * @param synapsys synapsys
+//   * @param parameter parameter
+//   * @return delta weight
+//   */
+//  def getSynapsysDeltaWeight(network: MarkovChain, perceptron: Perceptron, synapsys: Synapsys, parameter: GibbsParameter): Double = {
+//    if (synapsys.isFromBias)
+//      (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
+//    else
+//      (parameter.learningRate * perceptron.error * synapsys.from.output) + (parameter.momentum * synapsys.deltaWeight)
+////    0.0D
+//  }
 
   /**
    * Train network model with single data from dataset
