@@ -81,54 +81,21 @@ class MarkovChain (var inputLayer: Layer,
     getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
       value + ( getBias(synapsys.to.id.replace("perceptron", "bias")).output + (synapsys.weight * synapsys.to.output))
     }
-//
-//  /**
-//   * Update synapsies 'To'
-//   * @param listOfBiases
-//   */
-//  def updateSynapsiesTo(listOfBiases: List[Perceptron]) = {
-//    synapsies.foreach { s =>
-//      val tempBias = listOfBiases.find(b => b.id.equals(s.to.id))
-//      if(tempBias != None)
-//        s.to.output = listOfBiases.find(b => b.id.equals(s.to.id)).get.output
-//    }
-//  }
-
-//  /**
-//   * Update synapsis 'To' without parameter
-//   */
-//  def updateSynapsiesTo = {
-//    synapsies.foreach { s =>
-//      val tempBias = hiddenLayer.biases.find(b => b.id.equals(s.to.id))
-//      if(tempBias != None)
-//        s.to.output = hiddenLayer.biases.find(b => b.id.equals(s.to.id)).get.output
-//    }
-//  }
-//
-//  /**
-//   * Update synapsies 'From'
-//   * @param listOfBiases
-//   */
-//  def updateSynapsiesFrom(listOfBiases: List[Perceptron]) = {
-//    synapsies.foreach { s =>
-//      val tempBias = listOfBiases.find(b => b.id.equals(s.to.id))
-//      if(tempBias != None)
-//        s.from.output = listOfBiases.find(b => b.id.equals(s.to.id)).get.output
-//    }
-//  }
-//
-//  /**
-//   * Update synapsies 'From' without parameter
-//   */
-//  def updateSynapsiesFrom = {
-//    synapsies.foreach { s =>
-//      val tempBias = inputLayer.biases.find(b => b.id.equals(s.to.id))
-//      if(tempBias != None)
-//        s.from.output = inputLayer.biases.find(b => b.id.equals(s.to.id)).get.output
-//    }
-//  }
 
 
+  /**
+   * Update input synapsies synapsies 'From'
+   * @param listOfBiases
+   */
+  def updateInputLayerValues(listOfBiases: List[Perceptron]) = {
+    inputLayer.perceptrons.foreach( p => p.output = listOfBiases.find(x => x.id.equals(p.id)).get.output)
+
+    synapsies.foreach { s =>
+      val tempBias = listOfBiases.find(b => b.id.equals(s.to.id))
+      if(tempBias != None)
+        s.from.output = listOfBiases.find(b => b.id.equals(s.to.id)).get.output
+    }
+  }
 }
 
 

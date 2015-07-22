@@ -33,7 +33,7 @@ object RBMAlgorithm extends AbstractRestrictedBoltzmannMachine[List[Array[Denomi
 
           val z = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => temp + value)
           val lostFunction = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => {
-            println("p(x) = "+value + " / " z)
+            println("p(x) = "+value + " / " +z +" = "+ value/z)
             temp + (value/z)})/listOfPartialFreeEnergy.size
           // next iteration
           // print information
