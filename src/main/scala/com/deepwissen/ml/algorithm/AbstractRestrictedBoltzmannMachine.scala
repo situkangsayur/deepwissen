@@ -150,6 +150,7 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
 
     println("X : ")
     network.inputLayer.perceptrons.foreach( p => print(p.output + "; "))
+    println()
     println("xtilt : ")
     dataXTilt.foreach( p => print(p.output + "; "))
     println()
