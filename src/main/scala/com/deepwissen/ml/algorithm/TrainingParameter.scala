@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.function.{SigmoidFunction, ActivationFunction}
+import com.deepwissen.ml.function.{UniformDistribution, Sampling, SigmoidFunction, ActivationFunction}
 
 /**
  * Base trait for training parameter
@@ -36,15 +36,16 @@ case class BackpropragationParameter(inputPerceptronSize: Int,
                                      epsilon: Double = 0.000001,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter
 
-case class RbmParamter(inputPerceptronSize: Int,
-                       hiddenLayerSize: Int = 1,
-                       gibbsStep: Int = 3000,
-                       targetClassPosition: Int = -1,
-                       synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),
-                       activationFunction: ActivationFunction = SigmoidFunction,
-                       learningRate: Double = 0.75,
-                       epsilon: Double = 0.000001,
-                       iteration: Int = Int.MaxValue) extends TrainingParameter
+//case class RbmParamter(inputPerceptronSize: Int,
+//                       hiddenLayerSize: Int = 1,
+//                       gibbsStep: Int = 3000,
+//                       targetClassPosition: Int = -1,
+//                       synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),
+//                       activationFunction: ActivationFunction = SigmoidFunction,
+//                       learningRate: Double = 0.75,
+//                       epsilon: Double = 0.000001,
+//                       iteration: Int = Int.MaxValue,
+//                       sampling : Sampling = UniformDistribution) extends TrainingParameter
 
 case class DbnParamter(inputPerceptronSize: Int,
                        hiddenLayerSize: Int = 1,
@@ -66,4 +67,6 @@ case class GibbsParameter(inputPerceptronSize: Int,
                           learningRate: Double = 0.75,
                           momentum: Double = 0.75,
                           epsilon: Double = 0.000001,
-                          iteration: Int = Int.MaxValue) extends TrainingParameter
+                          iteration: Int = Int.MaxValue,
+                          sampling : Sampling = UniformDistribution(0,1),
+                          dataSize : Int) extends TrainingParameter

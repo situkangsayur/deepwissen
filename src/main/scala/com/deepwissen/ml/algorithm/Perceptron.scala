@@ -19,4 +19,5 @@ case class Perceptron(var id: String,
                       var index: Int,
                       var output: Double = 0.0,
                       var weight: Double = 0.0,
-                      var error: Double = 0.0)
+                      var error: Double = 0.0,
+                      var sample : Double = 0.0)

@@ -52,4 +52,12 @@ trait InferencesNetwork {
    */
   def getPerceptronWeightTo(perceptron: Perceptron): Double
 
+
+  /**
+   * Get perceptron weight, calculate from all synapsies and perceptron out source
+   * @param perceptron
+   * @return
+   */
+  def getPerceptronWeightFrom(perceptron: Perceptron): Double
+
 }

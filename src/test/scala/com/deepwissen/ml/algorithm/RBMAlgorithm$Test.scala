@@ -78,14 +78,15 @@ class RBMAlgorithm$Test extends FunSuite {
    */
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
-    hiddenPerceptronSize = dataset.head.length - 2,
-    k = 3000,
+    hiddenPerceptronSize = dataset.head.length + 2,
+    k = 100,
     iteration = 1000,
     epsilon = 0.00001,
     momentum = 0.50,
-    learningRate = 0.50,
+    learningRate = 0.1,
     synapsysFactory = RandomSynapsysFactory(),
-    activationFunction = SigmoidFunction
+    activationFunction = SigmoidFunction,
+    dataSize = dataset.size
   )
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
@@ -112,8 +113,9 @@ class RBMAlgorithm$Test extends FunSuite {
     def createNewNetwork(network: MarkovChain) : Network = {
       val inputLayer = new InputLayer(
         id = newLayerId(),
-        perceptrons = network.inputLayer.perceptrons.map( p => p),
-        bias = Some(Network.newBias(network.inputLayer.bias.get.id))
+        perceptrons = network.inputLayer.perceptrons.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
+        bias = Some(Network.newBias(network.inputLayer.bias.get.id)),
+        biases = network.inputLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error))
       )
 
       //    classifyNetwork.inputLayer = inpuLayer
@@ -122,8 +124,9 @@ class RBMAlgorithm$Test extends FunSuite {
 
       val hiddenLayer = List(new HiddenLayer(
         id = newLayerId(),
-        perceptrons = network.hiddenLayer.perceptrons.map( p => p),
-        bias = Some(Network.newBias(network.hiddenLayer.bias.get.id))
+        perceptrons = network.hiddenLayer.perceptrons.map(p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
+        bias = Some(Network.newBias(network.hiddenLayer.bias.get.id)),
+        biases = network.hiddenLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error))
       ))
 
       prevLayer.next = Some(hiddenLayer(0))
@@ -133,6 +136,7 @@ class RBMAlgorithm$Test extends FunSuite {
       val outputLayer = new OutputLayer(
         id = newLayerId(),
         perceptrons = network.inputLayer.perceptrons.map( p => p),
+        biases = network.inputLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
         prev = Some(prevLayer)
       )
       prevLayer.next = Some(outputLayer)
@@ -146,12 +150,12 @@ class RBMAlgorithm$Test extends FunSuite {
         )
       }
 
-      val listOfSynapsys = tempListOfSynapsys ::: network.synapsies.map(p => Synapsys(
+      val listOfSynapsys = tempListOfSynapsys ::: (network.synapsies.map(p => Synapsys(
         from = p.to,
         to = p.from,
         weight = p.weight,
         deltaWeight = p.deltaWeight
-      ))
+      )))
 
 
       new Network(inputLayer, hiddenLayer, outputLayer, listOfSynapsys)
@@ -162,7 +166,7 @@ class RBMAlgorithm$Test extends FunSuite {
 
     val newNetwork = createNewNetwork(network = tempNetwork)
 
-    val result = Validation.classification(newNetwork, BasicClassification, finalDataSet, SigmoidFunction)
+    val result = Validation.classification(newNetwork, RBMClassificationTesting, finalDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = Validation.validate(result, finalDataSet, 4)
@@ -179,7 +183,7 @@ class RBMAlgorithm$Test extends FunSuite {
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, newNetwork, SigmoidFunction)
+      val realScore = RBMClassificationTesting(data, newNetwork, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val originalClass = data(p._2).asInstanceOf[ContValue].get
         val result = p._1

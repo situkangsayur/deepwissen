@@ -67,20 +67,35 @@ class MarkovChain (var inputLayer: Layer,
    */
   def getSynapsiesTo(perceptronId: String):Seq[Synapsys] = synapsiesLookupTo(perceptronId)
 
+  def getPerceptronWeightFrom(perceptron: Perceptron): Double = 0.0
+
+  def getPerceptronWeightTo(perceptron: Perceptron): Double = 0.0
+
+
   /**
    * Get perceptron weight, calculate from all synapsies and perceptron source
    * @param perceptron perceptron
    * @return weight
    */
-  def getPerceptronWeightTo(perceptron: Perceptron): Double =
-    getSynapsiesTo(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
-      value + ( getBias(synapsys.from.id.replace("perceptron","bias")).output + (synapsys.weight * synapsys.from.output))
-    }
+  def getPerceptronWeightTo(perceptron: Perceptron, write : Boolean): Double = {
+    var inf = "f(x) = 1/(1 + exp( -1*( " + getBias(perceptron.id.replace("perceptron", "bias")).output
+    val temp  = getSynapsiesTo(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
+      inf += "+("+synapsys.weight + " * " + synapsys.from.output + ")"
+      value + (synapsys.weight * synapsys.from.output)
+    }  + getBias(perceptron.id.replace("perceptron", "bias")).output
+    if (write) println(perceptron.id + " : " + inf + "))) = " + temp)
+    temp
+  }
 
-  def getPerceptronWeightFrom(perceptron: Perceptron): Double =
-    getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
-      value + ( getBias(synapsys.to.id.replace("perceptron", "bias")).output + (synapsys.weight * synapsys.to.output))
-    }
+  def getPerceptronWeightFrom(perceptron: Perceptron, write : Boolean): Double = {
+    var inf = "f(x) = 1/(1 + exp( -1*(" + getBias(perceptron.id.replace("perceptron", "bias")).output
+    val temp = getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
+      inf += "+("+synapsys.weight + " * " + synapsys.from.output + ")"
+      value + (synapsys.weight * synapsys.to.output)
+    } + getBias(perceptron.id.replace("perceptron", "bias")).output
+    if (write) println(perceptron.id + " : " + inf + "))) = " + temp)
+    temp
+  }
 
 
   /**
@@ -148,7 +163,7 @@ object MarkovChain{
    */
   def newBiases(size : Int, perceptrons: List[Perceptron]) =
     perceptrons.map {p =>
-      Perceptron(p.id.replace("perceptron_","bias_"),p.index, output = 1.0)
+      Perceptron(p.id.replace("perceptron_","bias_"),p.index, output = 0.0)
     }
 
   /**

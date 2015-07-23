@@ -77,6 +77,10 @@ class Network(var inputLayer: Layer,
       value + (synapsys.weight * synapsys.from.output)
     }
 
+  def getPerceptronWeightFrom(perceptron: Perceptron): Double =
+    getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
+      value + (synapsys.weight * synapsys.to.output)
+    }
 }
 
 object Network {

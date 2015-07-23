@@ -73,3 +73,4 @@ case class RangeThresholdFunction(range: Double) extends ThresholdFunction {
     value2 >= min && value2 <= max
   }
 }
+

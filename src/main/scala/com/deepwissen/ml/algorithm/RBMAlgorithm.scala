@@ -25,6 +25,8 @@ object RBMAlgorithm extends AbstractRestrictedBoltzmannMachine[List[Array[Denomi
           // stop iteration
         } else {
           println("##########################################################################################################################")
+          println(s"###### lost function : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
+
           // run training
           val tempResult: List[(Double, List[Perceptron])] =
                 tempDataset.map( data => doTrainData(data._1,if(iteration == 1) null else resultParam(data._2),network, parameter))
@@ -33,12 +35,12 @@ object RBMAlgorithm extends AbstractRestrictedBoltzmannMachine[List[Array[Denomi
 
           val z = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => temp + value)
           val lostFunction = listOfPartialFreeEnergy.foldLeft(0.0)((temp, value) => {
-            println("p(x) = "+value + " / " +z +" = "+ value/z)
-            temp + (value/z)})/listOfPartialFreeEnergy.size
+            println("p(x) = "+value + " / " +z +" = "+ value/z + " -->> " + ((-1)*math.log(value/z)))
+            temp + (-1*math.log(value/z))
+          })/dataset.size
           // next iteration
           // print information
-          println(s"###### error : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
-          println("--------------------------------------------------------------------------------------------------------------------------")
+          println("----------------------------------------------------------"+lostFunction+"----------------------------------------------------------------")
 
           iterate(iteration + 1, lostFunction, tempResult.map(x => x._2))
         }
