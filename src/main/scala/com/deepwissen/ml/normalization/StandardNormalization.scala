@@ -20,7 +20,7 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
    * @param dataset dataset
    * @return normal dataset
    */
-  override def normalize(dataset: List[Array[Denomination[_]]], targetClass: Int): List[Array[Denomination[_]]] = {
+  override def  normalize(dataset: List[Array[Denomination[_]]], targetClass: Int): List[Array[Denomination[_]]] = {
     val minMax: Map[Int, (Double, Double)] = dataset.head.indices.filter(p => p != targetClass).map { i =>
       val min = dataset.foldLeft(Double.MaxValue) { (value, current) =>
         if (value > current(i).asInstanceOf[ContValue].get) current(i).asInstanceOf[ContValue].get else value
@@ -35,10 +35,14 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
     dataset.map { array =>
       dataset.head.indices.map { i =>
         val temp: Denomination[_] = if(i != targetClass) {
-          val min = minMax(i)._1
-          val max = minMax(i)._2
+          val min = if(minMax(i)._1 == minMax(i)._2) 0 else minMax(i)._1
+          val max = if(minMax(i)._1 == minMax(i)._2) 1 else minMax(i)._2
+
           normalize(array(i).asInstanceOf[ContValue].get, min, max, targetClass)
-        } else array(i)
+        } else {
+          println("target class - " + targetClass + " - " + array(i))
+          array(i)
+        }
         temp
       }.toArray
     }

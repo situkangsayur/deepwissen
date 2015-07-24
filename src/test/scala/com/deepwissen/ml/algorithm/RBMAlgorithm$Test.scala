@@ -16,26 +16,57 @@ import org.slf4j.LoggerFactory
 class RBMAlgorithm$Test extends FunSuite {
 
 
+//  val outlook = Map(
+//    "sunny" -> ContValue(0.0),
+//    "overcast" -> ContValue(1.0),
+//    "rainy" -> ContValue(2.0)
+//  )
+//
+//  val temperature = Map(
+//    "hot" -> ContValue(0.0),
+//    "mild" -> ContValue(1.0),
+//    "cool" -> ContValue(2.0)
+//  )
+//
+//  val humidity = Map(
+//    "high" -> ContValue(0.0),
+//    "normal" -> ContValue(1.0)
+//  )
+//
+//  val windy = Map(
+//    "TRUE" -> ContValue(0.0),
+//    "FALSE" -> ContValue(1.0)
+//  )
+
   val outlook = Map(
-    "sunny" -> ContValue(0.0),
-    "overcast" -> ContValue(1.0),
-    "rainy" -> ContValue(2.0)
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
   )
 
   val temperature = Map(
-    "hot" -> ContValue(0.0),
-    "mild" -> ContValue(1.0),
-    "cool" -> ContValue(2.0)
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
   )
 
   val humidity = Map(
-    "high" -> ContValue(0.0),
-    "normal" -> ContValue(1.0)
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
   )
 
   val windy = Map(
-    "TRUE" -> ContValue(0.0),
-    "FALSE" -> ContValue(1.0)
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
+  )
+
+
+  val field6 = Map(
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
+  )
+
+  val field5 = Map(
+    "no" -> ContValue(0.0),
+    "yes" -> ContValue(1.0)
   )
 
   val play = Map(
@@ -43,30 +74,79 @@ class RBMAlgorithm$Test extends FunSuite {
     "yes" -> BinaryValue(List(0.0,1.0))
   )
 
-  val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
+
+  val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, windy,humidity,field5,field6, play)
+//  val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity,windy, play)
+
+//  val strings =
+//    """
+//      |sunny,hot,high,FALSE,no
+//      |sunny,hot,high,TRUE,no
+//      |overcast,hot,high,FALSE,yes
+//      |rainy,mild,high,FALSE,yes
+//      |rainy,cool,normal,FALSE,yes
+//      |rainy,cool,normal,TRUE,no
+//      |overcast,cool,normal,TRUE,yes
+//      |sunny,mild,high,FALSE,no
+//      |sunny,cool,normal,FALSE,yes
+//      |rainy,mild,normal,FALSE,yes
+//      |sunny,mild,normal,TRUE,yes
+//      |overcast,mild,high,TRUE,yes
+//      |overcast,hot,normal,FALSE,yes
+//      |rainy,mild,high,TRUE,no
+//    """.stripMargin.trim.split("\n")
+
+//  Array(1, 1, 1, 0, 0, 0),
+//  Array(1, 0, 1, 0, 0, 0),
+//  Array(1, 1, 1, 0, 0, 0),
+//  Array(0, 0, 1, 1, 1, 0),
+//  Array(0, 0, 1, 0, 1, 0),
+//  Array(0, 0, 1, 1, 1, 0)
 
   val strings =
     """
-      |sunny,hot,high,FALSE,no
-      |sunny,hot,high,TRUE,no
-      |overcast,hot,high,FALSE,yes
-      |rainy,mild,high,FALSE,yes
-      |rainy,cool,normal,FALSE,yes
-      |rainy,cool,normal,TRUE,no
-      |overcast,cool,normal,TRUE,yes
-      |sunny,mild,high,FALSE,no
-      |sunny,cool,normal,FALSE,yes
-      |rainy,mild,normal,FALSE,yes
-      |sunny,mild,normal,TRUE,yes
-      |overcast,mild,high,TRUE,yes
-      |overcast,hot,normal,FALSE,yes
-      |rainy,mild,high,TRUE,no
+      |yes,yes,yes,no,no,no,no
+      |yes,no,yes,no,no,no,no
+      |yes,yes,yes,no,no,no,no
+      |no,no,yes,yes,yes,no,no
+      |no,no,yes,no,yes,no,no
+      |no,no,yes,yes,yes,no,no
+    """.stripMargin.trim.split("\n")
+
+  val stringsTest =
+    """
+      |yes,yes,no,no,no,no,no
+      |no,no,no,yes,yes,no,no
     """.stripMargin.trim.split("\n")
 
 
 
+//  val stringsTest =  """
+//                      |sunny,hot,high,FALSE,no
+//                      |sunny,hot,high,TRUE,no
+//                      |overcast,hot,high,FALSE,yes
+//                      |rainy,mild,high,FALSE,yes
+//                      |rainy,cool,normal,FALSE,yes
+//                      |rainy,cool,normal,TRUE,no
+//                      |overcast,cool,normal,TRUE,yes
+//                      |sunny,mild,high,FALSE,no
+//                      |sunny,cool,normal,FALSE,yes
+//                      |rainy,mild,normal,FALSE,yes
+//                      |sunny,mild,normal,TRUE,yes
+//                      |overcast,mild,high,TRUE,yes
+//                      |overcast,hot,normal,FALSE,yes
+//                      |rainy,mild,high,TRUE,no
+//                    """.stripMargin.trim.split("\n")
+
 
   val dataset = strings.map { string =>
+    string.split(",").zipWithIndex.map {
+      case (value, index) =>
+        (index, value)
+    }
+  }
+
+  val datasetTest = stringsTest.map { string =>
     string.split(",").zipWithIndex.map {
       case (value, index) =>
         (index, value)
@@ -78,8 +158,8 @@ class RBMAlgorithm$Test extends FunSuite {
    */
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
-    hiddenPerceptronSize = dataset.head.length + 2,
-    k = 100,
+    hiddenPerceptronSize = dataset.head.length -2,
+    k = 1,
     iteration = 1000,
     epsilon = 0.00001,
     momentum = 0.50,
@@ -93,6 +173,16 @@ class RBMAlgorithm$Test extends FunSuite {
 
   val finalDataSet = StandardNormalization.normalize(
     dataset.map(data => {
+      data.map { case (index, value) =>{
+        priorKnowledge(index)(value)
+      }
+      }
+    }).toList
+    , targetClass)
+
+
+  val finalDataSetTest = StandardNormalization.normalize(
+    datasetTest.map(data => {
       data.map { case (index, value) =>
         priorKnowledge(index)(value)
       }
@@ -169,7 +259,7 @@ class RBMAlgorithm$Test extends FunSuite {
     val result = Validation.classification(newNetwork, RBMClassificationTesting, finalDataSet, SigmoidFunction)
     println(result)
 
-    val validateResult = Validation.validate(result, finalDataSet, 4)
+    val validateResult = Validation.validate(result, finalDataSet, targetClass)
     val accuration = Validation.accuration(validateResult) {
       EitherThresholdFunction(0.7, 0.0, 1.0)
     }
@@ -182,7 +272,7 @@ class RBMAlgorithm$Test extends FunSuite {
     var allData = 0
 
     // classification
-    finalDataSet.foreach { data =>
+    finalDataSetTest.foreach { data =>
       val realScore = RBMClassificationTesting(data, newNetwork, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val originalClass = data(p._2).asInstanceOf[ContValue].get

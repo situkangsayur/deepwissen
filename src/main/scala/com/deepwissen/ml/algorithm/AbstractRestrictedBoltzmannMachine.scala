@@ -41,36 +41,6 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
    */
   def doTrain(network: MarkovChain, dataset: DATASET, parameter: GibbsParameter): Unit
 
-  /**
-   * Get target class
-   * @param data data
-   * @return
-   */
-  def getTargetClass(data: Array[Denomination[_]], index: Int) = data(index).asInstanceOf[ContValue]
-
-  /**
-   * Get perceptron error calculation
-   * @param network network
-   * @param layer layer
-   * @param fromPerceptron perceptron
-   * @param data dataset
-   * @param parameter train parameter
-   * @return error
-   */
-  def getPerceptronError(network: MarkovChain, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
-    layer.next match {
-      case None =>
-        // output layer
-        fromPerceptron.output * (1 - fromPerceptron.output) * (getTargetClass(data,fromPerceptron.index).get - fromPerceptron.output)
-
-      case Some(nextLayer) =>
-        // hidden or input layer
-        val sigmaError = nextLayer.perceptrons.foldLeft(0.0) { (value, toPerceptron) =>
-          value + toPerceptron.error * network.getSynapsys(fromPerceptron.id, toPerceptron.id).weight
-        }
-        fromPerceptron.output * (1 - fromPerceptron.output) * sigmaError
-    }
-  }
 
 //  /**
 //   * Get synapsys delta weight calculation
@@ -219,8 +189,8 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
         " - "+listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output+"))"
 
       p.output = p.output + (parameter.learningRate *
-        listOfX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.sample -
-        listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)/parameter.dataSize
+        listOfX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output -
+        listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)
       information += " = " + p.output + " \n"
     }
 
@@ -237,7 +207,7 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
         " - "+dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output+"))\n"
 
       p.output = p.output + (dataX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output -
-        dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output) / parameter.dataSize
+        dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)
 
       information += " = " + p.output + " \n"
     }
