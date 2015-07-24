@@ -158,7 +158,7 @@ class RBMAlgorithm$Test extends FunSuite {
    */
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
-    hiddenPerceptronSize = dataset.head.length -2,
+    hiddenPerceptronSize = 3,
     k = 1,
     iteration = 1000,
     epsilon = 0.00001,
@@ -200,66 +200,12 @@ class RBMAlgorithm$Test extends FunSuite {
 
   test("Testing for RBM Algorithm") {
 
-    def createNewNetwork(network: MarkovChain) : Network = {
-      val inputLayer = new InputLayer(
-        id = newLayerId(),
-        perceptrons = network.inputLayer.perceptrons.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
-        bias = Some(Network.newBias(network.inputLayer.bias.get.id)),
-        biases = network.inputLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error))
-      )
-
-      //    classifyNetwork.inputLayer = inpuLayer
-      var prevLayer: Layer = inputLayer
-
-
-      val hiddenLayer = List(new HiddenLayer(
-        id = newLayerId(),
-        perceptrons = network.hiddenLayer.perceptrons.map(p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
-        bias = Some(Network.newBias(network.hiddenLayer.bias.get.id)),
-        biases = network.hiddenLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error))
-      ))
-
-      prevLayer.next = Some(hiddenLayer(0))
-      hiddenLayer(0).prev = Some(prevLayer)
-
-      prevLayer = hiddenLayer(0)
-      val outputLayer = new OutputLayer(
-        id = newLayerId(),
-        perceptrons = network.inputLayer.perceptrons.map( p => p),
-        biases = network.inputLayer.biases.map( p => Perceptron(p.id,p.index,p.output,p.weight, p.error)),
-        prev = Some(prevLayer)
-      )
-      prevLayer.next = Some(outputLayer)
-
-      val tempListOfSynapsys = network.synapsies.map { synapsys =>
-        Synapsys(
-          from = synapsys.from,
-          to = synapsys.to,
-          weight = synapsys.weight,
-          deltaWeight = synapsys.deltaWeight
-        )
-      }
-
-      val listOfSynapsys = tempListOfSynapsys ::: (network.synapsies.map(p => Synapsys(
-        from = p.to,
-        to = p.from,
-        weight = p.weight,
-        deltaWeight = p.deltaWeight
-      )))
-
-
-      new Network(inputLayer, hiddenLayer, outputLayer, listOfSynapsys)
-    }
-
-
     val tempNetwork = RBMAlgorithm.train(finalDataSet, parameter)
 
-    val newNetwork = createNewNetwork(network = tempNetwork)
-
-    val result = Validation.classification(newNetwork, RBMClassificationTesting, finalDataSet, SigmoidFunction)
+    val result = Validation.classification(tempNetwork, RBMClassificationTesting, finalDataSet, SigmoidFunction)
     println(result)
 
-    val validateResult = Validation.validate(result, finalDataSet, targetClass)
+    val validateResult = Validation.validate(result, finalDataSetTest, targetClass)
     val accuration = Validation.accuration(validateResult) {
       EitherThresholdFunction(0.7, 0.0, 1.0)
     }
@@ -273,7 +219,7 @@ class RBMAlgorithm$Test extends FunSuite {
 
     // classification
     finalDataSetTest.foreach { data =>
-      val realScore = RBMClassificationTesting(data, newNetwork, SigmoidFunction)
+      val realScore = RBMClassificationTesting(data, tempNetwork, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val originalClass = data(p._2).asInstanceOf[ContValue].get
         val result = p._1
@@ -297,8 +243,5 @@ class RBMAlgorithm$Test extends FunSuite {
       new File("target" + File.separator + "cuaca.json")))
   }
 
-//  test("Testing for Gibbs Sampling") {
-//
-//  }
 
 }

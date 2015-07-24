@@ -121,6 +121,7 @@ class BasicBackpropagation$Test extends FunSuite {
 
       val network = BasicBackpropagation.train(finalDataSet, parameter)
 
+
       val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
       logger.info("result finding : "+ result.toString())
 

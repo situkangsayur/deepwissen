@@ -63,6 +63,8 @@ class AutoEncoder$Test extends FunSuite{
     """.stripMargin.trim.split("\n")
 
 
+
+
   val dataset = strings.map { string =>
     string.split(",").zipWithIndex.map {
       case (value, index) =>

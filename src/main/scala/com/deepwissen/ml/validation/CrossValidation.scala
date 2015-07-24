@@ -11,7 +11,7 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/28/15
  */
-object CrossValidation extends Validation {
+object CrossValidation {
 
   /**
    * Cross dataset

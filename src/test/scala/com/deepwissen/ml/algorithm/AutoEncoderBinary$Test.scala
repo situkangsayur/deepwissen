@@ -111,6 +111,7 @@ class AutoEncoderBinary$Test extends FunSuite{
     // training
     val network = Autoencoder.train(finalDataSet, parameter)
 
+
     val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
     println(result)
 

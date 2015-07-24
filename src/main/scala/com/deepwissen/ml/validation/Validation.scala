@@ -23,8 +23,11 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
-    dataset.map(data => classification(data, network, activationFunction))
+  def classification(network: InferencesNetwork, classification: Classification[Array[Denomination[_]], InferencesNetwork], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
+    dataset.map(data => {
+      val tempNet = if(network.isInstanceOf[MarkovChain]) network.asInstanceOf[MarkovChain] else network.asInstanceOf[Network]
+      classification(data, network, activationFunction)
+    })
 
   /**
    * Validate classification result

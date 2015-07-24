@@ -74,13 +74,18 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
     /**
      * print synapsis
      */
-//    network.synapsies.foreach( s => println(s.from.id +" - "+ s.to.id+" = " + s.weight))
-
+    network.synapsies.foreach( s => println(s.from.id+"("+s.from.output+") - "+ s.to.id+"("+s.to.output+") = " + s.weight))
+    println("----------------------------------------------------------------------------------------------------------------")
     /**
      * Update output for all input layer
      */
-    if(xTiltParam != null)
+    if(xTiltParam != null){
       network.inputLayer.fillOutput(xTiltParam)
+//      network.updateInputLayerValues(xTiltParam)
+    }
+
+    network.synapsies.foreach( s => println(s.from.id+"("+s.from.output+") - "+ s.to.id+"("+s.to.output+") = " + s.weight))
+    println("================================================================================================================")
 
     /**
      * Gibbs sampling for k-step
@@ -189,8 +194,8 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
         " - "+listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output+"))"
 
       p.output = p.output + (parameter.learningRate *
-        listOfX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output -
-        listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)
+        listOfX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.sample -
+        listOfOutputXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)/parameter.dataSize
       information += " = " + p.output + " \n"
     }
 
@@ -207,7 +212,7 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
         " - "+dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output+"))\n"
 
       p.output = p.output + (dataX.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output -
-        dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.output)
+        dataXTilt.find(x => x.id.equals(p.id.replace("bias","perceptron"))).get.sample)/parameter.dataSize
 
       information += " = " + p.output + " \n"
     }

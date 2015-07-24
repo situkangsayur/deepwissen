@@ -10,7 +10,7 @@ package com.deepwissen.ml.validation
  * @author Eko Khannedy
  * @since 2/27/15
  */
-object SplitValidation extends Validation {
+object SplitValidation {
 
   /**
    * Split dataset with given percentage (ex 70-30)

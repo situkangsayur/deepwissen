@@ -45,7 +45,7 @@ trait Classification[DATA, MODEL] {
  * @author Eko Khannedy
  * @since 6/3/15
  */
-object BasicClassification extends Classification[Array[Denomination[_]], Network] {
+object BasicClassification extends Classification[Array[Denomination[_]], InferencesNetwork] {
 
   /**
    * Run classification
@@ -54,26 +54,28 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): Denomination[_] = {
+  override def apply(data: Array[Denomination[_]], network: InferencesNetwork, activationFunction: ActivationFunction): Denomination[_] = {
 
+    val tempNetwork = network.asInstanceOf[Network]
+    
     // fill input layer
-    network.inputLayer.fillOutput(data)
+    tempNetwork.inputLayer.fillOutput(data)
 
     // fill hidden layer
-    network.hiddenLayers.foreach { layer =>
+    tempNetwork.hiddenLayers.foreach { layer =>
       layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = network.getPerceptronWeightTo(perceptron)
+        perceptron.weight = tempNetwork.getPerceptronWeightTo(perceptron)
         perceptron.output = activationFunction.activation(perceptron.weight)
       }
     }
 
     // fill output layer
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+    tempNetwork.outputLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = tempNetwork.getPerceptronWeightTo(perceptron)
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
-    BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
+    BinaryValue(tempNetwork.outputLayer.perceptrons.map(x => x.output))
     // calculate result
 //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
 //      value + perceptron.output
@@ -88,7 +90,7 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
  * @author Hendri Karisma
  * @since 7/23/15
  */
-object RBMClassificationTesting extends Classification[Array[Denomination[_]], Network] {
+object RBMClassificationTesting extends Classification[Array[Denomination[_]], InferencesNetwork] {
 
   /**
    * Run classification
@@ -97,26 +99,35 @@ object RBMClassificationTesting extends Classification[Array[Denomination[_]], N
    * @param activationFunction activation function
    * @return classification result
    */
-  override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): Denomination[_] = {
+  override def apply(data: Array[Denomination[_]], network: InferencesNetwork, activationFunction: ActivationFunction): Denomination[_] = {
 
+    val tempNetwork = network.asInstanceOf[MarkovChain]
     // fill input layer
-    network.inputLayer.fillOutput(data)
+    tempNetwork.inputLayer.fillOutput(data)
+
+    tempNetwork.inputLayer.perceptrons.foreach( p => println(p.id + ": " + p.output))
+    println()
+    tempNetwork.synapsies.foreach( s => {
+      println("from : " + s.from.id + "( "+ s.from.output + " )"+ " - " + "to : " + s.to.id + "( " + s.to.output+ " ) = " + s.deltaWeight )
+    })
 
     // fill hidden layer
-    network.hiddenLayers.foreach { layer =>
-      layer.perceptrons.foreach { perceptron =>
-        perceptron.weight = network.getPerceptronWeightTo(perceptron) + layer.biases.find(p => p.id.equals(perceptron.id.replace("perceptron","bias"))).get.output
-        perceptron.output = activationFunction.activation(perceptron.weight)
-      }
-    }
 
-    // fill output layer
-    network.outputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeightTo(perceptron) + network.outputLayer.biases.find(p => p.id.equals(perceptron.id.replace("perceptron","bias"))).get.output
+    tempNetwork.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = tempNetwork.getPerceptronWeightTo(perceptron)
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
-    BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
+
+    // fill output layer
+    tempNetwork.inputLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = tempNetwork.getPerceptronWeightTo(perceptron)
+      perceptron.output = activationFunction.activation(perceptron.weight)
+      print(perceptron.output+ " ; ")
+    }
+    println()
+
+    BinaryValue(tempNetwork.inputLayer.perceptrons.map(x => x.output))
     // calculate result
     //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
     //      value + perceptron.output
