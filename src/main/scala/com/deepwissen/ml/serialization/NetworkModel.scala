@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.serialization
 
-import com.deepwissen.ml.algorithm.networks.{Network, MarkovChain}
+import com.deepwissen.ml.algorithm.networks.{DeepNetwork, AutoencoderNetwork, Network, MarkovChain}
 import com.deepwissen.ml.algorithm.HiddenLayer
 
 
@@ -22,6 +22,12 @@ case class NetworkModel(inputLayer: LayerModel,
                         hiddenLayers: List[LayerModel],
                         outputLayer: LayerModel,
                         synapsies: List[SynapsysModel]) extends InferencesNetworkModel
+
+case class AutoencoderNetworkModel(inputLayer: LayerModel,
+                                   hiddenLayer: LayerModel,
+                                   outputLayer: LayerModel,
+                                   synapsies: List[SynapsysModel]) extends InferencesNetworkModel
+
 
 case class MarkovChainModel(inputLayer: LayerModel,
                         hiddenLayer: LayerModel,
@@ -101,6 +107,57 @@ object NetworkModel {
 /**
  * Created by hendri_k on 7/13/15.
  */
+object AutoencoderNetworkModel {
+
+  /**
+   * Convert from Network to NetworkModel
+   * @param network Network
+   * @return NetworkModel
+   */
+  def apply(network: AutoencoderNetwork): AutoencoderNetworkModel = {
+
+    val inputLayer = new LayerModel(
+      id = network.inputLayer.id,
+      perceptrons = network.inputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+      bias = network.inputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      nextLayer = network.inputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+      prevLayer = network.inputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+    )
+
+    val hiddenLayers = new LayerModel(
+        id = network.hiddenLayer.id,
+        perceptrons = network.hiddenLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+        bias = network.hiddenLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+        nextLayer = network.hiddenLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+        prevLayer = network.hiddenLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+      )
+
+
+    val outputLayer = new LayerModel(
+      id = network.outputLayer.id,
+      perceptrons = network.outputLayer.perceptrons.map(p => PerceptronModel(p.id, p.index)),
+      bias = network.outputLayer.bias.fold[Option[String]](None)(p => Some(p.id)),
+      nextLayer = network.outputLayer.next.fold[Option[String]](None)(l => Some(l.id)),
+      prevLayer = network.outputLayer.prev.fold[Option[String]](None)(l => Some(l.id))
+    )
+
+    val synapsies = network.synapsies.map { synapsys =>
+      SynapsysModel(
+        from = synapsys.from.id,
+        to = synapsys.to.id,
+        weight = synapsys.weight,
+        deltaWeight = synapsys.deltaWeight
+      )
+    }
+
+    AutoencoderNetworkModel(inputLayer, hiddenLayers, outputLayer, synapsies)
+  }
+
+}
+
+/**
+ * Created by hendri_k on 7/13/15.
+ */
 object MarkovChainModel {
 
   /**
@@ -150,7 +207,7 @@ object DeepNetworkModel {
    * @param network Network
    * @return NetworkModel
    */
-  def apply(network: Network): NetworkModel = {
+  def apply(network: DeepNetwork): NetworkModel = {
 
     val inputLayer = new LayerModel(
       id = network.inputLayer.id,

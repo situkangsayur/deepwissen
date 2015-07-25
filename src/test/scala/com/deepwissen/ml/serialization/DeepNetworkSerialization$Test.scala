@@ -114,7 +114,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
 
   test("save model") {
 
-    val network = DeepNetwork(inputPerceptronSize = 5, hiddenLayersSize = List(4,4), outputPerceptronSize = 1, finalDataSet, synapsysFactory = RandomSynapsysFactory())
+    val network = DeepNetwork(null, finalDataSet, synapsysFactory = RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
 
@@ -131,7 +131,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
   test("load model") {
 
     val network = NetworkSerialization.load(inputStream = new FileInputStream(
-      new File("target" + File.separator + "network-model.json")), typeOfInference = "NeuralNet").asInstanceOf[Network]
+      new File("target" + File.separator + "network-model.json")), typeOfInference = "NeuralNet").asInstanceOf[DeepNetwork]
     println("converter model network to network object")
     network.inputLayer.perceptrons.foreach { perceptron =>
       println(network.inputLayer.id + " input layer => " + perceptron.id)

@@ -78,7 +78,7 @@ class AutoEncoder$Test extends FunSuite{
   val parameter = BackpropragationParameter(
     hiddenLayerSize = 1,
     outputPerceptronSize = 2,
-    targetClassPosition = -1,
+    targetClassPosition = 12,
     iteration = 100000,
     epsilon = 0.000001,
     momentum = 0.50,
