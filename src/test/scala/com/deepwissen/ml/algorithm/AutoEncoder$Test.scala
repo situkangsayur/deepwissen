@@ -6,7 +6,7 @@ import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFuncti
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{SplitValidation, Validation}
+import com.deepwissen.ml.validation.{BackProValidation, SplitValidation, Validation}
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
@@ -112,11 +112,12 @@ class AutoEncoder$Test extends FunSuite{
     // training
     val network = Autoencoder.train(finalDataSet, parameter)
 
-    val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+    val validator = BackProValidation()
+    val result = validator.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
     println(result)
 
-    val validateResult = Validation.validate(result, finalDataSet, 4)
-    val accuration = Validation.accuration(validateResult) {
+    val validateResult = validator.validate(result, finalDataSet, 4)
+    val accuration = validator.accuration(validateResult) {
       EitherThresholdFunction(0.7, 0.0, 1.0)
     }
 

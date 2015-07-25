@@ -251,6 +251,13 @@ abstract class AbstractRestrictedBoltzmannMachine[DATASET] extends Algorithm[DAT
 //      println("--->"+p.id+" : "+tempExpOutput.get(p.id).get)
       Math.log(1 + tempExpOutput.get(p.id).get) }).foldLeft(0.0D)((temp, value) => temp + value) + "#\n\n"
 
+    /**
+     * print synapsis
+     */
+    println("\n\nlast synapsies condition : ")
+    network.synapsies.foreach( s => println(s.from.id+"("+s.from.output+") - "+ s.to.id+"("+s.to.output+") = " + s.weight))
+    println("----------------------------------------------------------------------------------------------------------------")
+
 //    println(information)
 //    println("free energy : " + freeEnergy)
 //    println("----------------------------------------------")

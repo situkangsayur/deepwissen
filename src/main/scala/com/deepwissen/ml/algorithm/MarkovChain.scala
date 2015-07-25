@@ -320,6 +320,8 @@ object MarkovChain{
       biases = model.hiddenLayer.biases.map(newPerceptron).sortBy(_.index)
     )
 
+
+
     // crate layer relation
     val allLayers = List(inputLayer, hiddenLayer)
     val allModelLayers = List(model.inputLayer , model.hiddenLayer)

@@ -14,7 +14,7 @@ import com.deepwissen.ml.utils.{BinaryValue, Denomination}
  * @author Eko Khannedy
  * @since 2/27/15
  */
-trait Validation {
+trait Validation[T] {
 
   /**
    * Run classification with given dataset
@@ -23,11 +23,7 @@ trait Validation {
    * @param dataset dataset
    * @return list of result
    */
-  def classification(network: InferencesNetwork, classification: Classification[Array[Denomination[_]], InferencesNetwork], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
-    dataset.map(data => {
-      val tempNet = if(network.isInstanceOf[MarkovChain]) network.asInstanceOf[MarkovChain] else network.asInstanceOf[Network]
-      classification(data, network, activationFunction)
-    })
+  def classification(network: T, classification: Classification[Array[Denomination[_]], T], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]]
 
   /**
    * Validate classification result
@@ -63,6 +59,31 @@ trait Validation {
 
 }
 
-object Validation extends Validation {
+case class BackProValidation() extends Validation[Network] {
 
+  /**
+   * Run classification with given dataset
+   * @param network network model
+   * @param classification classification
+   * @param dataset dataset
+   * @return list of result
+   */
+  def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
+    dataset.map(data => {
+      classification(data, network, activationFunction)
+    })
+}
+
+case class MarkovChainValidation() extends Validation[MarkovChain] {
+  /**
+   * Run classification with given dataset
+   * @param network network model
+   * @param classification classification
+   * @param dataset dataset
+   * @return list of result
+   */
+  def classification(network: MarkovChain, classification: Classification[Array[Denomination[_]], MarkovChain], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
+    dataset.map(data => {
+      classification(data, network, activationFunction)
+    })
 }

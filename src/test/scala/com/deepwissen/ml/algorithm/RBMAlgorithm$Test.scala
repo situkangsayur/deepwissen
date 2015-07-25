@@ -6,7 +6,7 @@ import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFuncti
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.Validation
+import com.deepwissen.ml.validation.{MarkovChainValidation, Validation}
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
@@ -202,11 +202,12 @@ class RBMAlgorithm$Test extends FunSuite {
 
     val tempNetwork = RBMAlgorithm.train(finalDataSet, parameter)
 
-    val result = Validation.classification(tempNetwork, RBMClassificationTesting, finalDataSet, SigmoidFunction)
+    val validator = MarkovChainValidation()
+    val result = validator.classification(tempNetwork, RBMClassificationTesting, finalDataSetTest, SigmoidFunction)
     println(result)
 
-    val validateResult = Validation.validate(result, finalDataSetTest, targetClass)
-    val accuration = Validation.accuration(validateResult) {
+    val validateResult = validator.validate(result, finalDataSetTest, targetClass)
+    val accuration = validator.accuration(validateResult) {
       EitherThresholdFunction(0.7, 0.0, 1.0)
     }
 

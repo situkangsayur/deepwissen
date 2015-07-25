@@ -11,7 +11,7 @@ import com.deepwissen.ml.function.{ActivationFunction, SigmoidFunction, EitherTh
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{SplitValidation, Validation}
+import com.deepwissen.ml.validation.{BackProValidation, SplitValidation, Validation}
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
@@ -121,15 +121,16 @@ class BasicBackpropagation$Test extends FunSuite {
 
       val network = BasicBackpropagation.train(finalDataSet, parameter)
 
+      val validator = BackProValidation()
 
-      val result = Validation.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+      val result = validator.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
       logger.info("result finding : "+ result.toString())
 
-      val validateResult = Validation.validate(result, finalDataSet, 4)
+      val validateResult = validator.validate(result, finalDataSet, 4)
 
       logger.info("after validation result : "+validateResult.toString())
 
-      val accuration = Validation.accuration(validateResult) {
+      val accuration = validator.accuration(validateResult) {
         EitherThresholdFunction(0.7, 0.0, 1.0)
       }
 
