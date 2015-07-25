@@ -1,6 +1,7 @@
-package com.deepwissen.ml.algorithm
+package com.deepwissen.ml.algorithm.networks
 
-import com.deepwissen.ml.serialization.{LayerModel, MarkovChainModel, NetworkModel, PerceptronModel}
+import com.deepwissen.ml.algorithm._
+import com.deepwissen.ml.serialization.{MarkovChainModel, PerceptronModel}
 
 import scala.annotation.tailrec
 
@@ -90,7 +91,7 @@ class MarkovChain (var inputLayer: Layer,
   def getPerceptronWeightFrom(perceptron: Perceptron, write : Boolean): Double = {
     var inf = "f(x) = 1/(1 + exp( -1*(" + getBias(perceptron.id.replace("perceptron", "bias")).output
     val temp = getSynapsiesFrom(perceptron.id).foldLeft(0.0) { (value, synapsys) =>
-      inf += "+("+synapsys.weight + " * " + synapsys.from.output + ")"
+      inf += "+("+synapsys.weight + " * " + synapsys.to.output + ")"
       value + (synapsys.weight * synapsys.to.output)
     } + getBias(perceptron.id.replace("perceptron", "bias")).output
     if (write) println(perceptron.id + " : " + inf + "))) = " + temp)

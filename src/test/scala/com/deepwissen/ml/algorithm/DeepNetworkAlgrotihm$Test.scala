@@ -1,28 +1,20 @@
-/*
- * Copyright (c) 2015, DeepWissen and/or its affiliates. All rights reserved.
- * DEEPWISSEN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
- */
-
 package com.deepwissen.ml.algorithm
 
-import java.io.{File, FileInputStream, FileOutputStream}
+import java.io.{FileInputStream, File, FileOutputStream}
 
 import com.deepwissen.ml.algorithm.networks.Network
-import com.deepwissen.ml.function.{ActivationFunction, SigmoidFunction, EitherThresholdFunction}
+import com.deepwissen.ml.function.{EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{BackProValidation, SplitValidation, Validation}
+import com.deepwissen.ml.validation.BackProValidation
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
-import scala.xml.MinimizeMode
-
 /**
- * @author Eko Khannedy
- * @since 2/26/15
+ * Created by hendri_k on 7/25/15.
  */
-class BasicBackpropagation$Test extends FunSuite {
+class DeepNetworkAlgrotihm$Test extends FunSuite{
 
   val outlook = Map(
     "sunny" -> ContValue(0.0),
@@ -105,8 +97,8 @@ class BasicBackpropagation$Test extends FunSuite {
         priorKnowledge(index)(value)
       }
     }).toList
-  , targetClass)
-3
+    , targetClass)
+  3
   finalDataSet.foreach { array =>
     println(array.mkString(","))
   }
@@ -176,22 +168,5 @@ class BasicBackpropagation$Test extends FunSuite {
       })
     }
   }
-
-//  test("split validation") {
-//
-//    val (trainDataSet, classificationDataSet) = SplitValidation.split(finalDataSet, 70 -> 30)
-//    val network = BasicBackpropagation.train(trainDataSet, parameter)
-//
-//    val result = Validation.classification(network, BasicClassification, classificationDataSet, SigmoidFunction)
-//    println(result)
-//
-//    val validateResult = Validation.validate(result, classificationDataSet, 4)
-//    println(validateResult)
-//    val accuration = Validation.accuration(validateResult) {
-//      EitherThresholdFunction(0.7, 0.0, 1.0)
-//    }
-//
-//    println(accuration)
-//  }
 
 }

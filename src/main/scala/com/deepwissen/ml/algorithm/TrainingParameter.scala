@@ -36,6 +36,19 @@ case class BackpropragationParameter(inputPerceptronSize: Int,
                                      epsilon: Double = 0.000001,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter
 
+
+case class DeepNetworkParameter(inputPerceptronSize: Int,
+                                hiddenLayerSize: List[Int] = List(4),
+                                outputPerceptronSize: Int = 1,
+                                targetClassPosition: Int = -1,
+                                synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),
+                                activationFunction: ActivationFunction = SigmoidFunction,
+                                learningRate: Double = 0.5,
+                                momentum: Double = 0.75,
+                                epsilon: Double = 0.000001,
+                                iteration: Int = Int.MaxValue) extends TrainingParameter
+
+
 //case class RbmParamter(inputPerceptronSize: Int,
 //                       hiddenLayerSize: Int = 1,
 //                       gibbsStep: Int = 3000,

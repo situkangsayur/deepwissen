@@ -6,6 +6,7 @@
 package com.deepwissen.ml.validation
 
 import com.deepwissen.ml.algorithm._
+import com.deepwissen.ml.algorithm.networks.{Network, MarkovChain}
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
 import com.deepwissen.ml.utils.{ContValue, BinaryValue, Denomination}
 

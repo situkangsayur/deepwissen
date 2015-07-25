@@ -5,6 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.algorithm.networks.Network
 import com.deepwissen.ml.utils.{LogPrint, BinaryValue, Denomination}
 
 /**

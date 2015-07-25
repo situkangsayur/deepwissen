@@ -7,7 +7,7 @@ package com.deepwissen.ml.serialization
 
 import java.io.{InputStream, OutputStream}
 
-import com.deepwissen.ml.algorithm.{MarkovChain, InferencesNetwork, Network}
+import com.deepwissen.ml.algorithm.networks.{InferencesNetwork, Network, MarkovChain}
 import org.apache.commons.io.IOUtils
 
 /**

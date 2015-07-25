@@ -5,6 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.algorithm.networks.{Network, MarkovChain}
 import com.deepwissen.ml.function.ActivationFunction
 import com.deepwissen.ml.utils.{BinaryValue, Denomination}
 
@@ -104,13 +105,13 @@ object RBMClassificationTesting extends Classification[Array[Denomination[_]], M
 //    val network = network.asInstanceOf[MarkovChain]
     // fill input layer
     network.inputLayer.fillOutput(data)
-    network.updateInputLayerValues(network.inputLayer.perceptrons)
+//    network.updateInputLayerValues(network.inputLayer.perceptrons)
 
-    network.inputLayer.perceptrons.foreach( p => println(p.id + ": " + p.output))
-    println()
-    network.synapsies.foreach( s => {
-      println("from : " + s.from.id + "( "+ s.from.output + " )"+ " - " + "to : " + s.to.id + "( " + s.to.output+ " ) = " + s.weight )
-    })
+//    network.inputLayer.perceptrons.foreach( p => println(p.id + ": " + p.output))
+//    println()
+//    network.synapsies.foreach( s => {
+//      println("from : " + s.from.id + "( "+ s.from.output + " )"+ " - " + "to : " + s.to.id + "( " + s.to.output+ " ) = " + s.weight )
+//    })
 
     // fill hidden layer
 
@@ -124,14 +125,9 @@ object RBMClassificationTesting extends Classification[Array[Denomination[_]], M
     network.inputLayer.perceptrons.foreach { perceptron =>
       perceptron.weight = network.getPerceptronWeightFrom(perceptron, false)
       perceptron.output = activationFunction.activation(perceptron.weight)
-//      print(perceptron.output+ " ; ")
     }
     println()
 
     BinaryValue(network.inputLayer.perceptrons.map(x => x.output))
-    // calculate result
-    //    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-    //      value + perceptron.output
-    //    }
   }
 }

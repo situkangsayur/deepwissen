@@ -3,9 +3,10 @@
  * DEEPWISSEN PROPRIETARY/CONFIDENTIAL. Use is subject to license terms.
  */
 
-package com.deepwissen.ml.algorithm
+package com.deepwissen.ml.algorithm.networks
 
-import com.deepwissen.ml.serialization.{PerceptronModel, NetworkModel}
+import com.deepwissen.ml.algorithm._
+import com.deepwissen.ml.serialization.{NetworkModel, PerceptronModel}
 
 import scala.annotation.tailrec
 
@@ -82,6 +83,7 @@ class Network(var inputLayer: Layer,
       value + (synapsys.weight * synapsys.to.output)
     }
 }
+
 
 object Network {
 

@@ -1,4 +1,6 @@
-package com.deepwissen.ml.algorithm
+package com.deepwissen.ml.algorithm.networks
+
+import com.deepwissen.ml.algorithm.{Perceptron, Synapsys}
 
 /**
  * Created by hendri_k on 7/13/15.

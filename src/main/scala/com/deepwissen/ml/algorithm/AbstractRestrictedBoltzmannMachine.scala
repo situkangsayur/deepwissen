@@ -1,5 +1,6 @@
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.algorithm.networks.MarkovChain
 import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**

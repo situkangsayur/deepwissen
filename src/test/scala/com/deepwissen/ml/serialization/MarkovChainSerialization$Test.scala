@@ -2,7 +2,8 @@ package com.deepwissen.ml.serialization
 
 import java.io.{FileInputStream, File, FileOutputStream, StringWriter}
 
-import com.deepwissen.ml.algorithm.{MarkovChain, RandomSynapsysFactory, Network}
+import com.deepwissen.ml.algorithm.networks.MarkovChain
+import com.deepwissen.ml.algorithm.RandomSynapsysFactory
 import org.apache.commons.io.output.WriterOutputStream
 import org.scalatest.FunSuite
 
