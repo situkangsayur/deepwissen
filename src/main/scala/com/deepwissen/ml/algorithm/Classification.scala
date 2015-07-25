@@ -104,26 +104,27 @@ object RBMClassificationTesting extends Classification[Array[Denomination[_]], M
 //    val network = network.asInstanceOf[MarkovChain]
     // fill input layer
     network.inputLayer.fillOutput(data)
+    network.updateInputLayerValues(network.inputLayer.perceptrons)
 
     network.inputLayer.perceptrons.foreach( p => println(p.id + ": " + p.output))
     println()
     network.synapsies.foreach( s => {
-      println("from : " + s.from.id + "( "+ s.from.output + " )"+ " - " + "to : " + s.to.id + "( " + s.to.output+ " ) = " + s.deltaWeight )
+      println("from : " + s.from.id + "( "+ s.from.output + " )"+ " - " + "to : " + s.to.id + "( " + s.to.output+ " ) = " + s.weight )
     })
 
     // fill hidden layer
 
     network.hiddenLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.weight = network.getPerceptronWeightTo(perceptron, false)
       perceptron.output = activationFunction.activation(perceptron.weight)
     }
 
 
     // fill output layer
     network.inputLayer.perceptrons.foreach { perceptron =>
-      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.weight = network.getPerceptronWeightFrom(perceptron, false)
       perceptron.output = activationFunction.activation(perceptron.weight)
-      print(perceptron.output+ " ; ")
+//      print(perceptron.output+ " ; ")
     }
     println()
 

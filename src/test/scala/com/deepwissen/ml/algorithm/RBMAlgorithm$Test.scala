@@ -159,11 +159,11 @@ class RBMAlgorithm$Test extends FunSuite {
   val parameter = GibbsParameter(
     inputPerceptronSize = dataset.head.length - 1,
     hiddenPerceptronSize = 3,
-    k = 1,
+    k = 100,
     iteration = 1000,
     epsilon = 0.00001,
     momentum = 0.50,
-    learningRate = 0.1,
+    learningRate = 0.2,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
     dataSize = dataset.size
@@ -208,10 +208,12 @@ class RBMAlgorithm$Test extends FunSuite {
 
     val validateResult = validator.validate(result, finalDataSetTest, targetClass)
     val accuration = validator.accuration(validateResult) {
-      EitherThresholdFunction(0.7, 0.0, 1.0)
+      RangeThresholdFunction(0.15)
     }
 
-    println(accuration)
+    println("accuration : "+accuration)
+
+//    assert(accuration >= 80)
 
     val threshold = RangeThresholdFunction(0.15)
 
