@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.algorithm.networks.{Network, MarkovChain}
+import com.deepwissen.ml.algorithm.networks.{AutoencoderNetwork, Network, MarkovChain}
 import com.deepwissen.ml.function.ActivationFunction
 import com.deepwissen.ml.utils.{BinaryValue, Denomination}
 
@@ -57,8 +57,6 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
    */
   override def apply(data: Array[Denomination[_]], network: Network, activationFunction: ActivationFunction): Denomination[_] = {
 
-//    val network = network.asInstanceOf[Network]
-    
     // fill input layer
     network.inputLayer.fillOutput(data)
 
@@ -77,13 +75,42 @@ object BasicClassification extends Classification[Array[Denomination[_]], Networ
     }
 
     BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
-    // calculate result
-//    network.outputLayer.perceptrons.foldLeft(0.0) { (value, perceptron) =>
-//      value + perceptron.output
-//    }
   }
 }
 
+/**
+ * Basic implementation of classification for data array of double and network model
+ * @author Hendri Karisma
+ * @since 6/3/15
+ */
+object AutoencoderClassification extends Classification[Array[Denomination[_]], AutoencoderNetwork] {
+
+  /**
+   * Run classification
+   * @param data data
+   * @param network model
+   * @param activationFunction activation function
+   * @return classification result
+   */
+  override def apply(data: Array[Denomination[_]], network: AutoencoderNetwork, activationFunction: ActivationFunction): Denomination[_] = {
+    // fill input layer
+    network.inputLayer.fillOutput(data)
+
+    // fill hidden layer
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+        perceptron.weight = network.getPerceptronWeightTo(perceptron)
+        perceptron.output = activationFunction.activation(perceptron.weight)
+    }
+
+    // fill output layer
+    network.outputLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = activationFunction.activation(perceptron.weight)
+    }
+
+    BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
+  }
+}
 
 
 /**

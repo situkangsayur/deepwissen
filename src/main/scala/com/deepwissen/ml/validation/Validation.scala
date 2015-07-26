@@ -6,7 +6,7 @@
 package com.deepwissen.ml.validation
 
 import com.deepwissen.ml.algorithm._
-import com.deepwissen.ml.algorithm.networks.{Network, MarkovChain}
+import com.deepwissen.ml.algorithm.networks.{AutoencoderNetwork, Network, MarkovChain}
 import com.deepwissen.ml.function.{ActivationFunction, ThresholdFunction}
 import com.deepwissen.ml.utils.{ContValue, BinaryValue, Denomination}
 
@@ -96,7 +96,7 @@ case class BackProValidation() extends Validation[Network, List[Array[Denominati
  * @author Hendri Karisma
  * @since 7/25/15
  */
-case class AutoencoderValidation() extends Validation[Network, List[Array[Denomination[_]]]] {
+case class AutoencoderValidation() extends Validation[AutoencoderNetwork, List[Array[Denomination[_]]]] {
 
   /**
    * Run classification with given dataset
@@ -105,7 +105,7 @@ case class AutoencoderValidation() extends Validation[Network, List[Array[Denomi
    * @param dataset dataset
    * @return list of result
    */
-  override def classification(network: Network, classification: Classification[Array[Denomination[_]], Network], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
+  override def classification(network: AutoencoderNetwork, classification: Classification[Array[Denomination[_]], AutoencoderNetwork], dataset: List[Array[Denomination[_]]], activationFunction: ActivationFunction): List[Denomination[_]] =
     dataset.map(data => {
       classification(data, network, activationFunction)
     })

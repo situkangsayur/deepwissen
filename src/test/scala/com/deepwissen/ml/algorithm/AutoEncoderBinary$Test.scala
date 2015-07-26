@@ -6,7 +6,7 @@ import com.deepwissen.ml.function.{EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.{BackProValidation, Validation}
+import com.deepwissen.ml.validation.{AutoencoderValidation, BackProValidation, Validation}
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
@@ -74,10 +74,8 @@ class AutoEncoderBinary$Test extends FunSuite{
   /**
    * Training Parameter
    */
-  val parameter = BackpropragationParameter(
+  val parameter = AutoencoderParameter(
     hiddenLayerSize = 1,
-    outputPerceptronSize = 2,
-    targetClassPosition = -1,
     iteration = 70000,
     epsilon = 0.000000001,
     momentum = 0.75,
@@ -87,7 +85,7 @@ class AutoEncoderBinary$Test extends FunSuite{
     inputPerceptronSize = dataset.head.length - 1
   )
 
-  val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
+  val targetClass = -1
 
   val finalDataSet = StandardNormalization.normalize(
     dataset.map(data => {
@@ -112,8 +110,8 @@ class AutoEncoderBinary$Test extends FunSuite{
     val network = Autoencoder.train(finalDataSet, parameter)
 
 
-    val validator = BackProValidation()
-    val result = validator.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+    val validator = AutoencoderValidation()
+    val result = validator.classification(network, AutoencoderClassification, finalDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = validator.validate(result, finalDataSet, 4)
@@ -125,7 +123,7 @@ class AutoEncoderBinary$Test extends FunSuite{
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, network, SigmoidFunction)
+      val realScore = AutoencoderClassification(data, network, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val percent = Math.round(p._1 * 100.0)
         val score = if (p._1 > 1/3) 1.0 else 0.0

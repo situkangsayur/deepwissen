@@ -75,10 +75,8 @@ class AutoEncoder$Test extends FunSuite{
   /**
    * Training Parameter
    */
-  val parameter = BackpropragationParameter(
+  val parameter = AutoencoderParameter(
     hiddenLayerSize = 1,
-    outputPerceptronSize = 2,
-    targetClassPosition = 12,
     iteration = 100000,
     epsilon = 0.000001,
     momentum = 0.50,
@@ -113,7 +111,7 @@ class AutoEncoder$Test extends FunSuite{
     val network = Autoencoder.train(finalDataSet, parameter)
 
     val validator = AutoencoderValidation()
-    val result = validator.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+    val result = validator.classification(network, AutoencoderClassification, finalDataSet, SigmoidFunction)
     println(result)
 
     val validateResult = validator.validate(result, finalDataSet, targetClass)
@@ -130,7 +128,7 @@ class AutoEncoder$Test extends FunSuite{
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, network, SigmoidFunction)
+      val realScore = AutoencoderClassification(data, network, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
         val originalClass = data(p._2).asInstanceOf[ContValue].get
         val result = p._1

@@ -117,7 +117,7 @@ object DeepNetwork {
       newPerceptron(i)
     }.toList
 
-  def runPreLearning(inputLayer : Layer, hiddenLayer : Layer, dataset: List[Array[Denomination[_]]],parameter : BackpropragationParameter) : Network =
+  def runPreLearning(inputLayer : Layer, hiddenLayer : Layer, dataset: List[Array[Denomination[_]]],parameter : AutoencoderParameter) : AutoencoderNetwork =
     Autoencoder.train(dataset, parameter)
 
 
@@ -217,7 +217,7 @@ object DeepNetwork {
           activationFunction = SigmoidFunction,
           inputPerceptronSize = dataset.head.length - 1
         )
-        Autoencoder.train(dataset,param)
+//        Autoencoder.train(dataset,param)
       } else {
         val param = BackpropragationParameter(
           hiddenLayerSize = 1,

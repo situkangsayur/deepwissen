@@ -1,12 +1,12 @@
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.algorithm.networks.Network
+import com.deepwissen.ml.algorithm.networks.{AutoencoderNetwork, Network}
 import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**
  * Created by hendri_k on 6/13/15.
  */
-abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network]{
+abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Double], AutoencoderParameter, AutoencoderNetwork]{
 
   /**
    * Run training with given dataset
@@ -14,7 +14,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter parameter
    * @return model
    */
-  override def train(dataset: DATASET, parameter: BackpropragationParameter): Network = {
+  override def train(dataset: DATASET, parameter: AutoencoderParameter): AutoencoderNetwork = {
     val network = newNetwork(dataset, parameter)
     doTrain(network, dataset, parameter)
     network
@@ -26,11 +26,10 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter parameter
    * @return network
    */
-  def newNetwork(dataset: DATASET, parameter: BackpropragationParameter): Network =
-    Network(
+  def newNetwork(dataset: DATASET, parameter: AutoencoderParameter): AutoencoderNetwork =
+    AutoencoderNetwork(
       inputPerceptronSize = parameter.inputPerceptronSize,
-      hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSize = parameter.inputPerceptronSize,
+      hiddenPerceptronSize = parameter.hiddenLayerSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
@@ -40,7 +39,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param dataset dataset
    * @param parameter training parameter
    */
-  def doTrain(network: Network, dataset: DATASET, parameter: BackpropragationParameter): Unit
+  def doTrain(network: AutoencoderNetwork, dataset: DATASET, parameter: AutoencoderParameter): Unit
 
   /**
    * Get target class
@@ -58,7 +57,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return error
    */
-  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
+  def getPerceptronError(network: AutoencoderNetwork, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
     layer.next match {
       case None =>
         // output layer
@@ -81,7 +80,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter parameter
    * @return delta weight
    */
-  def getSynapsysDeltaWeight(network: Network, perceptron: Perceptron, synapsys: Synapsys, parameter: BackpropragationParameter): Double = {
+  def getSynapsysDeltaWeight(network: AutoencoderNetwork, perceptron: Perceptron, synapsys: Synapsys, parameter: AutoencoderParameter): Double = {
     if (synapsys.isFromBias)
       (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
     else
@@ -95,7 +94,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return sum error
    */
-  def doTrainData(data: Array[Denomination[_]], network: Network, parameter: BackpropragationParameter): Double = {
+  def doTrainData(data: Array[Denomination[_]], network: AutoencoderNetwork, parameter: AutoencoderParameter): Double = {
 
     /**
      * Update output for all input layer
@@ -105,12 +104,12 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     /**
      * Update weight and output for all hidden layers
      */
-    network.hiddenLayers.foreach { layer =>
-      layer.perceptrons.foreach { perceptron =>
+//    network.hiddenLayers.foreach { layer =>
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
         perceptron.weight = network.getPerceptronWeightTo(perceptron)
         perceptron.output = parameter.activationFunction.activation(perceptron.weight)
       }
-    }
+//    }
 
     /**
      * Update weight and output for output layer
@@ -130,23 +129,23 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     /**
      * Update errors for all hidden layers
      */
-    network.hiddenLayers.reverse.foreach { layer =>
-      layer.perceptrons.foreach { perceptron =>
-        perceptron.error = getPerceptronError(network, layer, perceptron, data, parameter)
+//    network.hiddenLayers.reverse.foreach { layer =>
+      network.hiddenLayer.perceptrons.foreach { perceptron =>
+        perceptron.error = getPerceptronError(network, network.hiddenLayer, perceptron, data, parameter)
       }
-    }
+//    }
 
     /**
      * Update weight all synapsies to hidden layers
      */
-    network.hiddenLayers.foreach { layer =>
-      layer.perceptrons.foreach { perceptron =>
+//    network.hiddenLayers.foreach { layer =>
+      network.hiddenLayer.perceptrons.foreach { perceptron =>
         network.getSynapsiesTo(perceptron.id).foreach { synapsys =>
           synapsys.deltaWeight = getSynapsysDeltaWeight(network, perceptron, synapsys, parameter)
           synapsys.weight = synapsys.weight + synapsys.deltaWeight
         }
       }
-    }
+//    }
 
     /**
      * Update weight all synapsies to output layer

@@ -1,7 +1,7 @@
 package com.deepwissen.ml.algorithm
 
 import com.deepwissen.ml.algorithm.BasicBackpropagation._
-import com.deepwissen.ml.algorithm.networks.Network
+import com.deepwissen.ml.algorithm.networks.{AutoencoderNetwork, Network}
 import com.deepwissen.ml.utils.Denomination
 
 import scala.annotation.tailrec
@@ -16,7 +16,7 @@ object Autoencoder extends AbstractAutoEncoder[List[Array[Denomination[_]]]] {
    * @param parameter training parameter
    * @return network model
    */
-  override def doTrain(network: Network, dataset: List[Array[Denomination[_]]], parameter: BackpropragationParameter): Unit = {
+  override def doTrain(network: AutoencoderNetwork, dataset: List[Array[Denomination[_]]], parameter: AutoencoderParameter): Unit = {
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {
