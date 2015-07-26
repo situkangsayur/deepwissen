@@ -1,7 +1,7 @@
-package com.deepwissen.ml.algorithm.networks
+package com.deepwissen.ml.algorithm.test
 
 import com.deepwissen.ml.algorithm.BackpropragationParameter
-import com.deepwissen.ml.algorithm.BasicBackpropagation._
+import com.deepwissen.ml.algorithm.networks.Network
 import com.deepwissen.ml.utils.Denomination
 
 import scala.annotation.tailrec

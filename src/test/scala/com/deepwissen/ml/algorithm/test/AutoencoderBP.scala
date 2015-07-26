@@ -6,6 +6,7 @@ import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**
  * Created by hendri_k on 7/26/15.
+ * testing autoencoder using Backpro properties and network
  */
 abstract class AutoencoderBP[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network]{
 

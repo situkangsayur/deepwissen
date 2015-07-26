@@ -1,10 +1,12 @@
-package com.deepwissen.ml.algorithm.networks
+package com.deepwissen.ml.algorithm.test
 
 import com.deepwissen.ml.algorithm._
+import com.deepwissen.ml.algorithm.networks.Network
 import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**
  * Created by hendri_k on 6/13/15.
+ * testing abstract autoencoder before edited
  */
 abstract class AbstractAutoEncoderBefore[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network]{
 

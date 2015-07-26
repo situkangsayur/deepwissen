@@ -1,8 +1,7 @@
 package com.deepwissen.ml.algorithm
 
 import java.io.{File, FileOutputStream}
-
-import com.deepwissen.ml.algorithm.networks.AutoencoderBefore
+import com.deepwissen.ml.algorithm.test.AutoencoderBefore
 import com.deepwissen.ml.function.{RangeThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
