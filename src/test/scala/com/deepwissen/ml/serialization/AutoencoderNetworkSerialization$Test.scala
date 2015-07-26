@@ -39,6 +39,7 @@ class AutoencoderNetworkSerialization$Test extends FunSuite{
       assert(network.inputLayer.id != null)
     }
     println(network.inputLayer.id + " bias => " + network.inputLayer.bias.get.id)
+    println(network.inputLayer.id + " bias => " + network.inputLayer.bias.get.output)
     assert(network.inputLayer.bias.isDefined)
     assert(network.inputLayer.perceptrons.length == 4)
     assert(network.inputLayer.prev.isEmpty)
@@ -51,6 +52,7 @@ class AutoencoderNetworkSerialization$Test extends FunSuite{
         assert(network.hiddenLayer.id != null)
       }
       println(network.hiddenLayer.id + " bias => " + network.hiddenLayer.bias.get.id)
+      println(network.hiddenLayer.id + " bias => " + network.hiddenLayer.bias.get.output)
       assert(network.hiddenLayer.bias.isDefined)
       assert(network.hiddenLayer.perceptrons.length == 3)
       assert(network.hiddenLayer.prev.isDefined)

@@ -104,14 +104,14 @@ object Network {
    * Create new Bias with unique id
    * @return Perceptron of Bias
    */
-  def newBias() = Perceptron(newBiasId(), -1)
+  def newBias() = Perceptron(newBiasId(), -1,1)
 
   /**
    * Create new Bias with given id
    * @param id bias id
    * @return Perceptron of Bias
    */
-  def newBias(id: String) = Perceptron(id, -1)
+  def newBias(id: String) = Perceptron(id, -1,1)
 
   /**
    * Create list of perceptron with given size
