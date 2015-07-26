@@ -38,7 +38,7 @@ case class BackpropragationParameter(inputPerceptronSize: Int,
 
 
 case class AutoencoderParameter(inputPerceptronSize: Int,
-                                hiddenLayerSize: Int = 1,
+                                hiddenPerceptronSize: Int = 1,
                                 synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),
                                 targetClassPosition : Int = -1,
                                 activationFunction: ActivationFunction = SigmoidFunction,

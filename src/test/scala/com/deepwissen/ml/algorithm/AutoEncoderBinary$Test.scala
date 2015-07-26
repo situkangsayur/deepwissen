@@ -75,7 +75,7 @@ class AutoEncoderBinary$Test extends FunSuite{
    * Training Parameter
    */
   val parameter = AutoencoderParameter(
-    hiddenLayerSize = 1,
+    hiddenPerceptronSize = 1,
     iteration = 70000,
     epsilon = 0.000000001,
     momentum = 0.75,

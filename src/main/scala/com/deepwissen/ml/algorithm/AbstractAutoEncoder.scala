@@ -29,7 +29,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
   def newNetwork(dataset: DATASET, parameter: AutoencoderParameter): AutoencoderNetwork =
     AutoencoderNetwork(
       inputPerceptronSize = parameter.inputPerceptronSize,
-      hiddenPerceptronSize = parameter.hiddenLayerSize,
+      hiddenPerceptronSize = parameter.hiddenPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )
 
