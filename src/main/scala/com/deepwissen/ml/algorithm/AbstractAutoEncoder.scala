@@ -20,6 +20,12 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     network
   }
 
+  def trainWithLayer(dataset: DATASET, paramInputLayer : Layer, paramHiddenLayer: Layer, parameter: AutoencoderParameter): AutoencoderNetwork = {
+    val network = newNetwork(dataset, paramInputLayer , paramHiddenLayer, parameter)
+    doTrain(network, dataset, parameter)
+    network
+  }
+
   /**n
    * Create new network from dataset and training parameter
    * @param dataset dataset
@@ -30,6 +36,13 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
     AutoencoderNetwork(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenPerceptronSize = parameter.hiddenPerceptronSize,
+      synapsysFactory = parameter.synapsysFactory
+    )
+
+  def newNetwork(dataset: DATASET, pInputLayer : Layer, pHiddenLayer: Layer, parameter: AutoencoderParameter): AutoencoderNetwork =
+    AutoencoderNetwork(
+      paramInputLayer = pInputLayer,
+      paramHiddenLayer = pHiddenLayer,
       synapsysFactory = parameter.synapsysFactory
     )
 

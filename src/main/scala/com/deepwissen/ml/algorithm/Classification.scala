@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.algorithm.networks.{AutoencoderNetwork, Network, MarkovChain}
+import com.deepwissen.ml.algorithm.networks.{DeepNetwork, AutoencoderNetwork, Network, MarkovChain}
 import com.deepwissen.ml.function.ActivationFunction
 import com.deepwissen.ml.utils.{BinaryValue, Denomination}
 
@@ -156,5 +156,43 @@ object RBMClassificationTesting extends Classification[Array[Denomination[_]], M
     println()
 
     BinaryValue(network.inputLayer.perceptrons.map(x => x.output))
+  }
+}
+
+
+/**
+ * Basic implementation of classification for data array of double and network model
+ * @author Eko Khannedy
+ * @since 6/3/15
+ */
+object DeepNetworkClassification extends Classification[Array[Denomination[_]], DeepNetwork] {
+
+  /**
+   * Run classification
+   * @param data data
+   * @param network model
+   * @param activationFunction activation function
+   * @return classification result
+   */
+  override def apply(data: Array[Denomination[_]], network: DeepNetwork, activationFunction: ActivationFunction): Denomination[_] = {
+
+    // fill input layer
+    network.inputLayer.fillOutput(data)
+
+    // fill hidden layer
+    network.hiddenLayers.foreach { layer =>
+      layer.perceptrons.foreach { perceptron =>
+        perceptron.weight = network.getPerceptronWeightTo(perceptron)
+        perceptron.output = activationFunction.activation(perceptron.weight)
+      }
+    }
+
+    // fill output layer
+    network.outputLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = activationFunction.activation(perceptron.weight)
+    }
+
+    BinaryValue(network.outputLayer.perceptrons.map(x => x.output))
   }
 }

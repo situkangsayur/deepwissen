@@ -3,7 +3,7 @@ package com.deepwissen.ml.algorithm.networks
 import com.deepwissen.ml.algorithm._
 import com.deepwissen.ml.function.SigmoidFunction
 import com.deepwissen.ml.serialization.{DeepNetworkModel, NetworkModel, PerceptronModel}
-import com.deepwissen.ml.utils.Denomination
+import com.deepwissen.ml.utils.{BinaryValue, ContValue, Denomination}
 import io.netty.handler.codec.rtsp.RtspHeaders.Values
 
 import scala.annotation.tailrec
@@ -39,7 +39,7 @@ class DeepNetwork(var inputLayer: Layer,
    * @param toPerceptronId target perceptron
    * @return synapsys
    */
-  def getSynapsys(fromPerceptronId: String, toPerceptronId: String):Synapsys =
+  def getSynapsys(fromPerceptronId: String, toPerceptronId: String): Synapsys =
     synapsiesLookupPair(fromPerceptronId -> toPerceptronId)
 
   @transient
@@ -117,18 +117,54 @@ object DeepNetwork {
       newPerceptron(i)
     }.toList
 
-  def runPreLearning(inputLayer : Layer, hiddenLayer : Layer, dataset: List[Array[Denomination[_]]],parameter : AutoencoderParameter) : AutoencoderNetwork =
-    Autoencoder.train(dataset, parameter)
+  @tailrec
+  def inisializationNetwork(currentLayer: Layer, tempNetwork: DeepNetwork, dataset: List[Array[Denomination[_]]], tempResult: List[Synapsys], i: Int): DeepNetwork = {
+    println("layer ke - " + i )
+    if(!currentLayer.next.get.isInstanceOf[OutputLayer]) {
 
+      val sizeLayer : (Int, Int) = if (currentLayer.isInstanceOf[InputLayer])
+        (currentLayer.next.get.perceptrons.size, dataset.head.length - 1)
+      else
+        (currentLayer.next.get.perceptrons.size, currentLayer.perceptrons.size)
+
+      val tempParam = AutoencoderParameter(
+        hiddenPerceptronSize = sizeLayer._1,
+        iteration = 10000,
+        epsilon = 0.00001,
+        momentum = 0.50,
+        learningRate = 0.50,
+        synapsysFactory = RandomSynapsysFactory(),
+        activationFunction = SigmoidFunction,
+        inputPerceptronSize = sizeLayer._2
+      )
+
+      println(currentLayer.id +" - "+ currentLayer.next.get.id)
+      val tempLayer = Autoencoder.trainWithLayer(dataset, currentLayer, currentLayer.next.get, tempParam)
+
+      val nextDataset =
+        dataset.map( data => AutoencoderClassification(data,tempLayer,SigmoidFunction).asInstanceOf[BinaryValue].get.map(p => ContValue(p).asInstanceOf[Denomination[_]]).toArray)
+
+      val tempSynapsies = tempResult ::: ((tempLayer.inputLayer.bias.get +: tempLayer.inputLayer.perceptrons).flatMap( p => tempLayer.synapsies.filter(s => s.from.id.equals(p.id))))
+
+
+      inisializationNetwork(currentLayer.next.get, tempNetwork, nextDataset,tempSynapsies, i+1)
+
+    }else{
+      println("last layer")
+      tempNetwork.synapsies = tempResult ::: tempNetwork.outputLayer.perceptrons.flatMap(p => tempNetwork.synapsies.filter(s => s.to.id.equals(p.id)))
+      tempNetwork
+    }
+  }
 
   /**
    * Create new Network with given perceptron input size and hidden layer size
    * @param parameter parameter Deep network
    * @param dataset dataset for pretraining
-   * @param synapsysFactory synapsis value creator
    * @return
    */
-  def apply(parameter: DeepNetworkParameter, dataset : List[Array[Denomination[_]]],synapsysFactory: SynapsysFactory[_]): DeepNetwork = {
+  def apply(parameter: DeepNetworkParameter, dataset: List[Array[Denomination[_]]]): DeepNetwork = {
+
+    val synapsysFactory = parameter.synapsysFactory
 
     // create input layer
     val inputLayer = InputLayer(
@@ -143,6 +179,7 @@ object DeepNetwork {
     val hiddenLayersSize = parameter.hiddenLayerSize
     //create hidden layers
     var hiddenLayers = hiddenLayersSize.map { size =>
+      print(size + ", ")
       val hiddenLayer = HiddenLayer(
         id = newLayerId(),
         perceptrons = newPerceptrons(size),
@@ -157,6 +194,7 @@ object DeepNetwork {
       prevLayer = hiddenLayer
       hiddenLayer // return hidden layer
     }
+    println()
 
     // create output layer
     val outputLayer = new OutputLayer(
@@ -187,7 +225,7 @@ object DeepNetwork {
           createSynapsies(nextLayer, synapsies ::: currentSynapsies)
       }
 
-    val synapsies = if(synapsysFactory.isInstanceOf[CopySynapsysFactory]){
+    val synapsies = if (synapsysFactory.isInstanceOf[CopySynapsysFactory]) {
       val tempListOfSynapsys = synapsysFactory.asInstanceOf[CopySynapsysFactory]
       tempListOfSynapsys.getSynapsys().map { synapsys =>
         Synapsys(
@@ -200,44 +238,9 @@ object DeepNetwork {
     } else createSynapsies(inputLayer, List())
 
 
-    val allLayers: List[Layer] = (List(inputLayer) ::: hiddenLayers) :+ outputLayer
-
-    allLayers.foreach { layer =>
-
-      val tempNetwork = if(layer.isInstanceOf[InputLayer]) {
-        val param = BackpropragationParameter(
-          hiddenLayerSize = 1,
-          outputPerceptronSize = 1,
-          targetClassPosition = -1,
-          iteration = 10000,
-          epsilon = 0.00001,
-          momentum = 0.50,
-          learningRate = 0.50,
-          synapsysFactory = RandomSynapsysFactory(),
-          activationFunction = SigmoidFunction,
-          inputPerceptronSize = dataset.head.length - 1
-        )
-//        Autoencoder.train(dataset,param)
-      } else {
-        val param = BackpropragationParameter(
-          hiddenLayerSize = 1,
-          outputPerceptronSize = 1,
-          targetClassPosition = -1,
-          iteration = 10000,
-          epsilon = 0.00001,
-          momentum = 0.50,
-          learningRate = 0.50,
-          synapsysFactory = RandomSynapsysFactory(),
-          activationFunction = SigmoidFunction,
-          inputPerceptronSize = layer.perceptrons.size
-        )
-
-      }
-    }
-
     // create network
     var network = new DeepNetwork(inputLayer, hiddenLayers, outputLayer, synapsies)
-    network
+    inisializationNetwork(network.inputLayer, network, dataset, List[Synapsys](), 0)
   }
 
   /**

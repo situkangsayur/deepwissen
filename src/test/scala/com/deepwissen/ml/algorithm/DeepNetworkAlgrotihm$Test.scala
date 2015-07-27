@@ -7,7 +7,7 @@ import com.deepwissen.ml.function.{EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
-import com.deepwissen.ml.validation.BackProValidation
+import com.deepwissen.ml.validation.{DeepNetworkValidation, BackProValidation}
 import org.scalatest.FunSuite
 import org.slf4j.LoggerFactory
 
@@ -76,8 +76,8 @@ class DeepNetworkAlgrotihm$Test extends FunSuite{
   /**
    * Training Parameter
    */
-  val parameter = BackpropragationParameter(
-    hiddenLayerSize = 1,
+  val parameter = DeepNetworkParameter(
+    hiddenLayerSize = List(3,3,3),
     outputPerceptronSize = 2,
     targetClassPosition = -1,
     iteration = 70000,
@@ -112,11 +112,11 @@ class DeepNetworkAlgrotihm$Test extends FunSuite{
 
       logger.info(finalDataSet.toString())
 
-      val network = BasicBackpropagation.train(finalDataSet, parameter)
+      val network = DeepNetworkAlgorithm.train(finalDataSet, parameter)
 
-      val validator = BackProValidation()
+      val validator = DeepNetworkValidation()
 
-      val result = validator.classification(network, BasicClassification, finalDataSet, SigmoidFunction)
+      val result = validator.classification(network, DeepNetworkClassification, finalDataSet, SigmoidFunction)
       logger.info("result finding : "+ result.toString())
 
       val validateResult = validator.validate(result, finalDataSet, 4)
@@ -131,7 +131,7 @@ class DeepNetworkAlgrotihm$Test extends FunSuite{
 
       // classification
       finalDataSet.foreach { data =>
-        val realScore = BasicClassification(data, network, SigmoidFunction)
+        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
           val percent = Math.round(p._1 * 100.0)
           val score = if (p._1 > 0.7) 1.0 else 0.0

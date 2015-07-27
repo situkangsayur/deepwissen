@@ -191,6 +191,88 @@ object AutoencoderNetwork {
   }
 
   /**
+   * Create new Network with given perceptron input size and hidden layer size
+   * @param paramInputLayer input layer data
+   * @param paramHiddenLayer hidden layer data
+   * @return
+   */
+  def apply(paramInputLayer: Layer, paramHiddenLayer: Layer, synapsysFactory: SynapsysFactory[_]): AutoencoderNetwork = {
+
+
+    // create input layer
+    val inputLayer = InputLayer(
+      id = paramInputLayer.id,
+      perceptrons = paramInputLayer.perceptrons,
+      bias = paramInputLayer.bias
+    )
+
+    // create prev layer
+    var prevLayer: Layer = inputLayer
+
+    // create hidden layer
+    val hiddenLayer = HiddenLayer(
+      id = paramHiddenLayer.id,
+      perceptrons = paramHiddenLayer.perceptrons,
+      bias = paramHiddenLayer.bias,
+      prev = Option(prevLayer)
+    )
+    // create relation from prev layer to next layer
+    prevLayer.next = Some(hiddenLayer)
+
+    prevLayer = hiddenLayer
+
+    // create output layer
+    val outputLayer = new OutputLayer(
+      id = newLayerId(),
+      perceptrons = newPerceptrons(paramInputLayer.perceptrons.size),
+      prev = Some(prevLayer)
+    )
+
+    prevLayer.next = Some(outputLayer)
+
+    hiddenLayer.perceptrons.map( p => print(p.id +", "))
+    println()
+
+    // create synapsies
+    @tailrec
+    def createSynapsies(prevLayer: Layer, synapsies: List[Synapsys]): List[Synapsys] =
+      prevLayer.next match {
+        case None => synapsies // no next layer
+        case Some(nextLayer) =>
+          println(prevLayer.bias.get.id)
+          prevLayer.perceptrons.foreach( p => println("prev : "+ p.id +"," + p.output))
+          nextLayer.perceptrons.foreach( p => println("next : "+ p.id +"," + p.output))
+          //  prev perceptron + bias
+          val prevPerceptrons = prevLayer.bias.get :: prevLayer.perceptrons
+          // next perceptron - bias
+          val nextPerceptrons = nextLayer.perceptrons
+          // create perceptrom from prev layer to next layer
+          val currentSynapsies = prevPerceptrons.flatMap { prevPerceptron =>
+            nextPerceptrons.map { nextPerceptron =>
+              synapsysFactory(prevPerceptron, nextPerceptron)
+            }
+          }
+          // go to next layer
+          createSynapsies(nextLayer, synapsies ::: currentSynapsies)
+      }
+
+    val synapsies = if(synapsysFactory.isInstanceOf[CopySynapsysFactory]){
+      val tempListOfSynapsys = synapsysFactory.asInstanceOf[CopySynapsysFactory]
+      tempListOfSynapsys.getSynapsys().map { synapsys =>
+        Synapsys(
+          from = synapsys.from,
+          to = synapsys.to,
+          weight = synapsys.weight,
+          deltaWeight = synapsys.deltaWeight
+        )
+      }
+    } else createSynapsies(inputLayer, List())
+
+    // create network
+    new AutoencoderNetwork(inputLayer, hiddenLayer, outputLayer, synapsies)
+  }
+
+  /**
    * Convert from NetworkModel to Network
    * @param model NetworkModel
    * @return Network

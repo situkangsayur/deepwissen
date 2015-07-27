@@ -5,6 +5,8 @@
 
 package com.deepwissen.ml.algorithm
 
+import com.deepwissen.ml.algorithm.networks.AutoencoderNetwork
+
 /**
  * Base trait for Deep Learning Algorithm
  * @author Eko Khannedy

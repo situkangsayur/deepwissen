@@ -2,7 +2,7 @@ package com.deepwissen.ml.serialization
 
 import java.io.{FileInputStream, File, FileOutputStream, StringWriter}
 
-import com.deepwissen.ml.algorithm.{BackpropragationParameter, RandomSynapsysFactory}
+import com.deepwissen.ml.algorithm.{DeepNetworkParameter, BackpropragationParameter, RandomSynapsysFactory}
 import com.deepwissen.ml.algorithm.networks.{DeepNetwork, Network}
 import com.deepwissen.ml.function.SigmoidFunction
 import com.deepwissen.ml.normalization.StandardNormalization
@@ -46,6 +46,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
   )
 
   val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
+  val simplePriorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, play)
 
   val strings =
     """
@@ -65,10 +66,32 @@ class DeepNetworkSerialization$Test extends FunSuite{
       |rainy,mild,high,TRUE,no
     """.stripMargin.trim.split("\n")
 
-
-
+  val stringsSimple =
+    """
+      |sunny,hot,high,no
+      |sunny,hot,high,no
+      |overcast,hot,high,yes
+      |rainy,mild,high,yes
+      |rainy,cool,normal,yes
+      |rainy,cool,normal,no
+      |overcast,cool,normal,yes
+      |sunny,mild,high,no
+      |sunny,cool,normal,yes
+      |rainy,mild,normal,yes
+      |sunny,mild,normal,yes
+      |overcast,mild,high,yes
+      |overcast,hot,normal,yes
+      |rainy,mild,high,no
+    """.stripMargin.trim.split("\n")
 
   val dataset = strings.map { string =>
+    string.split(",").zipWithIndex.map {
+      case (value, index) =>
+        (index, value)
+    }
+  }
+
+  val simpleDataset = stringsSimple.map { string =>
     string.split(",").zipWithIndex.map {
       case (value, index) =>
         (index, value)
@@ -78,9 +101,9 @@ class DeepNetworkSerialization$Test extends FunSuite{
   /**
    * Training Parameter
    */
-  val parameter = BackpropragationParameter(
-    hiddenLayerSize = 1,
-    outputPerceptronSize = 2,
+  val parameter = DeepNetworkParameter(
+    hiddenLayerSize = List(3,3,3),
+    outputPerceptronSize = 1,
     targetClassPosition = -1,
     iteration = 100000,
     epsilon = 0.000001,
@@ -92,6 +115,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
   )
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
+  val simpleTargetClass = if(parameter.targetClassPosition == -1) simpleDataset.head.length - 1 else parameter.targetClassPosition
 
   val finalDataSet = StandardNormalization.normalize(
     dataset.map(data => {
@@ -107,14 +131,27 @@ class DeepNetworkSerialization$Test extends FunSuite{
     println(array.mkString(","))
   }
 
+  val simpleFinalDataSet = StandardNormalization.normalize(
+    simpleDataset.map(data => {
+      data.map { case (index, value) =>
+        simplePriorKnowledge(index)(value)
+      }
+    }).toList
+    , simpleTargetClass)
+
+  //  val labels
+
+//  simpleFinalDataSet.foreach { array =>
+//    println(array.mkString(","))
+//  }
+
   var logger  = LoggerFactory.getLogger("Main Objects")
-
-
 
 
   test("save model") {
 
-    val network = DeepNetwork(null, finalDataSet, synapsysFactory = RandomSynapsysFactory())
+    val network = DeepNetwork(parameter, finalDataSet, synapsysFactory = RandomSynapsysFactory())
+//    val network = DeepNetwork(parameter, simpleFinalDataSet, synapsysFactory = RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
 
@@ -131,7 +168,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
   test("load model") {
 
     val network = NetworkSerialization.load(inputStream = new FileInputStream(
-      new File("target" + File.separator + "network-model.json")), typeOfInference = "NeuralNet").asInstanceOf[DeepNetwork]
+      new File("target" + File.separator + "network-model.json")), typeOfInference = "DeepNet").asInstanceOf[DeepNetwork]
     println("converter model network to network object")
     network.inputLayer.perceptrons.foreach { perceptron =>
       println(network.inputLayer.id + " input layer => " + perceptron.id)
@@ -140,7 +177,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
     }
     println(network.inputLayer.id + " bias => " + network.inputLayer.bias.get.id)
     assert(network.inputLayer.bias.isDefined)
-    assert(network.inputLayer.perceptrons.length == 3)
+    assert(network.inputLayer.perceptrons.length == 4)
     assert(network.inputLayer.prev.isEmpty)
     assert(network.inputLayer.next.isDefined)
 
@@ -152,7 +189,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
       }
       println(layer.id + " bias => " + layer.bias.get.id)
       assert(layer.bias.isDefined)
-      assert(layer.perceptrons.length == 2)
+      assert(layer.perceptrons.length == 3)
       assert(layer.prev.isDefined)
       assert(layer.next.isDefined)
     }
@@ -173,7 +210,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
       assert(synapsys.to != null)
     }
     println("total synapsys => " + network.synapsies.length)
-    assert(network.synapsies.length == 17)
+    assert(network.synapsies.length == 43)
   }
 
 

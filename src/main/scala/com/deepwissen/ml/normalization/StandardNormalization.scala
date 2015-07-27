@@ -39,10 +39,8 @@ object StandardNormalization extends Normalization[List[Array[Denomination[_]]]]
           val max = if(minMax(i)._1 == minMax(i)._2) 1 else minMax(i)._2
 
           normalize(array(i).asInstanceOf[ContValue].get, min, max, targetClass)
-        } else {
-          println("target class - " + targetClass + " - " + array(i))
-          array(i)
-        }
+        } else array(i)
+
         temp
       }.toArray
     }

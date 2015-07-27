@@ -1,19 +1,19 @@
 package com.deepwissen.ml.algorithm
 
-import com.deepwissen.ml.algorithm.networks.Network
+import com.deepwissen.ml.algorithm.networks.{DeepNetwork, Network}
 import com.deepwissen.ml.utils.{ContValue, Denomination}
 
 /**
  * Created by hendri_k on 6/13/15.
  */
-abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Double], BackpropragationParameter, Network]{
+abstract class AbstractDeepNetwork extends Algorithm[List[Array[Denomination[_]]], Array[Double], DeepNetworkParameter, DeepNetwork]{
   /**
    * Run training with given dataset
    * @param dataset dataset
    * @param parameter parameter
    * @return model
    */
-  override def train(dataset: DATASET, parameter: BackpropragationParameter): Network = {
+  override def train(dataset: List[Array[Denomination[_]]], parameter: DeepNetworkParameter): DeepNetwork = {
     val network = newNetwork(dataset, parameter)
     doTrain(network, dataset, parameter)
     network
@@ -25,13 +25,9 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter parameter
    * @return network
    */
-  def newNetwork(dataset: DATASET, parameter: BackpropragationParameter): Network =
-    Network(
-      inputPerceptronSize = parameter.inputPerceptronSize,
-      hiddenSize = parameter.hiddenLayerSize,
-      outputPerceptronSize = parameter.outputPerceptronSize,
-      synapsysFactory = parameter.synapsysFactory
-    )
+  def newNetwork(dataset: List[Array[Denomination[_]]], parameter: DeepNetworkParameter): DeepNetwork =
+    DeepNetwork(parameter, dataset)
+
 
   /**
    * Train implementation
@@ -39,7 +35,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param dataset dataset
    * @param parameter training parameter
    */
-  def doTrain(network: Network, dataset: DATASET, parameter: BackpropragationParameter): Unit
+  def doTrain(network: DeepNetwork, dataset: List[Array[Denomination[_]]], parameter: DeepNetworkParameter): Unit
 
   /**
    * Get target class
@@ -57,7 +53,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return error
    */
-  def getPerceptronError(network: Network, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
+  def getPerceptronError(network: DeepNetwork, layer: Layer, fromPerceptron: Perceptron, data: Array[Denomination[_]], parameter: TrainingParameter): Double = {
     layer.next match {
       case None =>
         // output layer
@@ -80,7 +76,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter parameter
    * @return delta weight
    */
-  def getSynapsysDeltaWeight(network: Network, perceptron: Perceptron, synapsys: Synapsys, parameter: BackpropragationParameter): Double = {
+  def getSynapsysDeltaWeight(network: DeepNetwork, perceptron: Perceptron, synapsys: Synapsys, parameter: DeepNetworkParameter): Double = {
     if (synapsys.isFromBias)
       (parameter.learningRate * perceptron.error) + (parameter.momentum * synapsys.deltaWeight)
     else
@@ -94,7 +90,7 @@ abstract class AbstractDeepNetwork[DATASET] extends Algorithm[DATASET, Array[Dou
    * @param parameter train parameter
    * @return sum error
    */
-  def doTrainData(data: Array[Denomination[_]], network: Network, parameter: BackpropragationParameter): Double = {
+  def doTrainData(data: Array[Denomination[_]], network: DeepNetwork, parameter: DeepNetworkParameter): Double = {
 
     /**
      * Update output for all input layer
