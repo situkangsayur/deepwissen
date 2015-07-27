@@ -150,7 +150,7 @@ class DeepNetworkSerialization$Test extends FunSuite{
 
   test("save model") {
 
-    val network = DeepNetwork(parameter, finalDataSet, synapsysFactory = RandomSynapsysFactory())
+    val network = DeepNetwork(parameter, finalDataSet)
 //    val network = DeepNetwork(parameter, simpleFinalDataSet, synapsysFactory = RandomSynapsysFactory())
     val writer = new StringWriter()
     val outputStream = new WriterOutputStream(writer)
