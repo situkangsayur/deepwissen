@@ -565,7 +565,8 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
       logger.info("after accuration counting : "+accuration.toString())
 
       // classification
-      finalDataSetBreastCancer.foreach { data =>
+//      finalDataSetBreastCancer.foreach { data =>
+      finalDataSet.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
           val percent = Math.round(p._1 * 100.0)
