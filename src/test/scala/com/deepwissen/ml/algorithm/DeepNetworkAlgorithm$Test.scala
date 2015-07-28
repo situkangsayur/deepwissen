@@ -504,7 +504,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
     learningRate = 0.5,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
-    inputPerceptronSize = dataset.head.length - 1
+    inputPerceptronSize = datasetBreastCancer.head.length - 1
   )
 
   val targetClass = if (parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
@@ -528,75 +528,21 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
 
   var logger = LoggerFactory.getLogger("Main Objects")
 
-  test("traininig and classification and save model") {
-    // training
-    try {
-
-      //      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
-      val network = DeepNetworkAlgorithm.train(finalDataSet, parameter)
-
-      val validator = DeepNetworkValidation()
-
-      //      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
-      val result = validator.classification(network, DeepNetworkClassification, finalDataSet, SigmoidFunction)
-      //      logger.info("result finding : "+ result.toString())
-
-      //      val validateResult = validator.validate(result, finalDataSetBreastCancer, 4)
-      val validateResult = validator.validate(result, finalDataSet, targetClass)
-
-      logger.info("after validation result : " + validateResult.toString())
-
-      val accuration = validator.accuration(validateResult) {
-        EitherThresholdFunction(0.7, 0.0, 1.0)
-      }
-
-      logger.info("after accuration counting : " + accuration.toString())
-
-      val threshold = RangeThresholdFunction(0.15)
-
-      var trueCounter = 0
-      var allData = 0
-
-      // classification
-      finalDataSet.foreach { data =>
-        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
-        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(p._2).asInstanceOf[ContValue].get
-          val result = p._1
-          val compare = threshold.compare(p._1, originalClass)
-          println(s"real $p == score $compare == targetClass ${originalClass}")
-          trueCounter = if(compare) trueCounter + 1 else trueCounter
-          allData += 1
-        })
-        println("------------------------------------------------------------")
-      }
-
-      val percent = trueCounter * (100.0 / allData)
-
-      println("result comparation : " + trueCounter + " :> in percent : " + percent)
-
-      assert(percent >= 80)
-
-      // save model
-      NetworkSerialization.save(network, new FileOutputStream(
-        new File("target" + File.separator + "cuaca.json")))
-    } catch {
-      case npe: NullPointerException => npe.printStackTrace()
-      case e: Exception => e.printStackTrace()
-    }
-  }
-//
-//  test("training and classification with breast cancer dataset") {
+//  test("traininig and classification and save model") {
 //    // training
 //    try {
-//      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
+//
+//      //      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
+//      val network = DeepNetworkAlgorithm.train(finalDataSet, parameter)
 //
 //      val validator = DeepNetworkValidation()
 //
-//      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
-//      //            logger.info("result finding : "+ result.toString())
+//      //      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
+//      val result = validator.classification(network, DeepNetworkClassification, finalDataSet, SigmoidFunction)
+//      //      logger.info("result finding : "+ result.toString())
 //
-//      val validateResult = validator.validate(result, finalDataSetBreastCancer, targetClassBreastCancer)
+//      //      val validateResult = validator.validate(result, finalDataSetBreastCancer, 4)
+//      val validateResult = validator.validate(result, finalDataSet, targetClass)
 //
 //      logger.info("after validation result : " + validateResult.toString())
 //
@@ -612,7 +558,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
 //      var allData = 0
 //
 //      // classification
-//      finalDataSetBreastCancer.foreach { data =>
+//      finalDataSet.foreach { data =>
 //        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
 //        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
 //          val originalClass = data(p._2).asInstanceOf[ContValue].get
@@ -640,37 +586,91 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
 //    }
 //  }
 
-  test("load model and classification") {
+  test("training and classification with breast cancer dataset") {
+    // training
+    try {
+      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
 
-    // load model
-    val network = NetworkSerialization.load(inputStream = new FileInputStream(
-      new File("target" + File.separator + "cuaca.json")), typeOfInference = "NeuralNet").asInstanceOf[DeepNetwork]
+      val validator = DeepNetworkValidation()
 
-    // classification
-    val threshold = RangeThresholdFunction(0.15)
+      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
+      //            logger.info("result finding : "+ result.toString())
 
-    var trueCounter = 0
-    var allData = 0
+      val validateResult = validator.validate(result, finalDataSetBreastCancer, targetClassBreastCancer)
 
-    // classification
-    finalDataSet.foreach { data =>
-      val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
-      realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-        val originalClass = data(p._2).asInstanceOf[ContValue].get
-        val result = p._1
-        val compare = threshold.compare(p._1, originalClass)
-        println(s"real $p == score $compare == targetClass ${originalClass}")
-        trueCounter = if(compare) trueCounter + 1 else trueCounter
-        allData += 1
-      })
-      println("------------------------------------------------------------")
+      logger.info("after validation result : " + validateResult.toString())
+
+      val accuration = validator.accuration(validateResult) {
+        EitherThresholdFunction(0.7, 0.0, 1.0)
+      }
+
+      logger.info("after accuration counting : " + accuration.toString())
+
+      val threshold = RangeThresholdFunction(0.15)
+
+      var trueCounter = 0
+      var allData = 0
+
+      // classification
+      finalDataSetBreastCancer.foreach { data =>
+        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+          val originalClass = data(p._2).asInstanceOf[ContValue].get
+          val result = p._1
+          val compare = threshold.compare(p._1, originalClass)
+          println(s"real $p == score $compare == targetClass ${originalClass}")
+          trueCounter = if(compare) trueCounter + 1 else trueCounter
+          allData += 1
+        })
+        println("------------------------------------------------------------")
+      }
+
+      val percent = trueCounter * (100.0 / allData)
+
+      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+      assert(percent >= 80)
+
+      // save model
+      NetworkSerialization.save(network, new FileOutputStream(
+        new File("target" + File.separator + "cuaca.json")))
+    } catch {
+      case npe: NullPointerException => npe.printStackTrace()
+      case e: Exception => e.printStackTrace()
     }
-
-    val percent = trueCounter * (100.0 / allData)
-
-    println("result comparation : " + trueCounter + " :> in percent : " + percent)
-
-    assert(percent >= 80)
   }
+
+//  test("load model and classification") {
+//
+//    // load model
+//    val network = NetworkSerialization.load(inputStream = new FileInputStream(
+//      new File("target" + File.separator + "cuaca.json")), typeOfInference = "NeuralNet").asInstanceOf[DeepNetwork]
+//
+//    // classification
+//    val threshold = RangeThresholdFunction(0.15)
+//
+//    var trueCounter = 0
+//    var allData = 0
+//
+//    // classification
+//    finalDataSet.foreach { data =>
+//      val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+//      realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+//        val originalClass = data(p._2).asInstanceOf[ContValue].get
+//        val result = p._1
+//        val compare = threshold.compare(p._1, originalClass)
+//        println(s"real $p == score $compare == targetClass ${originalClass}")
+//        trueCounter = if(compare) trueCounter + 1 else trueCounter
+//        allData += 1
+//      })
+//      println("------------------------------------------------------------")
+//    }
+//
+//    val percent = trueCounter * (100.0 / allData)
+//
+//    println("result comparation : " + trueCounter + " :> in percent : " + percent)
+//
+//    assert(percent >= 80)
+//  }
 
 }
