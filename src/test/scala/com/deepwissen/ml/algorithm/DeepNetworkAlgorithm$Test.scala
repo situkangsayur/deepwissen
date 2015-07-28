@@ -2,8 +2,8 @@ package com.deepwissen.ml.algorithm
 
 import java.io.{FileInputStream, File, FileOutputStream}
 
-import com.deepwissen.ml.algorithm.networks.Network
-import com.deepwissen.ml.function.{EitherThresholdFunction, SigmoidFunction}
+import com.deepwissen.ml.algorithm.networks.{DeepNetwork, Network}
+import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFunction, SigmoidFunction}
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{Denomination, BinaryValue, ContValue}
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory
 /**
  * Created by hendri_k on 7/25/15.
  */
-class DeepNetworkAlgorithm$Test extends FunSuite{
+class DeepNetworkAlgorithm$Test extends FunSuite {
 
   /**
    * breast cancer dataset priorknowledge
@@ -113,8 +113,8 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
   )
 
 
-  val priorKnowledgeBreastCancer : List[Map[String, Denomination[_]]] =
-    List(age, menopause,tumorSize,invNodes, nodeCaps, degMalig, breast, breastQuad, irradiat, classTarget)
+  val priorKnowledgeBreastCancer: List[Map[String, Denomination[_]]] =
+    List(age, menopause, tumorSize, invNodes, nodeCaps, degMalig, breast, breastQuad, irradiat, classTarget)
 
   /**
    * play tennis dataset priorknowledge
@@ -142,8 +142,8 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
   )
 
   val play = Map(
-    "no" -> BinaryValue(List(0.0,0.0)),
-    "yes" -> BinaryValue(List(0.0,1.0))
+    "no" -> BinaryValue(List(0.0, 0.0)),
+    "yes" -> BinaryValue(List(0.0, 1.0))
   )
 
   val priorKnowledge: List[Map[String, Denomination[_]]] = List(outlook, temperature, humidity, windy, play)
@@ -153,294 +153,294 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
    * dataset breast cancer
    */
   val stringsBreastCancer =
-  """
-    |40-49,premeno,15-19,0-2,yes,3,right,left_up,no,recurrence-events
-    |50-59,ge40,15-19,0-2,no,1,right,central,no,no-recurrence-events
-    |50-59,ge40,35-39,0-2,no,2,left,left_low,no,recurrence-events
-    |40-49,premeno,35-39,0-2,yes,3,right,left_low,yes,no-recurrence-events
-    |40-49,premeno,30-34,3-5,yes,2,left,right_up,no,recurrence-events
-    |50-59,premeno,25-29,3-5,no,2,right,left_up,yes,no-recurrence-events
-    |50-59,ge40,40-44,0-2,no,3,left,left_up,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,2,left,left_up,no,no-recurrence-events
-    |40-49,premeno,0-4,0-2,no,2,right,right_low,no,no-recurrence-events
-    |40-49,ge40,40-44,15-17,yes,2,right,left_up,yes,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,right,left_up,no,no-recurrence-events
-    |50-59,ge40,30-34,0-2,no,1,right,central,no,no-recurrence-events
-    |50-59,ge40,25-29,0-2,no,2,right,left_up,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,left,left_low,yes,recurrence-events
-    |30-39,premeno,20-24,0-2,no,3,left,central,no,no-recurrence-events
-    |50-59,premeno,10-14,3-5,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,right,left_up,no,no-recurrence-events
-    |50-59,premeno,40-44,0-2,no,2,left,left_up,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
-    |50-59,lt40,20-24,0-2,?,1,left,left_low,no,recurrence-events
-    |60-69,ge40,40-44,3-5,no,2,right,left_up,yes,no-recurrence-events
-    |50-59,ge40,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
-    |30-39,premeno,15-19,6-8,yes,3,left,left_low,yes,recurrence-events
-    |50-59,ge40,20-24,3-5,yes,2,right,left_up,no,no-recurrence-events
-    |50-59,ge40,10-14,0-2,no,2,right,left_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,30-34,3-5,yes,3,left,left_low,no,no-recurrence-events
-    |40-49,premeno,15-19,15-17,yes,3,left,left_low,no,recurrence-events
-    |60-69,ge40,30-34,0-2,no,3,right,central,no,recurrence-events
-    |60-69,ge40,25-29,3-5,?,1,right,left_low,yes,no-recurrence-events
-    |50-59,ge40,25-29,0-2,no,3,left,right_up,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,3,right,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,1,left,left_low,yes,recurrence-events
-    |30-39,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,2,right,left_up,no,no-recurrence-events
-    |60-69,ge40,45-49,6-8,yes,3,left,central,no,no-recurrence-events
-    |40-49,ge40,20-24,0-2,no,3,left,left_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,1,right,right_low,no,no-recurrence-events
-    |30-39,premeno,35-39,0-2,no,3,left,left_low,no,recurrence-events
-    |40-49,premeno,35-39,9-11,yes,2,right,right_up,yes,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
-    |50-59,ge40,20-24,3-5,yes,3,right,right_up,no,recurrence-events
-    |30-39,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,premeno,30-34,0-2,no,3,left,right_up,no,recurrence-events
-    |60-69,ge40,10-14,0-2,no,2,right,left_up,yes,no-recurrence-events
-    |40-49,premeno,35-39,0-2,yes,3,right,left_up,yes,no-recurrence-events
-    |50-59,premeno,50-54,0-2,yes,2,right,left_up,yes,no-recurrence-events
-    |50-59,ge40,40-44,0-2,no,3,right,left_up,no,no-recurrence-events
-    |70-79,ge40,15-19,9-11,?,1,left,left_low,yes,recurrence-events
-    |50-59,lt40,30-34,0-2,no,3,right,left_up,no,no-recurrence-events
-    |40-49,premeno,0-4,0-2,no,3,left,central,no,no-recurrence-events
-    |70-79,ge40,40-44,0-2,no,1,right,right_up,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,?,2,left,right_low,yes,no-recurrence-events
-    |50-59,ge40,25-29,15-17,yes,3,right,left_up,no,no-recurrence-events
-    |50-59,premeno,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,35-39,15-17,no,3,left,left_low,no,no-recurrence-events
-    |50-59,ge40,50-54,0-2,no,1,right,right_up,no,no-recurrence-events
-    |30-39,premeno,0-4,0-2,no,2,right,central,no,recurrence-events
-    |50-59,ge40,40-44,6-8,yes,3,left,left_low,yes,recurrence-events
-    |40-49,premeno,30-34,0-2,no,2,right,right_up,yes,no-recurrence-events
-    |40-49,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,15-17,yes,3,left,left_low,no,recurrence-events
-    |40-49,ge40,20-24,0-2,no,2,right,left_up,no,recurrence-events
-    |50-59,ge40,15-19,0-2,no,1,right,central,no,no-recurrence-events
-    |30-39,premeno,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,premeno,50-54,9-11,yes,2,right,left_up,no,recurrence-events
-    |30-39,premeno,10-14,0-2,no,1,right,left_low,no,no-recurrence-events
-    |50-59,premeno,25-29,3-5,yes,3,left,left_low,yes,recurrence-events
-    |60-69,ge40,25-29,3-5,?,1,right,left_up,yes,no-recurrence-events
-    |60-69,ge40,10-14,0-2,no,1,right,left_low,no,no-recurrence-events
-    |50-59,ge40,30-34,6-8,yes,3,left,right_low,no,recurrence-events
-    |30-39,premeno,25-29,6-8,yes,3,left,right_low,yes,recurrence-events
-    |50-59,ge40,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,right,central,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,3,left,right_up,no,recurrence-events
-    |60-69,ge40,30-34,6-8,yes,2,right,right_up,no,no-recurrence-events
-    |50-59,lt40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,left,left_up,yes,no-recurrence-events
-    |30-39,premeno,0-4,0-2,no,2,right,central,no,no-recurrence-events
-    |50-59,ge40,35-39,0-2,no,3,left,left_up,no,no-recurrence-events
-    |40-49,premeno,40-44,0-2,no,1,right,left_up,no,no-recurrence-events
-    |30-39,premeno,25-29,6-8,yes,2,right,left_up,yes,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,1,right,left_low,no,no-recurrence-events
-    |50-59,ge40,30-34,0-2,no,1,left,left_up,no,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,1,right,left_up,no,recurrence-events
-    |30-39,premeno,30-34,3-5,no,3,right,left_up,yes,recurrence-events
-    |50-59,lt40,20-24,0-2,?,1,left,left_up,no,recurrence-events
-    |50-59,premeno,10-14,0-2,no,2,right,left_up,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
-    |40-49,premeno,45-49,0-2,no,2,left,left_low,yes,no-recurrence-events
-    |30-39,premeno,40-44,0-2,no,1,left,left_up,no,recurrence-events
-    |50-59,premeno,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
-    |60-69,ge40,30-34,0-2,no,3,right,left_up,yes,recurrence-events
-    |40-49,premeno,35-39,0-2,no,1,right,left_up,no,recurrence-events
-    |40-49,premeno,20-24,3-5,yes,2,left,left_low,yes,recurrence-events
-    |50-59,premeno,15-19,0-2,no,2,left,left_low,no,recurrence-events
-    |50-59,ge40,30-34,0-2,no,3,right,left_low,no,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,2,left,left_up,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,1,left,right_low,no,no-recurrence-events
-    |60-69,ge40,30-34,3-5,yes,2,left,central,yes,recurrence-events
-    |60-69,ge40,20-24,3-5,no,2,left,left_low,yes,recurrence-events
-    |50-59,premeno,25-29,0-2,no,2,left,right_up,no,recurrence-events
-    |50-59,ge40,30-34,0-2,no,1,right,right_up,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,left,right_low,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,30-34,0-2,no,2,left,left_low,yes,no-recurrence-events
-    |30-39,premeno,30-34,0-2,no,2,left,left_up,no,no-recurrence-events
-    |30-39,premeno,40-44,3-5,no,3,right,right_up,yes,no-recurrence-events
-    |60-69,ge40,5-9,0-2,no,1,left,central,no,no-recurrence-events
-    |60-69,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,6-8,yes,3,right,left_up,no,recurrence-events
-    |60-69,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
-    |40-49,premeno,35-39,9-11,yes,2,right,left_up,yes,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,1,right,left_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,yes,3,right,right_up,no,recurrence-events
-    |50-59,premeno,25-29,0-2,yes,2,left,left_up,no,no-recurrence-events
-    |40-49,premeno,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
-    |30-39,premeno,35-39,9-11,yes,3,left,left_low,no,recurrence-events
-    |30-39,premeno,10-14,0-2,no,2,left,right_low,no,no-recurrence-events
-    |50-59,ge40,30-34,0-2,no,1,right,left_low,no,no-recurrence-events
-    |60-69,ge40,30-34,0-2,no,2,left,left_up,no,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,15-19,0-2,no,2,left,left_up,no,recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,2,left,right_low,no,no-recurrence-events
-    |20-29,premeno,35-39,0-2,no,2,right,right_up,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,3,right,right_up,no,recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,right,left_low,no,recurrence-events
-    |30-39,premeno,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
-    |30-39,premeno,15-19,0-2,no,1,right,left_low,no,recurrence-events
-    |50-59,ge40,0-4,0-2,no,1,right,central,no,no-recurrence-events
-    |50-59,ge40,0-4,0-2,no,1,left,left_low,no,no-recurrence-events
-    |60-69,ge40,50-54,0-2,no,3,right,left_up,no,recurrence-events
-    |50-59,premeno,30-34,0-2,no,1,left,central,no,no-recurrence-events
-    |60-69,ge40,20-24,24-26,yes,3,left,left_low,yes,recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,left,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,3-5,no,2,right,left_up,no,recurrence-events
-    |50-59,premeno,20-24,3-5,yes,2,left,left_low,no,no-recurrence-events
-    |50-59,ge40,15-19,0-2,yes,2,left,central,yes,no-recurrence-events
-    |50-59,premeno,10-14,0-2,no,3,left,left_low,no,no-recurrence-events
-    |30-39,premeno,30-34,9-11,no,2,right,left_up,yes,recurrence-events
-    |60-69,ge40,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
-    |40-49,premeno,40-44,0-2,no,2,right,left_low,no,no-recurrence-events
-    |50-59,ge40,30-34,9-11,?,3,left,left_up,yes,no-recurrence-events
-    |40-49,premeno,50-54,0-2,no,2,right,left_low,yes,recurrence-events
-    |50-59,ge40,15-19,0-2,no,2,right,right_up,no,no-recurrence-events
-    |50-59,ge40,40-44,3-5,yes,2,left,left_low,no,no-recurrence-events
-    |30-39,premeno,25-29,3-5,yes,3,left,left_low,yes,recurrence-events
-    |60-69,ge40,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
-    |60-69,lt40,10-14,0-2,no,1,left,right_up,no,no-recurrence-events
-    |30-39,premeno,30-34,0-2,no,2,left,left_up,no,recurrence-events
-    |30-39,premeno,20-24,3-5,yes,2,left,left_low,no,recurrence-events
-    |50-59,ge40,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,3,right,left_up,no,no-recurrence-events
-    |50-59,ge40,25-29,3-5,yes,3,right,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,6-8,no,2,left,left_up,no,no-recurrence-events
-    |60-69,ge40,50-54,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,premeno,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
-    |40-49,ge40,20-24,3-5,no,3,right,left_low,yes,recurrence-events
-    |50-59,ge40,30-34,6-8,yes,2,left,right_low,yes,recurrence-events
-    |60-69,ge40,25-29,3-5,no,2,right,right_up,no,recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,left,central,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,left,left_up,no,no-recurrence-events
-    |40-49,premeno,50-54,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,2,right,central,no,recurrence-events
-    |50-59,ge40,30-34,3-5,no,3,right,left_up,no,recurrence-events
-    |40-49,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,1,right,left_up,no,recurrence-events
-    |40-49,premeno,40-44,3-5,yes,3,right,left_up,yes,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
-    |40-49,premeno,20-24,3-5,no,2,right,left_up,no,no-recurrence-events
-    |40-49,premeno,25-29,9-11,yes,3,right,left_up,no,recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,right,left_low,no,recurrence-events
-    |40-49,premeno,20-24,0-2,no,1,right,right_up,no,no-recurrence-events
-    |30-39,premeno,40-44,0-2,no,2,right,right_up,no,no-recurrence-events
-    |60-69,ge40,10-14,6-8,yes,3,left,left_up,yes,recurrence-events
-    |40-49,premeno,35-39,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,30-34,3-5,no,3,left,left_low,no,recurrence-events
-    |40-49,premeno,5-9,0-2,no,1,left,left_low,yes,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,1,left,right_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,3,right,right_up,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,3,left,left_up,no,recurrence-events
-    |50-59,ge40,5-9,0-2,no,2,right,right_up,no,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,2,right,right_low,no,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,2,left,right_up,no,recurrence-events
-    |40-49,premeno,10-14,0-2,no,2,left,left_low,yes,no-recurrence-events
-    |60-69,ge40,35-39,6-8,yes,3,left,left_low,no,recurrence-events
-    |60-69,ge40,50-54,0-2,no,2,right,left_up,yes,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,right,left_up,no,no-recurrence-events
-    |30-39,premeno,20-24,3-5,no,2,right,central,no,no-recurrence-events
-    |30-39,premeno,30-34,0-2,no,1,right,left_up,no,recurrence-events
-    |60-69,lt40,30-34,0-2,no,1,left,left_low,no,no-recurrence-events
-    |40-49,premeno,15-19,12-14,no,3,right,right_low,yes,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,3,right,left_low,no,recurrence-events
-    |30-39,premeno,5-9,0-2,no,2,left,right_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,3,left,left_up,no,no-recurrence-events
-    |60-69,ge40,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,1,right,right_low,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,1,left,right_low,no,no-recurrence-events
-    |60-69,ge40,40-44,3-5,yes,3,right,left_low,no,recurrence-events
-    |50-59,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,premeno,30-34,0-2,no,3,right,left_up,yes,recurrence-events
-    |40-49,ge40,30-34,3-5,no,3,left,left_low,no,recurrence-events
-    |40-49,premeno,25-29,0-2,no,1,right,left_low,yes,no-recurrence-events
-    |40-49,ge40,25-29,12-14,yes,3,left,right_low,yes,recurrence-events
-    |40-49,premeno,40-44,0-2,no,1,left,left_low,no,recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,left,left_low,no,no-recurrence-events
-    |50-59,ge40,25-29,0-2,no,1,left,right_low,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
-    |70-79,ge40,40-44,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,3,left,left_up,no,recurrence-events
-    |50-59,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |60-69,ge40,45-49,0-2,no,1,right,right_up,yes,recurrence-events
-    |50-59,ge40,20-24,0-2,yes,2,right,left_up,no,no-recurrence-events
-    |50-59,ge40,25-29,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
-    |40-49,premeno,20-24,3-5,no,2,right,left_low,no,no-recurrence-events
-    |50-59,ge40,35-39,0-2,no,2,left,left_up,no,no-recurrence-events
-    |30-39,premeno,20-24,0-2,no,3,left,left_up,yes,recurrence-events
-    |60-69,ge40,30-34,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,3,right,left_low,no,no-recurrence-events
-    |40-49,ge40,30-34,0-2,no,2,left,left_up,yes,no-recurrence-events
-    |30-39,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,left,left_low,no,recurrence-events
-    |30-39,premeno,20-24,0-2,no,2,left,right_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,2,right,left_low,no,no-recurrence-events
-    |50-59,premeno,15-19,0-2,no,2,right,right_low,no,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,1,right,left_up,no,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
-    |60-69,ge40,40-44,0-2,no,2,right,left_low,no,recurrence-events
-    |30-39,lt40,15-19,0-2,no,3,right,left_up,no,no-recurrence-events
-    |40-49,premeno,30-34,12-14,yes,3,left,left_up,yes,recurrence-events
-    |60-69,ge40,30-34,0-2,yes,2,right,right_up,yes,recurrence-events
-    |50-59,ge40,40-44,6-8,yes,3,left,left_low,yes,recurrence-events
-    |50-59,ge40,30-34,0-2,no,3,left,?,no,recurrence-events
-    |70-79,ge40,10-14,0-2,no,2,left,central,no,no-recurrence-events
-    |30-39,premeno,40-44,0-2,no,2,left,left_low,yes,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,2,right,right_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,1,left,left_low,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,30-34,9-11,yes,3,left,right_low,yes,recurrence-events
-    |50-59,ge40,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,30-34,0-2,no,1,left,right_up,no,no-recurrence-events
-    |70-79,ge40,0-4,0-2,no,1,left,right_low,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,3,right,left_up,yes,no-recurrence-events
-    |50-59,premeno,25-29,0-2,no,3,right,left_low,yes,recurrence-events
-    |50-59,ge40,40-44,0-2,no,2,left,left_low,no,no-recurrence-events
-    |60-69,ge40,25-29,0-2,no,3,left,right_low,yes,recurrence-events
-    |40-49,premeno,30-34,3-5,yes,2,right,left_low,no,no-recurrence-events
-    |50-59,ge40,20-24,0-2,no,2,left,left_up,no,recurrence-events
-    |70-79,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
-    |30-39,premeno,25-29,0-2,no,1,left,central,no,no-recurrence-events
-    |60-69,ge40,30-34,0-2,no,2,left,left_low,no,no-recurrence-events
-    |40-49,premeno,20-24,3-5,yes,2,right,right_up,yes,recurrence-events
-    |50-59,ge40,30-34,9-11,?,3,left,left_low,yes,no-recurrence-events
-    |50-59,ge40,0-4,0-2,no,2,left,central,no,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,3,right,left_low,yes,no-recurrence-events
-    |30-39,premeno,35-39,0-2,no,3,left,left_low,no,recurrence-events
-    |60-69,ge40,30-34,0-2,no,1,left,left_up,no,no-recurrence-events
-    |60-69,ge40,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
-    |50-59,ge40,25-29,6-8,no,3,left,left_low,yes,recurrence-events
-    |50-59,premeno,35-39,15-17,yes,3,right,right_up,no,recurrence-events
-    |30-39,premeno,20-24,3-5,yes,2,right,left_up,yes,no-recurrence-events
-    |40-49,premeno,20-24,6-8,no,2,right,left_low,yes,no-recurrence-events
-    |50-59,ge40,35-39,0-2,no,3,left,left_low,no,no-recurrence-events
-    |50-59,premeno,35-39,0-2,no,2,right,left_up,no,no-recurrence-events
-    |40-49,premeno,25-29,0-2,no,2,left,left_up,yes,no-recurrence-events
-    |40-49,premeno,35-39,0-2,no,2,right,right_up,no,no-recurrence-events
-    |50-59,premeno,30-34,3-5,yes,2,left,left_low,yes,no-recurrence-events
-    |40-49,premeno,20-24,0-2,no,2,right,right_up,no,no-recurrence-events
-    |60-69,ge40,15-19,0-2,no,3,right,left_up,yes,no-recurrence-events
-    |50-59,ge40,30-34,6-8,yes,2,left,left_low,no,no-recurrence-events
-    |50-59,premeno,25-29,3-5,yes,2,left,left_low,yes,no-recurrence-events
-    |30-39,premeno,30-34,6-8,yes,2,right,right_up,no,no-recurrence-events
-    |50-59,premeno,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
-    |50-59,ge40,40-44,0-2,no,3,left,right_up,no,no-recurrence-events
-  """.stripMargin.trim.split("\n")
+    """
+      |40-49,premeno,15-19,0-2,yes,3,right,left_up,no,recurrence-events
+      |50-59,ge40,15-19,0-2,no,1,right,central,no,no-recurrence-events
+      |50-59,ge40,35-39,0-2,no,2,left,left_low,no,recurrence-events
+      |40-49,premeno,35-39,0-2,yes,3,right,left_low,yes,no-recurrence-events
+      |40-49,premeno,30-34,3-5,yes,2,left,right_up,no,recurrence-events
+      |50-59,premeno,25-29,3-5,no,2,right,left_up,yes,no-recurrence-events
+      |50-59,ge40,40-44,0-2,no,3,left,left_up,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,2,left,left_up,no,no-recurrence-events
+      |40-49,premeno,0-4,0-2,no,2,right,right_low,no,no-recurrence-events
+      |40-49,ge40,40-44,15-17,yes,2,right,left_up,yes,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,right,left_up,no,no-recurrence-events
+      |50-59,ge40,30-34,0-2,no,1,right,central,no,no-recurrence-events
+      |50-59,ge40,25-29,0-2,no,2,right,left_up,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,left,left_low,yes,recurrence-events
+      |30-39,premeno,20-24,0-2,no,3,left,central,no,no-recurrence-events
+      |50-59,premeno,10-14,3-5,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,right,left_up,no,no-recurrence-events
+      |50-59,premeno,40-44,0-2,no,2,left,left_up,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
+      |50-59,lt40,20-24,0-2,?,1,left,left_low,no,recurrence-events
+      |60-69,ge40,40-44,3-5,no,2,right,left_up,yes,no-recurrence-events
+      |50-59,ge40,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
+      |30-39,premeno,15-19,6-8,yes,3,left,left_low,yes,recurrence-events
+      |50-59,ge40,20-24,3-5,yes,2,right,left_up,no,no-recurrence-events
+      |50-59,ge40,10-14,0-2,no,2,right,left_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,30-34,3-5,yes,3,left,left_low,no,no-recurrence-events
+      |40-49,premeno,15-19,15-17,yes,3,left,left_low,no,recurrence-events
+      |60-69,ge40,30-34,0-2,no,3,right,central,no,recurrence-events
+      |60-69,ge40,25-29,3-5,?,1,right,left_low,yes,no-recurrence-events
+      |50-59,ge40,25-29,0-2,no,3,left,right_up,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,3,right,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,1,left,left_low,yes,recurrence-events
+      |30-39,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,2,right,left_up,no,no-recurrence-events
+      |60-69,ge40,45-49,6-8,yes,3,left,central,no,no-recurrence-events
+      |40-49,ge40,20-24,0-2,no,3,left,left_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,1,right,right_low,no,no-recurrence-events
+      |30-39,premeno,35-39,0-2,no,3,left,left_low,no,recurrence-events
+      |40-49,premeno,35-39,9-11,yes,2,right,right_up,yes,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
+      |50-59,ge40,20-24,3-5,yes,3,right,right_up,no,recurrence-events
+      |30-39,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,premeno,30-34,0-2,no,3,left,right_up,no,recurrence-events
+      |60-69,ge40,10-14,0-2,no,2,right,left_up,yes,no-recurrence-events
+      |40-49,premeno,35-39,0-2,yes,3,right,left_up,yes,no-recurrence-events
+      |50-59,premeno,50-54,0-2,yes,2,right,left_up,yes,no-recurrence-events
+      |50-59,ge40,40-44,0-2,no,3,right,left_up,no,no-recurrence-events
+      |70-79,ge40,15-19,9-11,?,1,left,left_low,yes,recurrence-events
+      |50-59,lt40,30-34,0-2,no,3,right,left_up,no,no-recurrence-events
+      |40-49,premeno,0-4,0-2,no,3,left,central,no,no-recurrence-events
+      |70-79,ge40,40-44,0-2,no,1,right,right_up,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,?,2,left,right_low,yes,no-recurrence-events
+      |50-59,ge40,25-29,15-17,yes,3,right,left_up,no,no-recurrence-events
+      |50-59,premeno,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,35-39,15-17,no,3,left,left_low,no,no-recurrence-events
+      |50-59,ge40,50-54,0-2,no,1,right,right_up,no,no-recurrence-events
+      |30-39,premeno,0-4,0-2,no,2,right,central,no,recurrence-events
+      |50-59,ge40,40-44,6-8,yes,3,left,left_low,yes,recurrence-events
+      |40-49,premeno,30-34,0-2,no,2,right,right_up,yes,no-recurrence-events
+      |40-49,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,15-17,yes,3,left,left_low,no,recurrence-events
+      |40-49,ge40,20-24,0-2,no,2,right,left_up,no,recurrence-events
+      |50-59,ge40,15-19,0-2,no,1,right,central,no,no-recurrence-events
+      |30-39,premeno,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,premeno,50-54,9-11,yes,2,right,left_up,no,recurrence-events
+      |30-39,premeno,10-14,0-2,no,1,right,left_low,no,no-recurrence-events
+      |50-59,premeno,25-29,3-5,yes,3,left,left_low,yes,recurrence-events
+      |60-69,ge40,25-29,3-5,?,1,right,left_up,yes,no-recurrence-events
+      |60-69,ge40,10-14,0-2,no,1,right,left_low,no,no-recurrence-events
+      |50-59,ge40,30-34,6-8,yes,3,left,right_low,no,recurrence-events
+      |30-39,premeno,25-29,6-8,yes,3,left,right_low,yes,recurrence-events
+      |50-59,ge40,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,premeno,15-19,0-2,no,1,left,left_low,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,right,central,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,3,left,right_up,no,recurrence-events
+      |60-69,ge40,30-34,6-8,yes,2,right,right_up,no,no-recurrence-events
+      |50-59,lt40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,right,left_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,left,left_up,yes,no-recurrence-events
+      |30-39,premeno,0-4,0-2,no,2,right,central,no,no-recurrence-events
+      |50-59,ge40,35-39,0-2,no,3,left,left_up,no,no-recurrence-events
+      |40-49,premeno,40-44,0-2,no,1,right,left_up,no,no-recurrence-events
+      |30-39,premeno,25-29,6-8,yes,2,right,left_up,yes,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,1,right,left_low,no,no-recurrence-events
+      |50-59,ge40,30-34,0-2,no,1,left,left_up,no,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,1,right,left_up,no,recurrence-events
+      |30-39,premeno,30-34,3-5,no,3,right,left_up,yes,recurrence-events
+      |50-59,lt40,20-24,0-2,?,1,left,left_up,no,recurrence-events
+      |50-59,premeno,10-14,0-2,no,2,right,left_up,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
+      |40-49,premeno,45-49,0-2,no,2,left,left_low,yes,no-recurrence-events
+      |30-39,premeno,40-44,0-2,no,1,left,left_up,no,recurrence-events
+      |50-59,premeno,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
+      |60-69,ge40,30-34,0-2,no,3,right,left_up,yes,recurrence-events
+      |40-49,premeno,35-39,0-2,no,1,right,left_up,no,recurrence-events
+      |40-49,premeno,20-24,3-5,yes,2,left,left_low,yes,recurrence-events
+      |50-59,premeno,15-19,0-2,no,2,left,left_low,no,recurrence-events
+      |50-59,ge40,30-34,0-2,no,3,right,left_low,no,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,2,left,left_up,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,1,left,right_low,no,no-recurrence-events
+      |60-69,ge40,30-34,3-5,yes,2,left,central,yes,recurrence-events
+      |60-69,ge40,20-24,3-5,no,2,left,left_low,yes,recurrence-events
+      |50-59,premeno,25-29,0-2,no,2,left,right_up,no,recurrence-events
+      |50-59,ge40,30-34,0-2,no,1,right,right_up,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,left,right_low,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,30-34,0-2,no,2,left,left_low,yes,no-recurrence-events
+      |30-39,premeno,30-34,0-2,no,2,left,left_up,no,no-recurrence-events
+      |30-39,premeno,40-44,3-5,no,3,right,right_up,yes,no-recurrence-events
+      |60-69,ge40,5-9,0-2,no,1,left,central,no,no-recurrence-events
+      |60-69,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,6-8,yes,3,right,left_up,no,recurrence-events
+      |60-69,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
+      |40-49,premeno,35-39,9-11,yes,2,right,left_up,yes,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,1,right,left_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,yes,3,right,right_up,no,recurrence-events
+      |50-59,premeno,25-29,0-2,yes,2,left,left_up,no,no-recurrence-events
+      |40-49,premeno,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
+      |30-39,premeno,35-39,9-11,yes,3,left,left_low,no,recurrence-events
+      |30-39,premeno,10-14,0-2,no,2,left,right_low,no,no-recurrence-events
+      |50-59,ge40,30-34,0-2,no,1,right,left_low,no,no-recurrence-events
+      |60-69,ge40,30-34,0-2,no,2,left,left_up,no,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,15-19,0-2,no,2,left,left_up,no,recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,2,left,right_low,no,no-recurrence-events
+      |20-29,premeno,35-39,0-2,no,2,right,right_up,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,3,right,right_up,no,recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,right,left_low,no,recurrence-events
+      |30-39,premeno,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
+      |30-39,premeno,15-19,0-2,no,1,right,left_low,no,recurrence-events
+      |50-59,ge40,0-4,0-2,no,1,right,central,no,no-recurrence-events
+      |50-59,ge40,0-4,0-2,no,1,left,left_low,no,no-recurrence-events
+      |60-69,ge40,50-54,0-2,no,3,right,left_up,no,recurrence-events
+      |50-59,premeno,30-34,0-2,no,1,left,central,no,no-recurrence-events
+      |60-69,ge40,20-24,24-26,yes,3,left,left_low,yes,recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,left,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,3-5,no,2,right,left_up,no,recurrence-events
+      |50-59,premeno,20-24,3-5,yes,2,left,left_low,no,no-recurrence-events
+      |50-59,ge40,15-19,0-2,yes,2,left,central,yes,no-recurrence-events
+      |50-59,premeno,10-14,0-2,no,3,left,left_low,no,no-recurrence-events
+      |30-39,premeno,30-34,9-11,no,2,right,left_up,yes,recurrence-events
+      |60-69,ge40,10-14,0-2,no,1,left,left_low,no,no-recurrence-events
+      |40-49,premeno,40-44,0-2,no,2,right,left_low,no,no-recurrence-events
+      |50-59,ge40,30-34,9-11,?,3,left,left_up,yes,no-recurrence-events
+      |40-49,premeno,50-54,0-2,no,2,right,left_low,yes,recurrence-events
+      |50-59,ge40,15-19,0-2,no,2,right,right_up,no,no-recurrence-events
+      |50-59,ge40,40-44,3-5,yes,2,left,left_low,no,no-recurrence-events
+      |30-39,premeno,25-29,3-5,yes,3,left,left_low,yes,recurrence-events
+      |60-69,ge40,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
+      |60-69,lt40,10-14,0-2,no,1,left,right_up,no,no-recurrence-events
+      |30-39,premeno,30-34,0-2,no,2,left,left_up,no,recurrence-events
+      |30-39,premeno,20-24,3-5,yes,2,left,left_low,no,recurrence-events
+      |50-59,ge40,10-14,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,3,right,left_up,no,no-recurrence-events
+      |50-59,ge40,25-29,3-5,yes,3,right,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,6-8,no,2,left,left_up,no,no-recurrence-events
+      |60-69,ge40,50-54,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,premeno,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
+      |40-49,ge40,20-24,3-5,no,3,right,left_low,yes,recurrence-events
+      |50-59,ge40,30-34,6-8,yes,2,left,right_low,yes,recurrence-events
+      |60-69,ge40,25-29,3-5,no,2,right,right_up,no,recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,left,central,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,left,left_up,no,no-recurrence-events
+      |40-49,premeno,50-54,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,2,right,central,no,recurrence-events
+      |50-59,ge40,30-34,3-5,no,3,right,left_up,no,recurrence-events
+      |40-49,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,1,right,left_up,no,recurrence-events
+      |40-49,premeno,40-44,3-5,yes,3,right,left_up,yes,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
+      |40-49,premeno,20-24,3-5,no,2,right,left_up,no,no-recurrence-events
+      |40-49,premeno,25-29,9-11,yes,3,right,left_up,no,recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,right,left_low,no,recurrence-events
+      |40-49,premeno,20-24,0-2,no,1,right,right_up,no,no-recurrence-events
+      |30-39,premeno,40-44,0-2,no,2,right,right_up,no,no-recurrence-events
+      |60-69,ge40,10-14,6-8,yes,3,left,left_up,yes,recurrence-events
+      |40-49,premeno,35-39,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,30-34,3-5,no,3,left,left_low,no,recurrence-events
+      |40-49,premeno,5-9,0-2,no,1,left,left_low,yes,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,1,left,right_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,3,right,right_up,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,3,left,left_up,no,recurrence-events
+      |50-59,ge40,5-9,0-2,no,2,right,right_up,no,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,2,right,right_low,no,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,2,left,right_up,no,recurrence-events
+      |40-49,premeno,10-14,0-2,no,2,left,left_low,yes,no-recurrence-events
+      |60-69,ge40,35-39,6-8,yes,3,left,left_low,no,recurrence-events
+      |60-69,ge40,50-54,0-2,no,2,right,left_up,yes,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,right,left_up,no,no-recurrence-events
+      |30-39,premeno,20-24,3-5,no,2,right,central,no,no-recurrence-events
+      |30-39,premeno,30-34,0-2,no,1,right,left_up,no,recurrence-events
+      |60-69,lt40,30-34,0-2,no,1,left,left_low,no,no-recurrence-events
+      |40-49,premeno,15-19,12-14,no,3,right,right_low,yes,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,3,right,left_low,no,recurrence-events
+      |30-39,premeno,5-9,0-2,no,2,left,right_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,3,left,left_up,no,no-recurrence-events
+      |60-69,ge40,30-34,0-2,no,3,left,left_low,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,1,right,right_low,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,1,left,right_low,no,no-recurrence-events
+      |60-69,ge40,40-44,3-5,yes,3,right,left_low,no,recurrence-events
+      |50-59,ge40,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,premeno,30-34,0-2,no,3,right,left_up,yes,recurrence-events
+      |40-49,ge40,30-34,3-5,no,3,left,left_low,no,recurrence-events
+      |40-49,premeno,25-29,0-2,no,1,right,left_low,yes,no-recurrence-events
+      |40-49,ge40,25-29,12-14,yes,3,left,right_low,yes,recurrence-events
+      |40-49,premeno,40-44,0-2,no,1,left,left_low,no,recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,left,left_low,no,no-recurrence-events
+      |50-59,ge40,25-29,0-2,no,1,left,right_low,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
+      |70-79,ge40,40-44,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,3,left,left_up,no,recurrence-events
+      |50-59,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |60-69,ge40,45-49,0-2,no,1,right,right_up,yes,recurrence-events
+      |50-59,ge40,20-24,0-2,yes,2,right,left_up,no,no-recurrence-events
+      |50-59,ge40,25-29,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
+      |40-49,premeno,20-24,3-5,no,2,right,left_low,no,no-recurrence-events
+      |50-59,ge40,35-39,0-2,no,2,left,left_up,no,no-recurrence-events
+      |30-39,premeno,20-24,0-2,no,3,left,left_up,yes,recurrence-events
+      |60-69,ge40,30-34,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,3,right,left_low,no,no-recurrence-events
+      |40-49,ge40,30-34,0-2,no,2,left,left_up,yes,no-recurrence-events
+      |30-39,premeno,25-29,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,left,left_low,no,recurrence-events
+      |30-39,premeno,20-24,0-2,no,2,left,right_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,2,right,left_low,no,no-recurrence-events
+      |50-59,premeno,15-19,0-2,no,2,right,right_low,no,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,1,right,left_up,no,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,2,right,left_up,no,no-recurrence-events
+      |60-69,ge40,40-44,0-2,no,2,right,left_low,no,recurrence-events
+      |30-39,lt40,15-19,0-2,no,3,right,left_up,no,no-recurrence-events
+      |40-49,premeno,30-34,12-14,yes,3,left,left_up,yes,recurrence-events
+      |60-69,ge40,30-34,0-2,yes,2,right,right_up,yes,recurrence-events
+      |50-59,ge40,40-44,6-8,yes,3,left,left_low,yes,recurrence-events
+      |50-59,ge40,30-34,0-2,no,3,left,?,no,recurrence-events
+      |70-79,ge40,10-14,0-2,no,2,left,central,no,no-recurrence-events
+      |30-39,premeno,40-44,0-2,no,2,left,left_low,yes,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,2,right,right_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,1,left,left_low,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,10-14,0-2,no,1,left,left_up,no,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,30-34,9-11,yes,3,left,right_low,yes,recurrence-events
+      |50-59,ge40,10-14,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,30-34,0-2,no,1,left,right_up,no,no-recurrence-events
+      |70-79,ge40,0-4,0-2,no,1,left,right_low,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,3,right,left_up,yes,no-recurrence-events
+      |50-59,premeno,25-29,0-2,no,3,right,left_low,yes,recurrence-events
+      |50-59,ge40,40-44,0-2,no,2,left,left_low,no,no-recurrence-events
+      |60-69,ge40,25-29,0-2,no,3,left,right_low,yes,recurrence-events
+      |40-49,premeno,30-34,3-5,yes,2,right,left_low,no,no-recurrence-events
+      |50-59,ge40,20-24,0-2,no,2,left,left_up,no,recurrence-events
+      |70-79,ge40,20-24,0-2,no,3,left,left_up,no,no-recurrence-events
+      |30-39,premeno,25-29,0-2,no,1,left,central,no,no-recurrence-events
+      |60-69,ge40,30-34,0-2,no,2,left,left_low,no,no-recurrence-events
+      |40-49,premeno,20-24,3-5,yes,2,right,right_up,yes,recurrence-events
+      |50-59,ge40,30-34,9-11,?,3,left,left_low,yes,no-recurrence-events
+      |50-59,ge40,0-4,0-2,no,2,left,central,no,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,3,right,left_low,yes,no-recurrence-events
+      |30-39,premeno,35-39,0-2,no,3,left,left_low,no,recurrence-events
+      |60-69,ge40,30-34,0-2,no,1,left,left_up,no,no-recurrence-events
+      |60-69,ge40,20-24,0-2,no,1,left,left_low,no,no-recurrence-events
+      |50-59,ge40,25-29,6-8,no,3,left,left_low,yes,recurrence-events
+      |50-59,premeno,35-39,15-17,yes,3,right,right_up,no,recurrence-events
+      |30-39,premeno,20-24,3-5,yes,2,right,left_up,yes,no-recurrence-events
+      |40-49,premeno,20-24,6-8,no,2,right,left_low,yes,no-recurrence-events
+      |50-59,ge40,35-39,0-2,no,3,left,left_low,no,no-recurrence-events
+      |50-59,premeno,35-39,0-2,no,2,right,left_up,no,no-recurrence-events
+      |40-49,premeno,25-29,0-2,no,2,left,left_up,yes,no-recurrence-events
+      |40-49,premeno,35-39,0-2,no,2,right,right_up,no,no-recurrence-events
+      |50-59,premeno,30-34,3-5,yes,2,left,left_low,yes,no-recurrence-events
+      |40-49,premeno,20-24,0-2,no,2,right,right_up,no,no-recurrence-events
+      |60-69,ge40,15-19,0-2,no,3,right,left_up,yes,no-recurrence-events
+      |50-59,ge40,30-34,6-8,yes,2,left,left_low,no,no-recurrence-events
+      |50-59,premeno,25-29,3-5,yes,2,left,left_low,yes,no-recurrence-events
+      |30-39,premeno,30-34,6-8,yes,2,right,right_up,no,no-recurrence-events
+      |50-59,premeno,15-19,0-2,no,2,right,left_low,no,no-recurrence-events
+      |50-59,ge40,40-44,0-2,no,3,left,right_up,no,no-recurrence-events
+    """.stripMargin.trim.split("\n")
 
   /**
    * dataset playtennis
@@ -464,8 +464,6 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
     """.stripMargin.trim.split("\n")
 
 
-
-
   val dataset = strings.map { string =>
     string.split(",").zipWithIndex.map {
       case (value, index) =>
@@ -484,10 +482,10 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
    * Training Parameter
    */
   val parameter = DeepNetworkParameter(
-    hiddenLayerSize = List(3,3,3,3,3,3,3),
+    hiddenLayerSize = List(3, 3, 3, 3, 3, 3),
     outputPerceptronSize = 2,
     targetClassPosition = -1,
-    iteration = 100000,
+    iteration = 75000,
     epsilon = 0.00000001,
     momentum = 0.75,
     learningRate = 0.5,
@@ -497,7 +495,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
   )
 
   val parameterBreastCancer = DeepNetworkParameter(
-    hiddenLayerSize = List(8,8,8,8,8),
+    hiddenLayerSize = List(8, 8, 8, 8, 8),
     outputPerceptronSize = 2,
     targetClassPosition = -1,
     iteration = 100000,
@@ -509,8 +507,8 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
     inputPerceptronSize = dataset.head.length - 1
   )
 
-  val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
-  val targetClassBreastCancer = if(parameterBreastCancer.targetClassPosition == -1) datasetBreastCancer.head.length - 1 else parameterBreastCancer.targetClassPosition
+  val targetClass = if (parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
+  val targetClassBreastCancer = if (parameterBreastCancer.targetClassPosition == -1) datasetBreastCancer.head.length - 1 else parameterBreastCancer.targetClassPosition
 
   val finalDataSet = StandardNormalization.normalize(
     dataset.map(data => {
@@ -528,81 +526,151 @@ class DeepNetworkAlgorithm$Test extends FunSuite{
     }).toList
     , targetClassBreastCancer)
 
-
-//  finalDataSet.foreach { array =>
-//    println(array.mkString(","))
-//  }
-//
-//  finalDataSetBreastCancer.foreach { array =>
-//    println(array.mkString(","))
-//  }
-
-
-  var logger  = LoggerFactory.getLogger("Main Objects")
+  var logger = LoggerFactory.getLogger("Main Objects")
 
   test("traininig and classification and save model") {
     // training
     try {
 
-//      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
+      //      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
       val network = DeepNetworkAlgorithm.train(finalDataSet, parameter)
 
       val validator = DeepNetworkValidation()
 
-//      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
+      //      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
       val result = validator.classification(network, DeepNetworkClassification, finalDataSet, SigmoidFunction)
-//      logger.info("result finding : "+ result.toString())
+      //      logger.info("result finding : "+ result.toString())
 
-//      val validateResult = validator.validate(result, finalDataSetBreastCancer, 4)
-      val validateResult = validator.validate(result, finalDataSet, 4)
+      //      val validateResult = validator.validate(result, finalDataSetBreastCancer, 4)
+      val validateResult = validator.validate(result, finalDataSet, targetClass)
 
-      logger.info("after validation result : "+validateResult.toString())
+      logger.info("after validation result : " + validateResult.toString())
 
       val accuration = validator.accuration(validateResult) {
         EitherThresholdFunction(0.7, 0.0, 1.0)
       }
 
-      logger.info("after accuration counting : "+accuration.toString())
+      logger.info("after accuration counting : " + accuration.toString())
+
+      val threshold = RangeThresholdFunction(0.15)
+
+      var trueCounter = 0
+      var allData = 0
 
       // classification
-//      finalDataSetBreastCancer.foreach { data =>
       finalDataSet.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val percent = Math.round(p._1 * 100.0)
-          val score = if (p._1 > 0.7) 1.0 else 0.0
-          val originalClass = data(targetClass).asInstanceOf[BinaryValue].get(p._2)
-          println(s"real $p== percent $percent% == score $score == targetClass ${originalClass}")
-          assert(score == originalClass)
+          val originalClass = data(p._2).asInstanceOf[ContValue].get
+          val result = p._1
+          val compare = threshold.compare(p._1, originalClass)
+          println(s"real $p == score $compare == targetClass ${originalClass}")
+          trueCounter = if(compare) trueCounter + 1 else trueCounter
+          allData += 1
         })
+        println("------------------------------------------------------------")
       }
+
+      val percent = trueCounter * (100.0 / allData)
+
+      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+      assert(percent >= 80)
 
       // save model
       NetworkSerialization.save(network, new FileOutputStream(
         new File("target" + File.separator + "cuaca.json")))
-    }catch {
-      case npe : NullPointerException => npe.printStackTrace()
-      case e : Exception => e.printStackTrace()
+    } catch {
+      case npe: NullPointerException => npe.printStackTrace()
+      case e: Exception => e.printStackTrace()
     }
   }
+//
+//  test("training and classification with breast cancer dataset") {
+//    // training
+//    try {
+//      val network = DeepNetworkAlgorithm.train(finalDataSetBreastCancer, parameterBreastCancer)
+//
+//      val validator = DeepNetworkValidation()
+//
+//      val result = validator.classification(network, DeepNetworkClassification, finalDataSetBreastCancer, SigmoidFunction)
+//      //            logger.info("result finding : "+ result.toString())
+//
+//      val validateResult = validator.validate(result, finalDataSetBreastCancer, targetClassBreastCancer)
+//
+//      logger.info("after validation result : " + validateResult.toString())
+//
+//      val accuration = validator.accuration(validateResult) {
+//        EitherThresholdFunction(0.7, 0.0, 1.0)
+//      }
+//
+//      logger.info("after accuration counting : " + accuration.toString())
+//
+//      val threshold = RangeThresholdFunction(0.15)
+//
+//      var trueCounter = 0
+//      var allData = 0
+//
+//      // classification
+//      finalDataSetBreastCancer.foreach { data =>
+//        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+//        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+//          val originalClass = data(p._2).asInstanceOf[ContValue].get
+//          val result = p._1
+//          val compare = threshold.compare(p._1, originalClass)
+//          println(s"real $p == score $compare == targetClass ${originalClass}")
+//          trueCounter = if(compare) trueCounter + 1 else trueCounter
+//          allData += 1
+//        })
+//        println("------------------------------------------------------------")
+//      }
+//
+//      val percent = trueCounter * (100.0 / allData)
+//
+//      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+//
+//      assert(percent >= 80)
+//
+//      // save model
+//      NetworkSerialization.save(network, new FileOutputStream(
+//        new File("target" + File.separator + "cuaca.json")))
+//    } catch {
+//      case npe: NullPointerException => npe.printStackTrace()
+//      case e: Exception => e.printStackTrace()
+//    }
+//  }
 
   test("load model and classification") {
 
     // load model
     val network = NetworkSerialization.load(inputStream = new FileInputStream(
-      new File("target" + File.separator + "cuaca.json")), typeOfInference = "NeuralNet").asInstanceOf[Network]
+      new File("target" + File.separator + "cuaca.json")), typeOfInference = "NeuralNet").asInstanceOf[DeepNetwork]
+
+    // classification
+    val threshold = RangeThresholdFunction(0.15)
+
+    var trueCounter = 0
+    var allData = 0
 
     // classification
     finalDataSet.foreach { data =>
-      val realScore = BasicClassification(data, network, SigmoidFunction)
+      val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
       realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-        val percent = Math.round(p._1 * 100.0)
-        val score = if (p._1 > 0.7) 1.0 else 0.0
-        val originalClass = data(targetClass).asInstanceOf[BinaryValue].get(p._2)
-        println(s"real $p== percent $percent% == score $score == targetClass ${originalClass}")
-        assert(score == originalClass)
+        val originalClass = data(p._2).asInstanceOf[ContValue].get
+        val result = p._1
+        val compare = threshold.compare(p._1, originalClass)
+        println(s"real $p == score $compare == targetClass ${originalClass}")
+        trueCounter = if(compare) trueCounter + 1 else trueCounter
+        allData += 1
       })
+      println("------------------------------------------------------------")
     }
+
+    val percent = trueCounter * (100.0 / allData)
+
+    println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+    assert(percent >= 80)
   }
 
 }
