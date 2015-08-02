@@ -131,7 +131,7 @@ object DeepNetwork {
 
       val tempParam = AutoencoderParameter(
         hiddenPerceptronSize = sizeLayer._1,
-        iteration = 70000,
+        iteration = 20000,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
