@@ -198,7 +198,6 @@ object AutoencoderNetwork {
    */
   def apply(paramInputLayer: Layer, paramHiddenLayer: Layer, synapsysFactory: SynapsysFactory[_]): AutoencoderNetwork = {
 
-
     // create input layer
     val inputLayer = InputLayer(
       id = paramInputLayer.id,
@@ -230,18 +229,18 @@ object AutoencoderNetwork {
 
     prevLayer.next = Some(outputLayer)
 
-    hiddenLayer.perceptrons.map( p => print(p.id +", "))
-    println()
-
+//    hiddenLayer.perceptrons.map( p => print(p.id +", "))
+////    println()
+////
     // create synapsies
     @tailrec
     def createSynapsies(prevLayer: Layer, synapsies: List[Synapsys]): List[Synapsys] =
       prevLayer.next match {
         case None => synapsies // no next layer
         case Some(nextLayer) =>
-          println(prevLayer.bias.get.id)
-          prevLayer.perceptrons.foreach( p => println("prev : "+ p.id +"," + p.output))
-          nextLayer.perceptrons.foreach( p => println("next : "+ p.id +"," + p.output))
+//          println(prevLayer.bias.get.id)
+//          prevLayer.perceptrons.foreach( p => println("prev : "+ p.id +"," + p.output))
+//          nextLayer.perceptrons.foreach( p => println("next : "+ p.id +"," + p.output))
           //  prev perceptron + bias
           val prevPerceptrons = prevLayer.bias.get :: prevLayer.perceptrons
           // next perceptron - bias
@@ -255,6 +254,7 @@ object AutoencoderNetwork {
           // go to next layer
           createSynapsies(nextLayer, synapsies ::: currentSynapsies)
       }
+
 
     val synapsies = if(synapsysFactory.isInstanceOf[CopySynapsysFactory]){
       val tempListOfSynapsys = synapsysFactory.asInstanceOf[CopySynapsysFactory]

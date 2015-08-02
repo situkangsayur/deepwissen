@@ -112,6 +112,33 @@ object AutoencoderClassification extends Classification[Array[Denomination[_]], 
   }
 }
 
+/**
+ * Basic implementation of classification for data array of double and network model
+ * @author Hendri Karisma
+ * @since 6/3/15
+ */
+object AutoencoderMainOutputClassification extends Classification[Array[Denomination[_]], AutoencoderNetwork] {
+
+  /**
+   * Run classification
+   * @param data data
+   * @param network model
+   * @param activationFunction activation function
+   * @return classification result
+   */
+  override def apply(data: Array[Denomination[_]], network: AutoencoderNetwork, activationFunction: ActivationFunction): Denomination[_] = {
+    // fill input layer
+    network.inputLayer.fillOutput(data)
+
+    // fill hidden layer
+    network.hiddenLayer.perceptrons.foreach { perceptron =>
+      perceptron.weight = network.getPerceptronWeightTo(perceptron)
+      perceptron.output = activationFunction.activation(perceptron.weight)
+    }
+
+    BinaryValue(network.hiddenLayer.perceptrons.map(x => x.output))
+  }
+}
 
 /**
  * implementation of classification for data array of double and markov model for RBM

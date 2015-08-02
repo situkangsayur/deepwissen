@@ -127,9 +127,11 @@ object DeepNetwork {
       else
         (currentLayer.next.get.perceptrons.size, currentLayer.perceptrons.size)
 
+      println("size of layer: "+sizeLayer)
+
       val tempParam = AutoencoderParameter(
         hiddenPerceptronSize = sizeLayer._1,
-        iteration = 10000,
+        iteration = 70000,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
@@ -139,13 +141,17 @@ object DeepNetwork {
       )
 
       println(currentLayer.id +" - "+ currentLayer.next.get.id)
+      println("dataset total "+ dataset.size + " ; " + dataset.head.size)
       val tempLayer = Autoencoder.trainWithLayer(dataset, currentLayer, currentLayer.next.get, tempParam)
 
+      println("done , network created")
       val nextDataset =
-        dataset.map( data => AutoencoderClassification(data,tempLayer,SigmoidFunction).asInstanceOf[BinaryValue].get.map(p => ContValue(p).asInstanceOf[Denomination[_]]).toArray)
+        dataset.map( data => AutoencoderMainOutputClassification(data,tempLayer,SigmoidFunction).asInstanceOf[BinaryValue].get.map(p => ContValue(p).asInstanceOf[Denomination[_]]).toArray)
 
+      println("done , classified")
       val tempSynapsies = tempResult ::: ((tempLayer.inputLayer.bias.get +: tempLayer.inputLayer.perceptrons).flatMap( p => tempLayer.synapsies.filter(s => s.from.id.equals(p.id))))
 
+      println("next dataset total "+ nextDataset.size + " ; " + nextDataset.head.size)
 
       inisializationNetwork(currentLayer.next.get, tempNetwork, nextDataset,tempSynapsies, i+1)
 

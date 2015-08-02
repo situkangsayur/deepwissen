@@ -109,10 +109,12 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
    */
   def doTrainData(data: Array[Denomination[_]], network: AutoencoderNetwork, parameter: AutoencoderParameter): Double = {
 
+
     /**
      * Update output for all input layer
      */
     network.inputLayer.fillOutput(data)
+
 
     /**
      * Update weight and output for all hidden layers
@@ -124,6 +126,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
       }
 //    }
 
+
     /**
      * Update weight and output for output layer
      */
@@ -132,12 +135,14 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
       perceptron.output = parameter.activationFunction.activation(perceptron.weight)
     }
 
+
     /**
      * Update error for output layer
      */
     network.outputLayer.perceptrons.foreach { perceptron =>
       perceptron.error = getPerceptronError(network, network.outputLayer, perceptron, data, parameter)
     }
+
 
     /**
      * Update errors for all hidden layers
@@ -147,6 +152,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
         perceptron.error = getPerceptronError(network, network.hiddenLayer, perceptron, data, parameter)
       }
 //    }
+
 
     /**
      * Update weight all synapsies to hidden layers
@@ -159,6 +165,7 @@ abstract class AbstractAutoEncoder[DATASET] extends Algorithm[DATASET, Array[Dou
         }
       }
 //    }
+
 
     /**
      * Update weight all synapsies to output layer

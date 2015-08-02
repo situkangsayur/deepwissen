@@ -16,7 +16,8 @@ import scala.annotation.tailrec
  * @author Eko Khannedy
  * @since 2/25/15
  */
-class Network(var inputLayer: Layer,
+class
+Network(var inputLayer: Layer,
               var hiddenLayers: List[Layer],
               var outputLayer: Layer,
               var synapsies: List[Synapsys]) extends InferencesNetwork{

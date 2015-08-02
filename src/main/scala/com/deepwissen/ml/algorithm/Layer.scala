@@ -68,6 +68,7 @@ trait Layer {
   def fillOutput(data: Array[Denomination[_]]): Layer = {
     val tempData = data.filterNot(p => p.isInstanceOf[BinaryValue])
 
+//    println("tempData length : " + tempData.length)
     // update all perceptrons with given dataset
     perceptrons.foreach { perceptron =>
       // make sure non error ArrayIndexOutOfBoundsException

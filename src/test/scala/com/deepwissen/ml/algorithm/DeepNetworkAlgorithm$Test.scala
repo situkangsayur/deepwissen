@@ -495,10 +495,12 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
   )
 
   val parameterBreastCancer = DeepNetworkParameter(
-    hiddenLayerSize = List(8, 8, 8, 8, 8),
-    outputPerceptronSize = 2,
+    hiddenLayerSize = List(9,10,11,12,11,10,9),
+//    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
+//    hiddenLayerSize = List(5),
+    outputPerceptronSize = 1,
     targetClassPosition = -1,
-    iteration = 100000,
+    iteration = 75000,
     epsilon = 0.00000001,
     momentum = 0.75,
     learningRate = 0.5,
@@ -527,7 +529,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
     , targetClassBreastCancer)
 
   var logger = LoggerFactory.getLogger("Main Objects")
-
+//
 //  test("traininig and classification and save model") {
 //    // training
 //    try {
@@ -639,7 +641,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
       case e: Exception => e.printStackTrace()
     }
   }
-
+//
 //  test("load model and classification") {
 //
 //    // load model
