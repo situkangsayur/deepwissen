@@ -48,7 +48,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       hiddenLayerSize = 1,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 1000,
+      iteration = 70000,
       epsilon = 0.0000001,
       momentum = 0.75,
       learningRate = 0.5,
@@ -127,10 +127,6 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
 
       val threshold = RangeThresholdFunction(0.15)
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
-
-
       var trueCounter = 0
       var allData = 0
 
@@ -149,6 +145,9 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       }
 
       val percent = trueCounter * (100.0 / allData)
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
 
       println("result comparation : " + trueCounter + " :> in percent : " + percent)
 
