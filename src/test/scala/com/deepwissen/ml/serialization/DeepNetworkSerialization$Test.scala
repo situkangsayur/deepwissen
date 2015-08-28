@@ -2,7 +2,7 @@ package com.deepwissen.ml.serialization
 
 import java.io.{FileInputStream, File, FileOutputStream, StringWriter}
 
-import com.deepwissen.ml.algorithm.{DeepNetworkParameter, BackpropragationParameter, RandomSynapsysFactory}
+import com.deepwissen.ml.algorithm.{AutoencoderParameter, DeepNetworkParameter, BackpropragationParameter, RandomSynapsysFactory}
 import com.deepwissen.ml.algorithm.networks.{DeepNetwork, Network}
 import com.deepwissen.ml.function.SigmoidFunction
 import com.deepwissen.ml.normalization.StandardNormalization
@@ -111,7 +111,15 @@ class DeepNetworkSerialization$Test extends FunSuite{
     learningRate = 0.50,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
-    inputPerceptronSize = dataset.head.length - 1
+    inputPerceptronSize = dataset.head.length - 1,
+    autoecoderParam = AutoencoderParameter(
+      iteration = 50000,
+      epsilon = 0.00001,
+      momentum = 0.50,
+      learningRate = 0.30,
+      synapsysFactory = RandomSynapsysFactory(),
+      activationFunction = SigmoidFunction
+    )
   )
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition

@@ -37,8 +37,8 @@ case class BackpropragationParameter(inputPerceptronSize: Int,
                                      iteration: Int = Int.MaxValue) extends TrainingParameter
 
 
-case class AutoencoderParameter(inputPerceptronSize: Int,
-                                hiddenPerceptronSize: Int,
+case class AutoencoderParameter(inputPerceptronSize: Int = 1,
+                                hiddenPerceptronSize: Int = 1,
                                 synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),
                                 targetClassPosition : Int = -1,
                                 activationFunction: ActivationFunction = SigmoidFunction,
@@ -57,7 +57,8 @@ case class DeepNetworkParameter(inputPerceptronSize: Int,
                                 learningRate: Double = 0.5,
                                 momentum: Double = 0.75,
                                 epsilon: Double = 0.000001,
-                                iteration: Int = Int.MaxValue) extends TrainingParameter
+                                iteration: Int = Int.MaxValue,
+                                autoecoderParam : AutoencoderParameter) extends TrainingParameter
 
 
 //case class RbmParamter(inputPerceptronSize: Int,

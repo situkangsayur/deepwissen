@@ -491,22 +491,38 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
     learningRate = 0.5,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
-    inputPerceptronSize = dataset.head.length - 1
+    inputPerceptronSize = dataset.head.length - 1,
+    autoecoderParam = AutoencoderParameter(
+      iteration = 50000,
+      epsilon = 0.00001,
+      momentum = 0.50,
+      learningRate = 0.30,
+      synapsysFactory = RandomSynapsysFactory(),
+      activationFunction = SigmoidFunction
+    )
   )
 
   val parameterBreastCancer = DeepNetworkParameter(
-    hiddenLayerSize = List(9,10,11,12,11,10,9),
+//    hiddenLayerSize = List(9,10,11,12,11,10,9),
 //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-//    hiddenLayerSize = List(5),
+    hiddenLayerSize = List(7) ,
     outputPerceptronSize = 1,
     targetClassPosition = -1,
-    iteration = 75000,
+    iteration = 500,
     epsilon = 0.00000001,
-    momentum = 0.75,
-    learningRate = 0.5,
+    momentum = 0.3,
+    learningRate = 0.3,
     synapsysFactory = RandomSynapsysFactory(),
     activationFunction = SigmoidFunction,
-    inputPerceptronSize = datasetBreastCancer.head.length - 1
+    inputPerceptronSize = datasetBreastCancer.head.length - 1,
+    autoecoderParam = AutoencoderParameter(
+      iteration = 10000,
+      epsilon = 0.00001,
+      momentum = 0.50,
+      learningRate = 0.50,
+      synapsysFactory = RandomSynapsysFactory(),
+      activationFunction = SigmoidFunction
+    )
   )
 
   val targetClass = if (parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
@@ -529,7 +545,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
     , targetClassBreastCancer)
 
   var logger = LoggerFactory.getLogger("Main Objects")
-//
+
 //  test("traininig and classification and save model") {
 //    // training
 //    try {
@@ -603,7 +619,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
       logger.info("after validation result : " + validateResult.toString())
 
       val accuration = validator.accuration(validateResult) {
-        EitherThresholdFunction(0.7, 0.0, 1.0)
+        EitherThresholdFunction(0.5, 0.0, 1.0)
       }
 
       logger.info("after accuration counting : " + accuration.toString())
@@ -617,7 +633,7 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
       finalDataSetBreastCancer.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(p._2).asInstanceOf[ContValue].get
+          val originalClass = data(targetClassBreastCancer).asInstanceOf[ContValue].get
           val result = p._1
           val compare = threshold.compare(p._1, originalClass)
           println(s"real $p == score $compare == targetClass ${originalClass}")

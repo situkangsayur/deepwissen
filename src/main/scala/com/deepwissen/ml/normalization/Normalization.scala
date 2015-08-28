@@ -19,7 +19,7 @@ trait Normalization[T] {
    * @param dataset dataset
    * @return normal dataset
    */
-  def normalize(dataset: T, targetClass : Int): T
+  def normalize(dataset: T, targetClass : Int, targetClassIn : Boolean = false): T
 
   /**
    * Normalize value

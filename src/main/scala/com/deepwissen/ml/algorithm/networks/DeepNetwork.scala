@@ -118,7 +118,7 @@ object DeepNetwork {
     }.toList
 
   @tailrec
-  def inisializationNetwork(currentLayer: Layer, tempNetwork: DeepNetwork, dataset: List[Array[Denomination[_]]], tempResult: List[Synapsys], i: Int): DeepNetwork = {
+  def inisializationNetwork(currentLayer: Layer, tempNetwork: DeepNetwork, dataset: List[Array[Denomination[_]]], tempResult: List[Synapsys], i: Int, parameterDeepNet : DeepNetworkParameter): DeepNetwork = {
     println("layer ke - " + i )
     if(!currentLayer.next.get.isInstanceOf[OutputLayer]) {
 
@@ -131,10 +131,10 @@ object DeepNetwork {
 
       val tempParam = AutoencoderParameter(
         hiddenPerceptronSize = sizeLayer._1,
-        iteration = 20000,
-        epsilon = 0.00001,
-        momentum = 0.50,
-        learningRate = 0.50,
+        iteration = parameterDeepNet.autoecoderParam.iteration,
+        epsilon = parameterDeepNet.autoecoderParam.epsilon,
+        momentum = parameterDeepNet.autoecoderParam.momentum,
+        learningRate = parameterDeepNet.autoecoderParam.learningRate,
         synapsysFactory = RandomSynapsysFactory(),
         activationFunction = SigmoidFunction,
         inputPerceptronSize = sizeLayer._2
@@ -153,7 +153,7 @@ object DeepNetwork {
 
       println("next dataset total "+ nextDataset.size + " ; " + nextDataset.head.size)
 
-      inisializationNetwork(currentLayer.next.get, tempNetwork, nextDataset,tempSynapsies, i+1)
+      inisializationNetwork(currentLayer.next.get, tempNetwork, nextDataset,tempSynapsies, i+1, parameterDeepNet)
 
     }else{
       println("last layer")
@@ -246,7 +246,7 @@ object DeepNetwork {
 
     // create network
     var network = new DeepNetwork(inputLayer, hiddenLayers, outputLayer, synapsies)
-    inisializationNetwork(network.inputLayer, network, dataset, List[Synapsys](), 0)
+    inisializationNetwork(network.inputLayer, network, dataset, List[Synapsys](), 0, parameter)
   }
 
   /**

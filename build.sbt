@@ -33,3 +33,5 @@ libraryDependencies += "org.apache.hbase" % "hbase-common" % "1.0.1"
 libraryDependencies += "org.apache.hbase" % "hbase-annotations" % "1.0.1"
 
 libraryDependencies += "redis.clients" % "jedis" % "2.7.2"
+
+libraryDependencies += "org.mongodb" %% "casbah" % "2.8.1"
