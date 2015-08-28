@@ -59,7 +59,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       hiddenLayerSize = List(35,35,35,35) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 500,
+      iteration = 100,
       epsilon = 0.00000001,
       momentum = 0.3,
       learningRate = 0.3,
@@ -67,7 +67,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 10000,
+        iteration = 1000,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
@@ -134,7 +134,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       alldataset.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(labelPosition).asInstanceOf[ContValue].get
+          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
           val result = p._1
           val compare = threshold.compare(p._1, originalClass)
           println(s"real $p == score $compare == targetClass ${originalClass}")

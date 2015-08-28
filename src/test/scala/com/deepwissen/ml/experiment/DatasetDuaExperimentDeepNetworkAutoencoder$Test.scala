@@ -90,7 +90,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       println("-")
     }
 
-    assert(alldataset.size ==10424)
+    assert(alldataset.size ==6992)
     assert(alldataset(0).size == featuresName.size)
 
 
@@ -123,7 +123,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       alldataset.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(labelPosition).asInstanceOf[ContValue].get
+          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
           val result = p._1
           val compare = threshold.compare(p._1, originalClass)
           println(s"real $p == score $compare == targetClass ${originalClass}")
