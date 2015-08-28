@@ -54,7 +54,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 10000,
+        iteration = 10,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
