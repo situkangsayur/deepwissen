@@ -7,7 +7,7 @@ import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFuncti
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{BinaryValue, ContValue, Denomination}
-import com.deepwissen.ml.validation.{DeepNetworkValidation, BackProValidation}
+import com.deepwissen.ml.validation.{SplitForBankSequence, DeepNetworkValidation, BackProValidation}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
 import com.mongodb.casbah.commons.MongoDBObject
@@ -23,7 +23,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
   test("test for experiments dataset 3 with Deep Network Autoencoder"){
 
 
-    val featuresName = List("ID_BANK","ID_LAPORAN1","NAMA_BANK","TAHUN","BULAN","Illiquid_Assets","Illiquid_Liabilities",
+    val tempFeaturesName = List("ID_BANK","ID_LAPORAN1","NAMA_BANK","TAHUN","BULAN","Illiquid_Assets","Illiquid_Liabilities",
       "LTR","Giro","Tabungan","Deposito","DPK","CASA","CORE_DEPOSITS","Kredit","FINANCING_GAP","TOTAL_ASET","ATMR","RWA",
       "CAR","TotalEkuitas","EQTA","LABA_RUGI_TAHUN_BERJALAN","LABA_RUGI_TAHUN_BERJALAN_(ANN)","ROA","ROE","LRP","LLR",
       "OPERATION_COST","TOTAL_INCOME","CIR","INT_REV","INT_COST","INT_REV_ANN","INT_COST_ANN","Illiquid_Assets_1",
@@ -39,7 +39,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       "CAR_3","TotalEkuitas_3","EQTA_3","LABA_RUGI_TAHUN_BERJALAN_3","LABA_RUGI_TAHUN_BERJALAN_(ANN)_3","ROA_3",
       "ROE_3","LRP_3","LLR_3","OPERATION_COST_3","TOTAL_INCOME_3","CIR_3","INT_REV_3","INT_COST_3","INT_REV_ANN_3",
       "INT_COST_ANN_3","RG_3"
-    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK") || p.equals("TAHUN") )
+    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK"))
 
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_3")
@@ -47,8 +47,12 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     println(repricingCollection.find().toList.size)
 
     val tempDataRG  = repricingCollection.find().map( p => {
-      featuresName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
+      tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
+
+    val datasetRG = SplitForBankSequence.split(dataset = tempDataRG, fieldName = "TAHUN", year = 2013)
+
+    val featuresName = tempFeaturesName.filterNot(p => p.equals("TAHUN"))
 
     /**
      * Training Parameter
@@ -56,18 +60,18 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(35,35,35,35) ,
+      hiddenLayerSize = List(100,100,100) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 100,
-      epsilon = 0.00000001,
-      momentum = 0.3,
-      learningRate = 0.3,
+      iteration = 50000,
+      epsilon = 0.0000001,
+      momentum = 0.5,
+      learningRate = 0.5,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 1000,
+        iteration = 50,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
@@ -80,7 +84,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
     val labelPosition = if(parameterBank.targetClassPosition == -1) featuresName.length - 1 else parameterBank.targetClassPosition
 
-    val tempDataset = tempDataRG.map { p =>
+    val tempDatasetTraining = datasetRG._1.map { p =>
       featuresName.zipWithIndex.map { x =>
         if(x._2 == labelPosition) {
           BinaryValue(List(p.get(x._1).get)).asInstanceOf[Denomination[_]]
@@ -91,18 +95,36 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       } toArray
     }
 
-    val alldataset = StandardNormalization.normalize(
-      tempDataset
+    val tempDatasetTesting = datasetRG._2.map { p =>
+      featuresName.zipWithIndex.map { x =>
+        if(x._2 == labelPosition) {
+          BinaryValue(List(p.get(x._1).get)).asInstanceOf[Denomination[_]]
+        }
+        else {
+          ContValue(p.get(x._1).get).asInstanceOf[Denomination[_]]
+        }
+      } toArray
+    }
+
+    val datasetTraining = StandardNormalization.normalize(
+      tempDatasetTraining
+      , labelPosition, true)
+
+    val datasetTesting = StandardNormalization.normalize(
+      tempDatasetTesting
       , labelPosition, true)
 
 
-    alldataset.foreach { p=>
-      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
-      println("-")
-    }
+    //    alldataset.foreach { p=>
+    //      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
+    //      println("-")
+    //    }
 
-    assert(alldataset.size ==10424)
-    assert(alldataset(0).size == featuresName.size)
+    assert(datasetTraining.size ==9488)
+    assert(datasetTraining(0).size == featuresName.size)
+    assert(datasetTesting.size ==936)
+    assert(datasetTesting(0).size == featuresName.size)
+
 
 
     //test algoritma
@@ -111,14 +133,14 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
       //      logger.info(finalDataSetBreastCancer.toString())
 
-      val network = DeepNetworkAlgorithm.train(alldataset, parameterBank)
+      val network = DeepNetworkAlgorithm.train(datasetTraining, parameterBank)
 
       val validator = DeepNetworkValidation(tE = 0.05,tL = 0.05, k = 2.3)
 
-      val result = validator.classification(network, DeepNetworkClassification, alldataset, SigmoidFunction)
+      val result = validator.classification(network, DeepNetworkClassification, datasetTesting, SigmoidFunction)
       //            logger.info("result finding : "+ result.toString())
 
-      val validateResult = validator.validate(result, alldataset, labelPosition)
+      val validateResult = validator.validate(result, datasetTesting, labelPosition)
 
 
       val accuration = validator.accuration(validateResult) {
@@ -129,8 +151,6 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
         RangeThresholdFunction(0.01)
       }
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
 
       val threshold = RangeThresholdFunction(0.01)
 
@@ -138,25 +158,28 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       var trueCounter = 0
       var allData = 0
 
-      // classification
-      //      alldataset.foreach { data =>
-      //        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
-      //        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-      //          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-      //          val result = p._1
-      //          val compare = threshold.compare(p._1, originalClass)
-      //          println(s"real $p == score $compare == targetClass ${originalClass}")
-      //          trueCounter = if(compare._1) trueCounter + 1 else trueCounter
-      //          allData += 1
-      //        })
-      //        println("------------------------------------------------------------")
-      //      }
-      //
-      //      val percent = trueCounter * (100.0 / allData)
-      //
-      //      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+//       classification
+            datasetTesting.foreach { data =>
+              val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+              realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+                val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+                val result = p._1
+                val compare = threshold.compare(p._1, originalClass)
+                println(s"real $p == score $compare == targetClass ${originalClass}")
+                trueCounter = if(compare._1) trueCounter + 1 else trueCounter
+                allData += 1
+              })
+              println("------------------------------------------------------------")
+            }
 
-      //      assert(percent >= 80)
+            val percent = trueCounter * (100.0 / allData)
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
+            println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+            assert(percent >= 80)
       assert(accurationRange._1 >= 80)
 
       // save model
