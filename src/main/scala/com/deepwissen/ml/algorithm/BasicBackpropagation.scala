@@ -31,7 +31,8 @@ object BasicBackpropagation extends AbstractBackpropagation[List[Array[Denominat
         // stop iteration
       } else {
         // print information
-        println(s"###### error : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
+        val rmse = math.sqrt(error)
+        println(s"###### MSE : $error : RMSE : $rmse : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
         // run training
         val trainError = dataset.foldLeft(0.0)((value, data) => value + doTrainData(data, network, parameter))
         // next iteration

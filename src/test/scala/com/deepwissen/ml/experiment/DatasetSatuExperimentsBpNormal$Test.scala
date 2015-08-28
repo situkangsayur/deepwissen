@@ -73,10 +73,10 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       , labelPosition, true)
 
 
-    alldataset.foreach { p=>
-      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
-      println("-")
-    }
+//    alldataset.foreach { p=>
+//      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
+//      println("-")
+//    }
 
     assert(alldataset.size ==10424)
     assert(alldataset(0).size == featuresName.size)
@@ -100,30 +100,40 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
         EitherThresholdFunction(0.5, 0.0, 1.0)
       }
 
+      val accurationRange = validator.accuration(validateResult) {
+        RangeThresholdFunction(0.15)
+      }
+
       val threshold = RangeThresholdFunction(0.15)
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
 
       var trueCounter = 0
       var allData = 0
 
       // classification
-      alldataset.foreach { data =>
-        val realScore = BasicClassification(data, network, SigmoidFunction)
-        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-          val result = p._1
-          val compare = threshold.compare(p._1, originalClass)
-          println(s"real $p == score $compare == targetClass ${originalClass}")
-          trueCounter = if(compare) trueCounter + 1 else trueCounter
-          allData += 1
-        })
-        println("------------------------------------------------------------")
-      }
+//      alldataset.foreach { data =>
+//        val realScore = BasicClassification(data, network, SigmoidFunction)
+//        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+//          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+//          val result = p._1
+//          val compare = threshold.compare(p._1, originalClass)
+//          println(s"real $p == score $compare == targetClass ${originalClass}")
+//          trueCounter = if(compare) trueCounter + 1 else trueCounter
+//          allData += 1
+//        })
+//        println("------------------------------------------------------------")
+//      }
+//
+//      val percent = trueCounter * (100.0 / allData)
+//
+//      println("result comparation : " + trueCounter + " :> in percent : " + percent)
 
-      val percent = trueCounter * (100.0 / allData)
+//      assert(percent >= 80)
 
-      println("result comparation : " + trueCounter + " :> in percent : " + percent)
-
-      assert(percent >= 80)
+      assert(accurationRange >= 80)
 
       // save model
       NetworkSerialization.save(network, new FileOutputStream(

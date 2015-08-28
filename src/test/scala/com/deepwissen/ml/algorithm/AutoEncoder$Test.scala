@@ -119,7 +119,7 @@ class AutoEncoder$Test extends FunSuite{
       RangeThresholdFunction(0.15)
     }
 
-    println("accuration : "+accuration)
+    println("accuration : "+accuration._1 +": Recall : " + accuration._2 + " : precision : " + accuration._3)
 
     val threshold = RangeThresholdFunction(0.15)
 
@@ -134,7 +134,7 @@ class AutoEncoder$Test extends FunSuite{
         val result = p._1
         val compare = threshold.compare(p._1, originalClass)
         println(s"real $p == score $compare == targetClass ${originalClass}")
-        trueCounter = if(compare) trueCounter + 1 else trueCounter
+        trueCounter = if(compare._1) trueCounter + 1 else trueCounter
         allData += 1
       })
       println("------------------------------------------------------------")

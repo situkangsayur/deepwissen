@@ -607,7 +607,7 @@ class BasicBackpropagation$Test extends FunSuite {
         EitherThresholdFunction(0.5 , 0.0, 1.0)
       }
 
-      logger.info("after accuration counting : "+accuration.toString())
+      println("accuration : "+accuration._1 +": Recall : " + accuration._2 + " : precision : " + accuration._3)
 
       // classification
       finalDataSetBreastCancer.foreach { data =>

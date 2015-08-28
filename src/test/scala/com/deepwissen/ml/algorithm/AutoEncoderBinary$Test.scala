@@ -119,7 +119,7 @@ class AutoEncoderBinary$Test extends FunSuite{
       EitherThresholdFunction(0.7, 0.0, 1.0)
     }
 
-    println(accuration)
+    println("accuration : "+accuration._1 +": Recall : " + accuration._2 + " : precision : " + accuration._3)
 
     // classification
     finalDataSet.foreach { data =>

@@ -24,8 +24,9 @@ object DeepNetworkAlgorithm extends AbstractDeepNetwork {
       if (error < parameter.epsilon || iteration > parameter.iteration) {
         // stop iteration
       } else {
+        val rmse = math.sqrt(error)
         // print information
-        println(s"###### error : $error : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
+        println(s"###### MSE : $error : RMSE : $rmse : iteration :$iteration ---> max it ${parameter.iteration} max ep ${parameter.epsilon}")
         // run training
         val trainError = dataset.foldLeft(0.0)((value, data) => value + doTrainData(data, network, parameter))
         // next iteration

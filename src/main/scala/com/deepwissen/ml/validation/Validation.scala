@@ -41,7 +41,7 @@ trait Validation[T, U] {
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double
+  def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): (Double, Double, Double)
 
 }
 
@@ -51,7 +51,7 @@ trait Validation[T, U] {
  * @author Hendri Karisma
  * @since 7/25/15
  */
-case class BackProValidation() extends Validation[Network, List[Array[Denomination[_]]]] {
+case class BackProValidation(tL : Double = 0.6, tE : Double = 0.6, k : Double = 1.0) extends Validation[Network, List[Array[Denomination[_]]]] {
 
   /**
    * Run classification with given dataset
@@ -77,17 +77,42 @@ case class BackProValidation() extends Validation[Network, List[Array[Denominati
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
+  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): (Double, Double, Double) = {
     val compareResult = validateResult.map(x => x._1.asInstanceOf[BinaryValue].get.zip(x._2.asInstanceOf[BinaryValue].get)).map(x => {
       val  temp = x.map { case (score, target) =>
-        thresholdFunction.compare(score, target)
-      } filter(p => p == false)
-      if(temp.size == 0) true else false
+        val temp = thresholdFunction.compare(score, target)
+        (temp._1, temp._2, score, target)
+      }
+
+      //alpha parameter
+      val tempLoss = temp.foldLeft(0.0D)((temp, sc) => temp + math.pow(sc._2,2))/temp.size
+      val iFunc = if(tempLoss >= tL) 1 else 0
+      val alpha = iFunc * (1 - math.exp((-k) * (math.pow(tempLoss - tL, 2)/math.pow(tL,2))))
+
+      //recall parameter
+      val yCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._4) / temp.size
+      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tethaY = if (tempTethaY >= tE) 1 else 0
+
+      //precision parameter
+      val yTiltCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._3) / temp.size
+      val tempTethaYTilt = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tethaYTilt = if (tempTethaY >= tE) 1 else 0
+
+
+      val tempResult = if(temp.filter(p => p._1 == false).size == 0) true else false
+      (tempResult, alpha, tethaY,tethaYTilt)
     })
     val totalData = compareResult.length
-    val totalCorrect = compareResult.count(b => b)
+    val totalCorrect = compareResult.count(b => b._1)
+    val recall = compareResult.foldLeft(0.0D)((temp, data) => temp + data._2 * data._3) /
+      compareResult.foldLeft(0.0D)((temp, data) => temp + data._3)
+
+    val precision = compareResult.foldLeft(0.0D)((temp, data) => temp + data._2 * data._4) /
+      compareResult.foldLeft(0.0D)((temp, data) => temp + data._4)
+
     val accuration = 100.0 / totalData * totalCorrect
-    accuration
+    (accuration, recall, precision)
   }
 }
 
@@ -122,16 +147,16 @@ case class AutoencoderValidation() extends Validation[AutoencoderNetwork, List[A
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
+  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): (Double, Double, Double) = {
     val compareResult = validateResult.map(x => x._1.asInstanceOf[BinaryValue].get.zip(x._2.asInstanceOf[BinaryValue].get)).flatMap(x => {
       x.map { case (score, target) =>
         thresholdFunction.compare(score, target)
       }
     })
     val totalData = compareResult.length
-    val totalCorrect = compareResult.count(b => b)
+    val totalCorrect = compareResult.count(b => b._1)
     val accuration = 100.0 / totalData * totalCorrect
-    accuration
+    (accuration, 0.0, 0.0)
   }
 }
 
@@ -165,16 +190,16 @@ case class MarkovChainValidation() extends Validation[MarkovChain, List[Array[De
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
+  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): (Double, Double, Double) = {
     val compareResult = validateResult.map(x => x._1.asInstanceOf[BinaryValue].get.zip(x._2.asInstanceOf[BinaryValue].get)).flatMap(x => {
       x.map { case (score, target) =>
         thresholdFunction.compare(score, target)
       }
     })
     val totalData = compareResult.length
-    val totalCorrect = compareResult.count(b => b)
+    val totalCorrect = compareResult.count(b => b._1)
     val accuration = (100.0 / totalData) * totalCorrect
-    accuration
+    (accuration, 0.0, 0.0)
   }
 }
 
@@ -184,7 +209,7 @@ case class MarkovChainValidation() extends Validation[MarkovChain, List[Array[De
  * @author Hendri Karisma
  * @since 7/25/15
  */
-case class DeepNetworkValidation() extends Validation[DeepNetwork, List[Array[Denomination[_]]]] {
+case class DeepNetworkValidation(tL : Double = 0.6, tE : Double = 0.6, k : Double = 1.0) extends Validation[DeepNetwork, List[Array[Denomination[_]]]] {
 
   /**
    * Run classification with given dataset
@@ -210,16 +235,41 @@ case class DeepNetworkValidation() extends Validation[DeepNetwork, List[Array[De
    * @param thresholdFunction threshold function
    * @return accuration
    */
-  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): Double = {
+  override def accuration(validateResult: List[(Denomination[_], Denomination[_])])(implicit thresholdFunction: ThresholdFunction): (Double, Double, Double) = {
     val compareResult = validateResult.map(x => x._1.asInstanceOf[BinaryValue].get.zip(x._2.asInstanceOf[BinaryValue].get)).map(x => {
       val  temp = x.map { case (score, target) =>
-        thresholdFunction.compare(score, target)
-      } filter(p => p == false)
-      if(temp.size == 0) true else false
+        val temp = thresholdFunction.compare(score, target)
+        (temp._1, temp._2, score, target)
+      }
+
+      //alpha parameter
+      val tempLoss = temp.foldLeft(0.0D)((temp, sc) => temp + math.pow(sc._2,2))/temp.size
+      val iFunc = if(tempLoss >= tL) 1 else 0
+      val alpha = iFunc * (1 - math.exp((-k) * (math.pow(tempLoss - tL, 2)/math.pow(tL,2))))
+
+      //recall parameter
+      val yCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._4) / temp.size
+      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tethaY = if (tempTethaY >= tE) 1 else 0
+
+      //precision parameter
+      val yTiltCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._3) / temp.size
+      val tempTethaYTilt = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tethaYTilt = if (tempTethaY >= tE) 1 else 0
+
+
+      val tempResult = if(temp.filter(p => p._1 == false).size == 0) true else false
+      (tempResult, alpha, tethaY,tethaYTilt)
     })
     val totalData = compareResult.length
-    val totalCorrect = compareResult.count(b => b)
+    val totalCorrect = compareResult.count(b => b._1)
+    val recall = compareResult.foldLeft(0.0D)((temp, data) => temp + data._2 * data._3) /
+      compareResult.foldLeft(0.0D)((temp, data) => temp + data._3)
+
+    val precision = compareResult.foldLeft(0.0D)((temp, data) => temp + data._2 * data._4) /
+      compareResult.foldLeft(0.0D)((temp, data) => temp + data._4)
+
     val accuration = 100.0 / totalData * totalCorrect
-    accuration
+    (accuration, recall, precision)
   }
 }

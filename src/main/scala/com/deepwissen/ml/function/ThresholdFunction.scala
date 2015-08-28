@@ -17,7 +17,7 @@ trait ThresholdFunction {
    * @param value2 excepted value
    * @return true if ok, false if not ok
    */
-  def compare(value1: Double, value2: Double): Boolean
+  def compare(value1: Double, value2: Double): (Boolean, Double)
 
 }
 
@@ -32,7 +32,7 @@ object SimpleThresholdFunction extends ThresholdFunction {
    * @param value2 excepted value
    * @return true if ok, false if not ok
    */
-  override def compare(value1: Double, value2: Double): Boolean = value1 == value2
+  override def compare(value1: Double, value2: Double): (Boolean, Double) = (value1 == value2, value1 - value2)
 }
 
 /**
@@ -49,9 +49,9 @@ case class EitherThresholdFunction(value: Double, left: Double, right: Double) e
    * @param value2 excepted value
    * @return true if ok, false if not ok
    */
-  override def compare(value1: Double, value2: Double): Boolean = {
+  override def compare(value1: Double, value2: Double): (Boolean, Double)  = {
     val current = if (value1 >= value) right else left
-    current == value2
+    (current == value2, value1 - value2)
   }
 }
 
@@ -67,10 +67,10 @@ case class RangeThresholdFunction(range: Double) extends ThresholdFunction {
    * @param value2 excepted value
    * @return true if ok, false if not ok
    */
-  override def compare(value1: Double, value2: Double): Boolean = {
+  override def compare(value1: Double, value2: Double): (Boolean, Double)  = {
     val min = value1 - range
     val max = value1 + range
-    value2 >= min && value2 <= max
+    (value2 >= min && value2 <= max, value1 - value2)
   }
 }
 

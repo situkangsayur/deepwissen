@@ -107,10 +107,17 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
       val validateResult = validator.validate(result, alldataset, labelPosition)
 
-
       val accuration = validator.accuration(validateResult) {
         EitherThresholdFunction(0.5, 0.0, 1.0)
       }
+
+      val accurationRange = validator.accuration(validateResult) {
+        RangeThresholdFunction(0.15)
+      }
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
 
       val threshold = RangeThresholdFunction(0.15)
 
@@ -118,25 +125,25 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       var allData = 0
 
       // classification
-      alldataset.foreach { data =>
-        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
-        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-          val result = p._1
-          val compare = threshold.compare(p._1, originalClass)
-          println(s"real $p == score $compare == targetClass ${originalClass}")
-          trueCounter = if(compare) trueCounter + 1 else trueCounter
-          allData += 1
-        })
-        println("------------------------------------------------------------")
-      }
+//      alldataset.foreach { data =>
+//        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+//        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+//          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+//          val result = p._1
+//          val compare = threshold.compare(p._1, originalClass)
+//          println(s"real $p == score $compare == targetClass ${originalClass}")
+//          trueCounter = if(compare._1) trueCounter + 1 else trueCounter
+//          allData += 1
+//        })
+//        println("------------------------------------------------------------")
+//      }
+//
+//      val percent = trueCounter * (100.0 / allData)
+//
+//      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+//      assert(percent >= 80)
 
-      val percent = trueCounter * (100.0 / allData)
-
-      println("result comparation : " + trueCounter + " :> in percent : " + percent)
-
-      assert(percent >= 80)
-
+      assert(accurationRange._1>= 80)
       // save model
       NetworkSerialization.save(network, new FileOutputStream(
         new File("target" + File.separator + "bank_rg_data_1_dpa.json")))
