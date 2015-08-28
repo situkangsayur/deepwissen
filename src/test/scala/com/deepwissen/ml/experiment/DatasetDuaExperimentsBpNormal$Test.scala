@@ -45,7 +45,7 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       hiddenLayerSize = 1,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 1000,
+      iteration = 20,
       epsilon = 0.000000001,
       momentum = 0.75,
       learningRate = 0.5,
@@ -74,12 +74,12 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       , labelPosition, true)
 
 
-    alldataset.foreach { p=>
-      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
-      println("-")
-    }
+//    alldataset.foreach { p=>
+//      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
+//      println("-")
+//    }
 
-    assert(alldataset.size ==10424)
+    assert(alldataset.size ==6992)
     assert(alldataset(0).size == featuresName.size)
 
 //    assert(datasetTraining.size ==6368)

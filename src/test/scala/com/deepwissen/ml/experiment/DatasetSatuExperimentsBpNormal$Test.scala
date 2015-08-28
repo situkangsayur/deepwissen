@@ -122,7 +122,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.5)
+        RangeThresholdFunction(0.15)
       }
 
       val threshold = RangeThresholdFunction(0.15)

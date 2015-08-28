@@ -56,7 +56,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 10000,
+        iteration = 20,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
@@ -85,10 +85,10 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       , labelPosition, true)
 
 
-    alldataset.foreach { p=>
-      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
-      println("-")
-    }
+//    alldataset.foreach { p=>
+//      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
+//      println("-")
+//    }
 
     assert(alldataset.size ==6992)
     assert(alldataset(0).size == featuresName.size)
@@ -118,8 +118,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
         RangeThresholdFunction(0.01)
       }
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
 
       val threshold = RangeThresholdFunction(0.01)
 
@@ -128,24 +127,27 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       var allData = 0
 
       // classification
-//      alldataset.foreach { data =>
-//        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
-//        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-//          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-//          val result = p._1
-//          val compare = threshold.compare(p._1, originalClass)
-//          println(s"real $p == score $compare == targetClass ${originalClass}")
-//          trueCounter = if(compare._1) trueCounter + 1 else trueCounter
-//          allData += 1
-//        })
-//        println("------------------------------------------------------------")
-//      }
-//
-//      val percent = trueCounter * (100.0 / allData)
-//
-//      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+      alldataset.foreach { data =>
+        val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
+        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+          val result = p._1
+          val compare = threshold.compare(p._1, originalClass)
+          println(s"real $p == score $compare == targetClass ${originalClass}")
+          trueCounter = if(compare._1) trueCounter + 1 else trueCounter
+          allData += 1
+        })
+        println("------------------------------------------------------------")
+      }
 
-//      assert(percent >= 80)
+      val percent = trueCounter * (100.0 / allData)
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
+      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+      assert(percent >= 80)
       assert(accurationRange._1 >= 80)
 
       // save model
