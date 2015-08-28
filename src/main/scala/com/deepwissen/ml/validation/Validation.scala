@@ -86,18 +86,25 @@ case class BackProValidation(tL : Double = 0.6, tE : Double = 0.6, k : Double = 
 
       //alpha parameter
       val tempLoss = temp.foldLeft(0.0D)((temp, sc) => temp + math.pow(sc._2,2))/temp.size
-      val iFunc = if(tempLoss >= tL) 1 else 0
+//      print("loss : " + tempLoss  + " # ")
+      val iFunc = if(tempLoss <= tL) 1 else 0
+//      print("iFunc : " + iFunc + " # ")
       val alpha = iFunc * (1 - math.exp((-k) * (math.pow(tempLoss - tL, 2)/math.pow(tL,2))))
+//      print("a : " + alpha + " # ")
 
       //recall parameter
       val yCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._4) / temp.size
-      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+//      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tempTethaY =  yCount
       val tethaY = if (tempTethaY >= tE) 1 else 0
+//      print("t : " + tethaY+ " # ")
+
 
       //precision parameter
       val yTiltCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._3) / temp.size
-      val tempTethaYTilt = 1.0D / (1.0D + math.exp(-1.0 * yCount))
-      val tethaYTilt = if (tempTethaY >= tE) 1 else 0
+      val tempTethaYTilt = yTiltCount
+      val tethaYTilt = if (tempTethaYTilt >= tE) 1 else 0
+//      print("t^ : " + tethaYTilt+ " # ")
 
 
       val tempResult = if(temp.filter(p => p._1 == false).size == 0) true else false
@@ -244,18 +251,25 @@ case class DeepNetworkValidation(tL : Double = 0.6, tE : Double = 0.6, k : Doubl
 
       //alpha parameter
       val tempLoss = temp.foldLeft(0.0D)((temp, sc) => temp + math.pow(sc._2,2))/temp.size
-      val iFunc = if(tempLoss >= tL) 1 else 0
+      //      print("loss : " + tempLoss  + " # ")
+      val iFunc = if(tempLoss <= tL) 1 else 0
+      //      print("iFunc : " + iFunc + " # ")
       val alpha = iFunc * (1 - math.exp((-k) * (math.pow(tempLoss - tL, 2)/math.pow(tL,2))))
+      //      print("a : " + alpha + " # ")
 
       //recall parameter
       val yCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._4) / temp.size
-      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      //      val tempTethaY = 1.0D / (1.0D + math.exp(-1.0 * yCount))
+      val tempTethaY =  yCount
       val tethaY = if (tempTethaY >= tE) 1 else 0
+      //      print("t : " + tethaY+ " # ")
+
 
       //precision parameter
       val yTiltCount = temp.foldLeft(0.0D)((temp, sc) => temp + sc._3) / temp.size
-      val tempTethaYTilt = 1.0D / (1.0D + math.exp(-1.0 * yCount))
-      val tethaYTilt = if (tempTethaY >= tE) 1 else 0
+      val tempTethaYTilt = yTiltCount
+      val tethaYTilt = if (tempTethaYTilt >= tE) 1 else 0
+      //      print("t^ : " + tethaYTilt+ " # ")
 
 
       val tempResult = if(temp.filter(p => p._1 == false).size == 0) true else false

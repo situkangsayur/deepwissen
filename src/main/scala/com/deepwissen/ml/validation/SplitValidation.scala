@@ -33,7 +33,7 @@ object SplitValidation {
  * @author Hendri Karisma
  * @since 8/28/15
  */
-object SpilitForBankSequence {
+object SplitForBankSequence {
   /**
    * Split dataset with given percentage (ex 70-30)
    * @param dataset dataset

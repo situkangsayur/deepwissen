@@ -102,7 +102,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
       val network = DeepNetworkAlgorithm.train(alldataset, parameterBank)
 
-      val validator = DeepNetworkValidation()
+      val validator = DeepNetworkValidation(tE = 0.05,tL = 0.05, k = 2.3)
 
       val result = validator.classification(network, DeepNetworkClassification, alldataset, SigmoidFunction)
       //            logger.info("result finding : "+ result.toString())
@@ -115,13 +115,13 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.15)
+        RangeThresholdFunction(0.01)
       }
 
       println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
       println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
 
-      val threshold = RangeThresholdFunction(0.15)
+      val threshold = RangeThresholdFunction(0.01)
 
 
       var trueCounter = 0
