@@ -26,7 +26,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       "LTR","Giro","Tabungan","Deposito","DPK","CASA","CORE_DEPOSITS","Kredit","FINANCING_GAP","TOTAL_ASET","ATMR","RWA",
       "CAR","TotalEkuitas","EQTA","LABA_RUGI_TAHUN_BERJALAN","LABA_RUGI_TAHUN_BERJALAN_(ANN)","ROA","ROE","LRP","LLR",
       "OPERATION_COST","TOTAL_INCOME","CIR","INT_REV","INT_COST","INT_REV_ANN","INT_COST_ANN","RG_3_1","RG_3_2","RG_3_3","RG_3"
-    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK") || p.equals("TAHUN") )
+    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK"))
 
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_1")
@@ -48,7 +48,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       hiddenLayerSize = 1,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 10,
+      iteration = 1000,
       epsilon = 0.0000001,
       momentum = 0.75,
       learningRate = 0.5,
@@ -97,9 +97,9 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
 //      println("-")
 //    }
 
-    assert(datasetTraining.size ==6368)
+    assert(datasetTraining.size ==9488)
     assert(datasetTraining(0).size == featuresName.size)
-    assert(datasetTesting.size ==6368)
+    assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)
 
 
@@ -122,7 +122,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.01)
+        RangeThresholdFunction(0.5)
       }
 
       val threshold = RangeThresholdFunction(0.15)
@@ -135,24 +135,24 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       var allData = 0
 
       // classification
-//      datasetTesting.foreach { data =>
-//        val realScore = BasicClassification(data, network, SigmoidFunction)
-//        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-//          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-//          val result = p._1
-//          val compare = threshold.compare(p._1, originalClass)
-//          println(s"real $p == score $compare == targetClass ${originalClass}")
-//          trueCounter = if(compare) trueCounter + 1 else trueCounter
-//          allData += 1
-//        })
-//        println("------------------------------------------------------------")
-//      }
-//
-//      val percent = trueCounter * (100.0 / allData)
-//
-//      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+      datasetTesting.foreach { data =>
+        val realScore = BasicClassification(data, network, SigmoidFunction)
+        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+          val result = p._1
+          val compare = threshold.compare(p._1, originalClass)
+          println(s"real $p == score $compare == targetClass ${originalClass}")
+          trueCounter = if(compare._1) trueCounter + 1 else trueCounter
+          allData += 1
+        })
+        println("------------------------------------------------------------")
+      }
 
-//      assert(percent >= 80)
+      val percent = trueCounter * (100.0 / allData)
+
+      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+      assert(percent >= 80)
 
       assert(accurationRange._1 >= 80)
 

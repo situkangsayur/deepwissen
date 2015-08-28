@@ -82,6 +82,12 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
     assert(alldataset.size ==10424)
     assert(alldataset(0).size == featuresName.size)
 
+//    assert(datasetTraining.size ==6368)
+//    assert(datasetTraining(0).size == featuresName.size)
+//    assert(datasetTesting.size ==624)
+//    assert(datasetTesting(0).size == featuresName.size)
+
+
 
     //test algoritma
 
