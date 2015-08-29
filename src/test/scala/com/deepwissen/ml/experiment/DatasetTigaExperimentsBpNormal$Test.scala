@@ -60,7 +60,7 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
       hiddenLayerSize = 1,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 50,
+      iteration = 5000,
       epsilon = 0.000000001,
       momentum = 0.75,
       learningRate = 0.5,
