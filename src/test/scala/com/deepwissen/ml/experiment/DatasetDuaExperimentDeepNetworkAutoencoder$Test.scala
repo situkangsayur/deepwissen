@@ -53,7 +53,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 500,
-      epsilon = 0.00000001,
+      epsilon = 0.000000001,
       momentum = 0.3,
       learningRate = 0.3,
       synapsysFactory = RandomSynapsysFactory(),

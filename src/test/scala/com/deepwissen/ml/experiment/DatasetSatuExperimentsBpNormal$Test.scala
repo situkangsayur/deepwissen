@@ -46,12 +46,13 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
      */
     val parameterBank = BackpropragationParameter(
       hiddenLayerSize = 1,
+      hiddenNodeSize = 50,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 70000,
-      epsilon = 0.0000001,
-      momentum = 0.75,
-      learningRate = 0.5,
+      iteration = 500,
+      epsilon = 0.000000001,
+      momentum = 0.5,
+      learningRate = 0.3,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size- 1
@@ -103,7 +104,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
 //    assert(datasetTesting(0).size == featuresName.size)
 
 
-    assert(datasetTraining.size == 3744)
+    assert(datasetTraining.size == 5616)
     assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size == 936)
     assert(datasetTesting(0).size == featuresName.size)

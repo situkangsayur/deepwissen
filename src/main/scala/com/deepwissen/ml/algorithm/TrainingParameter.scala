@@ -27,6 +27,7 @@ trait TrainingParameter
  */
 case class BackpropragationParameter(inputPerceptronSize: Int,
                                      hiddenLayerSize: Int = 1,
+                                     hiddenNodeSize: Int = -1,
                                      outputPerceptronSize: Int = 1,
                                      targetClassPosition: Int = -1,
                                      synapsysFactory: SynapsysFactory[_] = RandomSynapsysFactory(),

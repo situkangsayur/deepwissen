@@ -53,9 +53,9 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 50000,
-      epsilon = 0.0000001,
+      epsilon = 0.000000001,
       momentum = 0.5,
-      learningRate = 0.5,
+      learningRate = 0.3,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
@@ -108,8 +108,8 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     //      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
     //      println("-")
     //    }
-
-    assert(datasetTraining.size ==9488)
+//9388
+    assert(datasetTraining.size ==5616)
     assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)

@@ -37,6 +37,7 @@ abstract class AbstractBackpropagation[DATASET] extends Algorithm[DATASET, Array
     Network(
       inputPerceptronSize = parameter.inputPerceptronSize,
       hiddenSize = parameter.hiddenLayerSize,
+      hiddenNodeSize = parameter.hiddenNodeSize,
       outputPerceptronSize = parameter.outputPerceptronSize,
       synapsysFactory = parameter.synapsysFactory
     )

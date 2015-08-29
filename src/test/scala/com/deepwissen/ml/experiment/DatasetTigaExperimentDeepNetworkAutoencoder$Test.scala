@@ -64,7 +64,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 50000,
-      epsilon = 0.0000001,
+      epsilon = 0.000000001,
       momentum = 0.5,
       learningRate = 0.5,
       synapsysFactory = RandomSynapsysFactory(),
