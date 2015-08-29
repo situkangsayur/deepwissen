@@ -60,7 +60,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(100,100,100) ,
+      hiddenLayerSize = List(86,86,86,86) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 50000,
@@ -71,7 +71,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 50,
+        iteration = 100,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,

@@ -31,7 +31,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_1")
 
-    println(repricingCollection.find().toList.size)
+    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
 
     val tempDataRG  = repricingCollection.find().map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
