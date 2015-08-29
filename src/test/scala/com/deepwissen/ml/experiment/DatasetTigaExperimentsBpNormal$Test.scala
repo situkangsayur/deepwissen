@@ -7,7 +7,7 @@ import com.deepwissen.ml.function.{RangeThresholdFunction, EitherThresholdFuncti
 import com.deepwissen.ml.normalization.StandardNormalization
 import com.deepwissen.ml.serialization.NetworkSerialization
 import com.deepwissen.ml.utils.{BinaryValue, ContValue, Denomination}
-import com.deepwissen.ml.validation.BackProValidation
+import com.deepwissen.ml.validation.{SplitForBankSequence, BackProValidation}
 import com.mongodb.casbah.Imports._
 import com.mongodb.casbah.MongoClient
 import com.mongodb.casbah.commons.MongoDBObject
@@ -22,7 +22,7 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
 
   test("test for experiment dataset 3 with standard backpropagation"){
 
-    val featuresName = List("ID_BANK","ID_LAPORAN1","NAMA_BANK","TAHUN","BULAN","Illiquid_Assets","Illiquid_Liabilities",
+    val tempFeaturesName = List("ID_BANK","ID_LAPORAN1","NAMA_BANK","TAHUN","BULAN","Illiquid_Assets","Illiquid_Liabilities",
       "LTR","Giro","Tabungan","Deposito","DPK","CASA","CORE_DEPOSITS","Kredit","FINANCING_GAP","TOTAL_ASET","ATMR","RWA",
       "CAR","TotalEkuitas","EQTA","LABA_RUGI_TAHUN_BERJALAN","LABA_RUGI_TAHUN_BERJALAN_(ANN)","ROA","ROE","LRP","LLR",
       "OPERATION_COST","TOTAL_INCOME","CIR","INT_REV","INT_COST","INT_REV_ANN","INT_COST_ANN","Illiquid_Assets_1",
@@ -43,11 +43,15 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_3")
 
-    println(repricingCollection.find().toList.size)
+    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
 
-    val tempDataRG  = repricingCollection.find().map( p => {
-      featuresName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
+    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+      tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
+
+    val datasetRG = SplitForBankSequence.split(dataset = tempDataRG, fieldName = "TAHUN", year = 2013)
+
+    val featuresName = tempFeaturesName.filterNot(p => p.equals("TAHUN"))
 
     /**
      * Training Parameter
@@ -69,7 +73,7 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
 
     val labelPosition = if(parameterBank.targetClassPosition == -1) featuresName.length - 1 else parameterBank.targetClassPosition
 
-    val tempDataset = tempDataRG.map { p =>
+    val tempDatasetTraining = datasetRG._1.map { p =>
       featuresName.zipWithIndex.map { x =>
         if(x._2 == labelPosition) {
           BinaryValue(List(p.get(x._1).get)).asInstanceOf[Denomination[_]]
@@ -80,18 +84,35 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
       } toArray
     }
 
-    val alldataset = StandardNormalization.normalize(
-      tempDataset
+    val tempDatasetTesting = datasetRG._2.map { p =>
+      featuresName.zipWithIndex.map { x =>
+        if(x._2 == labelPosition) {
+          BinaryValue(List(p.get(x._1).get)).asInstanceOf[Denomination[_]]
+        }
+        else {
+          ContValue(p.get(x._1).get).asInstanceOf[Denomination[_]]
+        }
+      } toArray
+    }
+
+    val datasetTraining = StandardNormalization.normalize(
+      tempDatasetTraining
+      , labelPosition, true)
+
+    val datasetTesting = StandardNormalization.normalize(
+      tempDatasetTesting
       , labelPosition, true)
 
 
-    alldataset.foreach { p=>
-      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
-      println("-")
-    }
+    //    alldataset.foreach { p=>
+    //      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
+    //      println("-")
+    //    }
 
-    assert(alldataset.size ==10424)
-    assert(alldataset(0).size == featuresName.size)
+    assert(datasetTraining.size ==5616)
+    assert(datasetTraining(0).size == featuresName.size)
+    assert(datasetTesting.size ==936)
+    assert(datasetTesting(0).size == featuresName.size)
 
 
     //test algoritma
@@ -100,13 +121,13 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
 
       //      logger.info(finalDataSetBreastCancer.toString())
 
-      val network = BasicBackpropagation.train(alldataset, parameterBank)
+      val network = BasicBackpropagation.train(datasetTraining, parameterBank)
 
       val validator = BackProValidation(tE = 0.05,tL = 0.05, k = 2.3)
 
-      val result = validator.classification(network, BasicClassification, alldataset, SigmoidFunction)
+      val result = validator.classification(network, BasicClassification, datasetTesting, SigmoidFunction)
 
-      val validateResult = validator.validate(result, alldataset, labelPosition)
+      val validateResult = validator.validate(result, datasetTesting, labelPosition)
 
       val accuration = validator.accuration(validateResult) {
         EitherThresholdFunction(0.5, 0.0, 1.0)
@@ -118,32 +139,30 @@ class DatasetTigaExperimentsBpNormal$Test extends FunSuite{
 
       val threshold = RangeThresholdFunction(0.15)
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
 
 
       var trueCounter = 0
       var allData = 0
 
-      // classification
-      //      alldataset.foreach { data =>
-      //        val realScore = BasicClassification(data, network, SigmoidFunction)
-      //        realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
-      //          val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
-      //          val result = p._1
-      //          val compare = threshold.compare(p._1, originalClass)
-      //          println(s"real $p == score $compare == targetClass ${originalClass}")
-      //          trueCounter = if(compare) trueCounter + 1 else trueCounter
-      //          allData += 1
-      //        })
-      //        println("------------------------------------------------------------")
-      //      }
-      //
-      //      val percent = trueCounter * (100.0 / allData)
-      //
-      //      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+//       classification
+            datasetTesting.foreach { data =>
+              val realScore = BasicClassification(data, network, SigmoidFunction)
+              realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
+                val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
+                val result = p._1
+                val compare = threshold.compare(p._1, originalClass)
+                println(s"real $p == score $compare == targetClass ${originalClass}")
+                trueCounter = if(compare._1) trueCounter + 1 else trueCounter
+                allData += 1
+              })
+              println("------------------------------------------------------------")
+            }
 
-      //      assert(percent >= 80)
+            val percent = trueCounter * (100.0 / allData)
+
+            println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+            assert(percent >= 80)
 
       assert(accurationRange._1 >= 80)
       // save model

@@ -44,9 +44,9 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_3")
 
-    println(repricingCollection.find().toList.size)
+    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
 
-    val tempDataRG  = repricingCollection.find().map( p => {
+    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -120,7 +120,7 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     //      println("-")
     //    }
 
-    assert(datasetTraining.size ==9488)
+    assert(datasetTraining.size ==5616)
     assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)
