@@ -130,7 +130,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       val result = validator.classification(network, DeepNetworkClassification, datasetTesting, SigmoidFunction)
       //            logger.info("result finding : "+ result.toString())
 
-      val validateResult = validator.validate(result, dataetTesting, labelPosition)
+      val validateResult = validator.validate(result, datasetTesting, labelPosition)
 
 
       val accuration = validator.accuration(validateResult) {
