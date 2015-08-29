@@ -110,9 +110,12 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 //      println("-")
 //    }
 
-    assert(alldataset.size ==6992)
-    assert(alldataset(0).size == featuresName.size)
-
+//    assert(alldataset.size ==6992)
+//    assert(alldataset(0).size == featuresName.size)
+    assert(datasetTraining.size ==3744)
+    assert(datasetTraining(0).size == featuresName.size)
+    assert(datasetTesting.size ==624)
+    assert(datasetTesting(0).size == featuresName.size)
 
     //test algoritma
 
@@ -120,14 +123,14 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
       //      logger.info(finalDataSetBreastCancer.toString())
 
-      val network = DeepNetworkAlgorithm.train(alldataset, parameterBank)
+      val network = DeepNetworkAlgorithm.train(datasetTraining, parameterBank)
 
       val validator = DeepNetworkValidation(tE = 0.05,tL = 0.05, k = 2.3)
 
-      val result = validator.classification(network, DeepNetworkClassification, alldataset, SigmoidFunction)
+      val result = validator.classification(network, DeepNetworkClassification, datasetTesting, SigmoidFunction)
       //            logger.info("result finding : "+ result.toString())
 
-      val validateResult = validator.validate(result, alldataset, labelPosition)
+      val validateResult = validator.validate(result, dataetTesting, labelPosition)
 
 
       val accuration = validator.accuration(validateResult) {
@@ -147,7 +150,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       var allData = 0
 
       // classification
-      alldataset.foreach { data =>
+      datasetTesting.foreach { data =>
         val realScore = DeepNetworkClassification(data, network, SigmoidFunction)
         realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
           val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
