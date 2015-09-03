@@ -80,7 +80,7 @@ class MongoDBLoadDatasetTiga$Test extends FunSuite{
       }
 
       val alldataset = StandardNormalization.normalize(
-        tempDataset
+        tempDataset, tempDataset
         , labelPosition, true)
 
 

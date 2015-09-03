@@ -106,11 +106,15 @@ class DatasetTigaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       } toArray
     }
 
+    val allDatasetForNormalization = tempDatasetTraining ::: tempDatasetTesting
+
     val datasetTraining = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTraining
       , labelPosition, true)
 
     val datasetTesting = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTesting
       , labelPosition, true)
 

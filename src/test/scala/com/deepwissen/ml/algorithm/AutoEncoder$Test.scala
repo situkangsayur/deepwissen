@@ -88,12 +88,14 @@ class AutoEncoder$Test extends FunSuite{
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
 
+  val tempDataset = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDataset, tempDataset
     , targetClass)
 
   //  val labels

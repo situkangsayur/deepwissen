@@ -46,13 +46,13 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
      */
     val parameterBank = BackpropragationParameter(
       hiddenLayerSize = 1,
-      hiddenNodeSize = 50,
+      hiddenNodeSize = 10,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 500,
+      iteration = 70000,
       epsilon = 0.000000001,
       momentum = 0.5,
-      learningRate = 0.3,
+      learningRate = 0.8,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size- 1
@@ -84,11 +84,15 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       } toArray
     }
 
+    val allDatasetForNormalization = tempDatasetTraining ::: tempDatasetTesting
+
     val datasetTraining = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTraining
       , labelPosition, true)
 
     val datasetTesting = StandardNormalization.normalize(
+      allDatasetForNormalization,
       tempDatasetTesting
       , labelPosition, true)
 
@@ -128,10 +132,10 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.15)
+        RangeThresholdFunction(0.05)
       }
 
-      val threshold = RangeThresholdFunction(0.15)
+      val threshold = RangeThresholdFunction(0.05)
 
       var trueCounter = 0
       var allData = 0

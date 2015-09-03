@@ -5,7 +5,7 @@
 
 package com.deepwissen.ml.normalization
 
-import com.deepwissen.ml.utils.ContValue
+import com.deepwissen.ml.utils.{Denomination, ContValue}
 
 /**
  * @author Eko Khannedy
@@ -16,10 +16,11 @@ trait Normalization[T] {
 
   /**
    * Normalize dataset
+   * @param allDataset all dataset
    * @param dataset dataset
    * @return normal dataset
    */
-  def normalize(dataset: T, targetClass : Int, targetClassIn : Boolean = false): T
+  def normalize(allDataset: T, dataset: T, targetClass : Int, targetClassIn : Boolean = false): T
 
   /**
    * Normalize value

@@ -84,11 +84,15 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       } toArray
     }
 
+    val allDatasetForNormalization = tempDatasetTraining ::: tempDatasetTesting
+
     val datasetTraining = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTraining
       , labelPosition, true)
 
     val datasetTesting = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTesting
       , labelPosition, true)
 
@@ -142,7 +146,7 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       var allData = 0
 
 //       classification
-            datasetTesting.foreach { data =>
+            dataTesting.foreach { data =>
               val realScore = BasicClassification(data, network, SigmoidFunction)
               realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
                 val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)

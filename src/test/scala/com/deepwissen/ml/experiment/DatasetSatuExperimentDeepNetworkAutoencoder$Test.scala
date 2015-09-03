@@ -49,10 +49,10 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(35,35,35) ,
+      hiddenLayerSize = List(21,21,21) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 50000,
+      iteration = 1000,
       epsilon = 0.000000001,
       momentum = 0.5,
       learningRate = 0.3,
@@ -95,11 +95,15 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       } toArray
     }
 
+    val allDatasetForNormalization = tempDatasetTraining ::: tempDatasetTesting
+
     val datasetTraining = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTraining
       , labelPosition, true)
 
     val datasetTesting = StandardNormalization.normalize(
+    allDatasetForNormalization,
       tempDatasetTesting
       , labelPosition, true)
 
@@ -140,11 +144,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
         RangeThresholdFunction(0.15)
       }
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
-
       val threshold = RangeThresholdFunction(0.15)
-
 
       var trueCounter = 0
       var allData = 0
@@ -156,16 +156,20 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
                 val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
                 val result = p._1
                 val compare = threshold.compare(p._1, originalClass)
-                println(s"real $p == score $compare == targetClass ${originalClass}")
+//                println(s"real $p == score $compare == targetClass ${originalClass}")
                 trueCounter = if(compare._1) trueCounter + 1 else trueCounter
                 allData += 1
               })
-              println("------------------------------------------------------------")
+//              println("------------------------------------------------------------")
             }
 
             val percent = trueCounter * (100.0 / allData)
 
-            println("result comparation : " + trueCounter + " :> in percent : " + percent)
+
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+
+      println("result comparation : " + trueCounter + " :> in percent : " + percent)
 
             assert(percent >= 80)
       assert(accurationRange._1 >= 80)

@@ -528,20 +528,24 @@ class DeepNetworkAlgorithm$Test extends FunSuite {
   val targetClass = if (parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
   val targetClassBreastCancer = if (parameterBreastCancer.targetClassPosition == -1) datasetBreastCancer.head.length - 1 else parameterBreastCancer.targetClassPosition
 
+
+  val tempDatasetPlayTennis = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDatasetPlayTennis, tempDatasetPlayTennis
     , targetClass)
 
+  val tempDatasetBreastCancer = datasetBreastCancer.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledgeBreastCancer(index)(value)
+    }
+  }).toList
+
   val finalDataSetBreastCancer = StandardNormalization.normalize(
-    datasetBreastCancer.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledgeBreastCancer(index)(value)
-      }
-    }).toList
+    tempDatasetBreastCancer, tempDatasetBreastCancer
     , targetClassBreastCancer)
 
   var logger = LoggerFactory.getLogger("Main Objects")

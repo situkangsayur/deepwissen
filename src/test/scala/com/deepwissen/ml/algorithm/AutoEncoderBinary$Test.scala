@@ -87,12 +87,14 @@ class AutoEncoderBinary$Test extends FunSuite{
 
   val targetClass = -1
 
+  val tempDataset = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDataset, tempDataset
     , targetClass)
 
   //  val labels

@@ -518,24 +518,28 @@ class BasicBackpropagation$Test extends FunSuite {
 
   val targetClassBreastCancer = if (parameterBreastCancer.targetClassPosition == -1) datasetBreastCancer.head.length - 1 else parameterBreastCancer.targetClassPosition
 
+  val tempDatasetPlayTennis = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+  tempDatasetPlayTennis, tempDatasetPlayTennis
   , targetClass)
 
   finalDataSet.foreach { array =>
     println(array.mkString(","))
   }
 
+  val tempDatasetBreastCancer = datasetBreastCancer.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledgeBreastCancer(index)(value)
+    }
+  }).toList
+
   val finalDataSetBreastCancer = StandardNormalization.normalize(
-    datasetBreastCancer.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledgeBreastCancer(index)(value)
-      }
-    }).toList
+    tempDatasetBreastCancer, tempDatasetBreastCancer
     , targetClassBreastCancer)
 
 

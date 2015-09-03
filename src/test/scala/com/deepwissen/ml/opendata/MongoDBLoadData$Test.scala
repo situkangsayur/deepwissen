@@ -91,12 +91,14 @@ class MongoDBLoadData$Test extends FunSuite{
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
 
+  val tempDatasetPlayTennis = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDatasetPlayTennis, tempDatasetPlayTennis
     , targetClass)
 
   val mongoClient =  MongoClient()
@@ -192,7 +194,7 @@ class MongoDBLoadData$Test extends FunSuite{
 
 
     val alldataset = StandardNormalization.normalize(
-      tempDataset
+      tempDataset, tempDataset
       , labelPosition, true)
 
 

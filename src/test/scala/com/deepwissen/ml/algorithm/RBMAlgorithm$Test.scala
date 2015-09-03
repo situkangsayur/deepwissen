@@ -171,22 +171,27 @@ class RBMAlgorithm$Test extends FunSuite {
 
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
 
+
+  val tempDatasetPlayTennis = dataset.map(data => {
+    data.map { case (index, value) =>{
+      priorKnowledge(index)(value)
+    }
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>{
-        priorKnowledge(index)(value)
-      }
-      }
-    }).toList
+    tempDatasetPlayTennis, tempDatasetPlayTennis
     , targetClass)
 
 
+  val tempDatasetBreastCancer = datasetTest.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSetTest = StandardNormalization.normalize(
-    datasetTest.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDatasetBreastCancer, tempDatasetBreastCancer
     , targetClass)
 
   //  val labels

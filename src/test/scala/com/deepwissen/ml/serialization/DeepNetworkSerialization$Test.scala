@@ -125,12 +125,15 @@ class DeepNetworkSerialization$Test extends FunSuite{
   val targetClass = if(parameter.targetClassPosition == -1) dataset.head.length - 1 else parameter.targetClassPosition
   val simpleTargetClass = if(parameter.targetClassPosition == -1) simpleDataset.head.length - 1 else parameter.targetClassPosition
 
+
+  val tempDatasetPlayTennis = dataset.map(data => {
+    data.map { case (index, value) =>
+      priorKnowledge(index)(value)
+    }
+  }).toList
+
   val finalDataSet = StandardNormalization.normalize(
-    dataset.map(data => {
-      data.map { case (index, value) =>
-        priorKnowledge(index)(value)
-      }
-    }).toList
+    tempDatasetPlayTennis, tempDatasetPlayTennis
     , targetClass)
 
   //  val labels
@@ -139,12 +142,14 @@ class DeepNetworkSerialization$Test extends FunSuite{
     println(array.mkString(","))
   }
 
+  val tempDatasetPlayTennisSimple = simpleDataset.map(data => {
+    data.map { case (index, value) =>
+      simplePriorKnowledge(index)(value)
+    }
+  }).toList
+
   val simpleFinalDataSet = StandardNormalization.normalize(
-    simpleDataset.map(data => {
-      data.map { case (index, value) =>
-        simplePriorKnowledge(index)(value)
-      }
-    }).toList
+    tempDatasetPlayTennisSimple, tempDatasetPlayTennisSimple
     , simpleTargetClass)
 
   //  val labels
