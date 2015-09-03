@@ -44,23 +44,23 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val featuresName = tempFeaturesName.filterNot(p => p.equals("TAHUN"))
 
     /**
-     * Training Parameter
+     * Training Parameter20,21,22,23,24,25,26,27,28,29,30
      */
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(35,35,35,35) ,
+      hiddenLayerSize = List(20,20,20) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 500,
+      iteration = 1000,
       epsilon = 0.000000001,
-      momentum = 0.3,
+      momentum = 0.5,
       learningRate = 0.3,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 20,
+        iteration = 100,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.50,
@@ -160,11 +160,11 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
           val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
           val result = p._1
           val compare = threshold.compare(p._1, originalClass)
-          println(s"real $p == score $compare == targetClass ${originalClass}")
+//          println(s"real $p == score $compare == targetClass ${originalClass}")
           trueCounter = if(compare._1) trueCounter + 1 else trueCounter
           allData += 1
         })
-        println("------------------------------------------------------------")
+//        println("------------------------------------------------------------")
       }
 
       val percent = trueCounter * (100.0 / allData)

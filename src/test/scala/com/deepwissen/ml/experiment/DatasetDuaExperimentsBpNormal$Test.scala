@@ -47,12 +47,13 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
      */
     val parameterBank = BackpropragationParameter(
       hiddenLayerSize = 1,
+      hiddenNodeSize = 20,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 20,
+      iteration = 1000,
       epsilon = 0.000000001,
-      momentum = 0.75,
-      learningRate = 0.5,
+      momentum = 0.5,
+      learningRate = 0.8,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size- 1
