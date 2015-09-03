@@ -146,7 +146,7 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       var allData = 0
 
 //       classification
-            dataTesting.foreach { data =>
+            datasetTesting.foreach { data =>
               val realScore = BasicClassification(data, network, SigmoidFunction)
               realScore.asInstanceOf[BinaryValue].get.zipWithIndex.foreach(p => {
                 val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)

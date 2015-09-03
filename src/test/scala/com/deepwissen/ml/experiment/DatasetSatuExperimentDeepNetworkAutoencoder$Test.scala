@@ -44,12 +44,12 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val featuresName = tempFeaturesName.filterNot(p => p.equals("TAHUN"))
 
     /**
-     * Training Parameter
+     * Training Parameter 20,21,
      */
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(21,21,21) ,
+      hiddenLayerSize = List(23,23,23) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 1000,
