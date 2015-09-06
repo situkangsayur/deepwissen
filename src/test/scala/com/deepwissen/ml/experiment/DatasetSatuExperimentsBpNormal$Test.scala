@@ -46,7 +46,7 @@ class DatasetSatuExperimentsBpNormal$Test extends FunSuite{
      */
     val parameterBank = BackpropragationParameter(
       hiddenLayerSize = 1,
-      hiddenNodeSize = 28,
+      hiddenNodeSize = 23,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 1000,

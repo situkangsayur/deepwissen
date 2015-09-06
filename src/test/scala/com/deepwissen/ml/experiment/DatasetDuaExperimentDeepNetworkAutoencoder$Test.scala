@@ -49,13 +49,13 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(20,20,20) ,
+      hiddenLayerSize = List(24,24,24) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 1000,
+      iteration = 2000,
       epsilon = 0.000000001,
       momentum = 0.5,
-      learningRate = 0.3,
+      learningRate = 0.75,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
@@ -63,7 +63,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
         iteration = 100,
         epsilon = 0.00001,
         momentum = 0.50,
-        learningRate = 0.50,
+        learningRate = 0.60,
         synapsysFactory = RandomSynapsysFactory(),
         activationFunction = SigmoidFunction
       )
@@ -142,12 +142,16 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.01)
+        RangeThresholdFunction(0.15)
+      }
+
+      val accurationRangeSecond = validator.accuration(validateResult) {
+        RangeThresholdFunction(0.05)
       }
 
 
 
-      val threshold = RangeThresholdFunction(0.01)
+      val threshold = RangeThresholdFunction(0.15)
 
 
       var trueCounter = 0
@@ -170,9 +174,10 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       val percent = trueCounter * (100.0 / allData)
 
       println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+      println("result RangeThresholdFunction (0.15) : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+      println("result RangeThresholdFunction (0.05) : " + accurationRangeSecond._1 +" :> recall : " + accurationRangeSecond._2 + " :> precision : " + accurationRangeSecond._3)
 
-      println("result comparation : " + trueCounter + " :> in percent : " + percent)
+      println("result comparation (0.015) : " + trueCounter + " :> in percent : " + percent)
 
       assert(percent >= 80)
       assert(accurationRange._1 >= 80)
