@@ -28,7 +28,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       "CAR","TotalEkuitas","EQTA","LABA_RUGI_TAHUN_BERJALAN","LABA_RUGI_TAHUN_BERJALAN_(ANN)","ROA","ROE","LRP","LLR",
       "OPERATION_COST","TOTAL_INCOME","CIR","INT_REV","INT_COST","INT_REV_ANN","INT_COST_ANN","RG_6_1","RG_6_2","RG_6_3",
       "RG_6_4","RG_6_5","RG_6_6","RG_6"
-    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK") || p.equals("TAHUN") )
+    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK"))
 
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_2")
