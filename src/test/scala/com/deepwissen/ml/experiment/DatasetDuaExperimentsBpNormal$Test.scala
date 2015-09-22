@@ -27,7 +27,7 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       "CAR","TotalEkuitas","EQTA","LABA_RUGI_TAHUN_BERJALAN","LABA_RUGI_TAHUN_BERJALAN_(ANN)","ROA","ROE","LRP","LLR",
       "OPERATION_COST","TOTAL_INCOME","CIR","INT_REV","INT_COST","INT_REV_ANN","INT_COST_ANN","RG_6_1","RG_6_2","RG_6_3",
       "RG_6_4","RG_6_5","RG_6_6","RG_6"
-    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK") || p.equals("TAHUN") )
+    ).filterNot(p => p.equals("ID_LAPORAN1") || p.equals("NAMA_BANK"))
 
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_2")
@@ -47,12 +47,13 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
      */
     val parameterBank = BackpropragationParameter(
       hiddenLayerSize = 1,
+      hiddenNodeSize = 24,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 20,
+      iteration = 1000,
       epsilon = 0.000000001,
-      momentum = 0.75,
-      learningRate = 0.5,
+      momentum = 0.5,
+      learningRate = 0.8,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size- 1
@@ -133,13 +134,15 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
       }
 
       val accurationRange = validator.accuration(validateResult) {
-        RangeThresholdFunction(0.01)
+        RangeThresholdFunction(0.15)
+      }
+
+      val accurationRangeSecond = validator.accuration(validateResult) {
+        RangeThresholdFunction(0.05)
       }
 
       val threshold = RangeThresholdFunction(0.15)
 
-      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
 
 
       var trueCounter = 0
@@ -152,16 +155,21 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
                 val originalClass = data(labelPosition).asInstanceOf[BinaryValue].get(0)
                 val result = p._1
                 val compare = threshold.compare(p._1, originalClass)
-                println(s"real $p == score $compare == targetClass ${originalClass}")
+//                println(s"real $p == score $compare == targetClass ${originalClass}")
                 trueCounter = if(compare._1) trueCounter + 1 else trueCounter
                 allData += 1
               })
-              println("------------------------------------------------------------")
+//              println("------------------------------------------------------------")
             }
 
             val percent = trueCounter * (100.0 / allData)
 
-            println("result comparation : " + trueCounter + " :> in percent : " + percent)
+      println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
+      println("result RangeThresholdFunction (0.15) : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+      println("result RangeThresholdFunction (0.05) : " + accurationRangeSecond._1 +" :> recall : " + accurationRangeSecond._2 + " :> precision : " + accurationRangeSecond._3)
+
+
+      println("result comparation (0.15) : " + trueCounter + " :> in percent : " + percent)
 
             assert(percent >= 80)
 
