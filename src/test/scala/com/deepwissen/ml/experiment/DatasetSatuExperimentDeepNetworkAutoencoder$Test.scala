@@ -33,9 +33,11 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_1")
 
-    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+//    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+    println(repricingCollection.toList.size)
 
-    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+//    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+    val tempDataRG  = repricingCollection.map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -49,10 +51,10 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(24,24,24) ,
+      hiddenLayerSize = List(26,26,26) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 2000,
+      iteration = 1000,
       epsilon = 0.000000001,
       momentum = 0.5,
       learningRate = 0.75,
@@ -60,7 +62,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 100,
+        iteration = 2000,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.60,
@@ -112,8 +114,8 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     //      p.foreach( x => print(if(x.isInstanceOf[ContValue]) "; " + x.asInstanceOf[ContValue].get else "; "+x.asInstanceOf[BinaryValue].get))
     //      println("-")
     //    }
-//9388
-    assert(datasetTraining.size ==5616)
+//9388 5616
+    assert(datasetTraining.size ==10424 -936)
     assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)
@@ -180,7 +182,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       assert(accurationRange._1 >= 80)
       // save model
       NetworkSerialization.save(network, new FileOutputStream(
-        new File("target" + File.separator + "bank_rg_data_1_dpa.json")))
+        new File("target" + File.separator + "bank_rg_data_1_9k_dpa.json")))
     } catch {
       case npe: NullPointerException => npe.printStackTrace()
       case e: Exception => e.printStackTrace()

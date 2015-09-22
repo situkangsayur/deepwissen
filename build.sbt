@@ -12,7 +12,8 @@ libraryDependencies += "org.scalatest" %% "scalatest" % "2.2.4" % "test"
 // Uncomment to use Akka
 //libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.3.9"
 
-libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.9"
+//libraryDependencies += "ch.qos.logback" % "logback-classic" % "1.0.9"
+libraryDependencies += "org.slf4j" % "slf4j-api" % "1.6.4"
 
 libraryDependencies += "org.specs2" %% "specs2-core" % "2.4.15" % "test"
 

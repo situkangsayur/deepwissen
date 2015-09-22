@@ -49,10 +49,10 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(24,24,24) ,
+      hiddenLayerSize = List(23,23,23) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 2000,
+      iteration = 1000,
       epsilon = 0.000000001,
       momentum = 0.5,
       learningRate = 0.75,
