@@ -33,9 +33,11 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_1")
 
-    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+//    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+    println(repricingCollection.toList.size)
 
-    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+//    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+    val tempDataRG  = repricingCollection.map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -49,19 +51,19 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(23,23,23) ,
+      hiddenLayerSize = List(24,29,24) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 1000,
       epsilon = 0.000000001,
       momentum = 0.5,
-      learningRate = 0.3,
+      learningRate = 0.75,
       synapsysFactory = RandomSynapsysFactory(),
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 100,
-        epsilon = 0.00001,
+        iteration = 2000,
+        epsilon = 0.00000001,
         momentum = 0.50,
         learningRate = 0.50,
         synapsysFactory = RandomSynapsysFactory(),
@@ -113,7 +115,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     //      println("-")
     //    }
 //9388
-    assert(datasetTraining.size ==5616)
+    assert(datasetTraining.size ==(10424-936))
     assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)
@@ -144,6 +146,11 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
         RangeThresholdFunction(0.15)
       }
 
+      val accurationRangeSecond = validator.accuration(validateResult) {
+        RangeThresholdFunction(0.05)
+      }
+
+
       val threshold = RangeThresholdFunction(0.15)
 
       var trueCounter = 0
@@ -167,7 +174,8 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 
 
       println("result Either Threshold Function : " + accuration._1 +" :> recall : " + accuration._2 + " :> precision : " + accuration._3)
-      println("result RangeThresholdFunction : " + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+      println("result RangeThresholdFunction : (0.15)" + accurationRange._1 +" :> recall : " + accurationRange._2 + " :> precision : " + accurationRange._3)
+      println("result RangeThresholdFunction (0.05) : " + accurationRangeSecond._1 +" :> recall : " + accurationRangeSecond._2 + " :> precision : " + accurationRangeSecond._3)
 
       println("result comparation : " + trueCounter + " :> in percent : " + percent)
 
