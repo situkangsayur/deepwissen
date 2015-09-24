@@ -13,7 +13,7 @@ import scala.annotation.tailrec
  */
 object DeepNetworkAlgorithm extends AbstractDeepNetwork {
 
-  val file = new PrintStream(new FileOutputStream("result-ds1-dnn1-2007.txt"), true)
+  val file = new PrintStream(new FileOutputStream("result-ds1-dnn1-2010.txt"), true)
   /**
    * Run training with given dataset
    * @param dataset dataset
