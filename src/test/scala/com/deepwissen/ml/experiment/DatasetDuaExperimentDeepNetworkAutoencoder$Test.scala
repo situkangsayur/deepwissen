@@ -33,9 +33,10 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_2")
 
-    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+    println(repricingCollection.toList.size)
 
-    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+//    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+    val tempDataRG  = repricingCollection.map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -49,7 +50,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val parameterBank = DeepNetworkParameter(
       //    hiddenLayerSize = List(9,10,11,12,11,10,9),
       //    hiddenLayerSize = List(11,11, 11, 11, 11, 11),
-      hiddenLayerSize = List(23,23,23) ,
+      hiddenLayerSize = List(34,34,34) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
       iteration = 1000,
@@ -60,7 +61,7 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       activationFunction = SigmoidFunction,
       inputPerceptronSize = featuresName.size - 1,
       autoecoderParam = AutoencoderParameter(
-        iteration = 100,
+        iteration = 2000,
         epsilon = 0.00001,
         momentum = 0.50,
         learningRate = 0.60,
@@ -114,10 +115,10 @@ class DatasetDuaExperimentDeepNetworkAutoencoder$Test extends FunSuite{
 //      println("-")
 //    }
 
-//    assert(alldataset.size ==6992)
-//    assert(alldataset(0).size == featuresName.size)
-    assert(datasetTraining.size ==3744)
+    assert(datasetTraining.size ==6368)
     assert(datasetTraining(0).size == featuresName.size)
+//    assert(datasetTraining.size ==3744)
+//    assert(datasetTraining(0).size == featuresName.size)
     assert(datasetTesting.size ==624)
     assert(datasetTesting(0).size == featuresName.size)
 

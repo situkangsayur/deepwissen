@@ -32,9 +32,10 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_2")
 
-    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
+    println(repricingCollection.toList.size)
 
-    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+//    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
+    val tempDataRG  = repricingCollection.map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -107,14 +108,14 @@ class DatasetDuaExperimentsBpNormal$Test extends FunSuite{
 //    assert(alldataset.size ==6992)
 //    assert(alldataset(0).size == featuresName.size)
 
-//    assert(datasetTraining.size ==6368)
-//    assert(datasetTraining(0).size == featuresName.size)
-//    assert(datasetTesting.size ==624)
-//    assert(datasetTesting(0).size == featuresName.size)
-        assert(datasetTraining.size ==3744)
-        assert(datasetTraining(0).size == featuresName.size)
-        assert(datasetTesting.size ==624)
-        assert(datasetTesting(0).size == featuresName.size)
+    assert(datasetTraining.size ==6368)
+    assert(datasetTraining(0).size == featuresName.size)
+    assert(datasetTesting.size ==624)
+    assert(datasetTesting(0).size == featuresName.size)
+//        assert(datasetTraining.size ==3744)
+//        assert(datasetTraining(0).size == featuresName.size)
+//        assert(datasetTesting.size ==624)
+//        assert(datasetTesting(0).size == featuresName.size)
 
 
     //test algoritma

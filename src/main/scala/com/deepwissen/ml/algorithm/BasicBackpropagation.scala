@@ -23,8 +23,8 @@ import scala.annotation.tailrec
  */
 object BasicBackpropagation extends AbstractBackpropagation[List[Array[Denomination[_]]]] {
 //  val writer = new PrintWriter(new File("output-ds1-bp.txt"))
-var logger : Logger = LoggerFactory.getLogger(this.getClass)
-  val file = new PrintStream(new FileOutputStream("result-ds1-bp.txt"), true)
+  var logger : Logger = LoggerFactory.getLogger(this.getClass)
+  val file = new PrintStream(new FileOutputStream("result-ds1-bp1-2003.txt"), true)
 //  val bw = new BufferedWriter(new FileWriter(file))
 
 //  val writer : Output = Resource.fromFile("output-ds1-bp.txt")
@@ -38,8 +38,8 @@ var logger : Logger = LoggerFactory.getLogger(this.getClass)
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {
-//      if (error < parameter.epsilon || iteration > parameter.iteration) {
-      if (error < parameter.epsilon) {
+      if (error < parameter.epsilon || iteration > parameter.iteration) {
+//      if (error < parameter.epsilon) {
         // stop iteration
       } else {
         // print information
