@@ -53,7 +53,7 @@ var logger : Logger = LoggerFactory.getLogger(this.getClass)
         // run training
         val trainError = dataset.foldLeft(0.0)((value, data) => value + doTrainData(data, network, parameter))
         // next iteration
-        iterate(iteration + 1, trainError / ( dataset.length * parameter.outputPerceptronSize))
+        iterate(iteration + 1, trainError / (dataset.length * parameter.outputPerceptronSize))
       }
     }
 
