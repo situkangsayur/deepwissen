@@ -33,11 +33,11 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     val db = mongoClient("bank_dataset")
     val repricingCollection = db("datasetrepricing_gap_1")
 
-//    println(repricingCollection.find("TAHUN" $gte 2007).toList.size)
-    println(repricingCollection.toList.size)
+    println(repricingCollection.find($or("TAHUN" $lte 2007, "TAHUN" $gte 2013)).toList.size)
+//    println(repricingCollection.toList.size)
 
-//    val tempDataRG  = repricingCollection.find("TAHUN" $gte 2007).map( p => {
-    val tempDataRG  = repricingCollection.map( p => {
+    val tempDataRG  = repricingCollection.find($or("TAHUN" $lte 2007,"TAHUN" $gte 2013)).map( p => {
+//    val tempDataRG  = repricingCollection.map( p => {
       tempFeaturesName.zipWithIndex.map( x =>( x._1 -> p.getAs[Double](x._1).getOrElse(p.getAs[Int](x._1).get.toDouble))).toMap
     }).toList
 
@@ -54,7 +54,7 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
       hiddenLayerSize = List(26,26,26) ,
       outputPerceptronSize = 1,
       targetClassPosition = -1,
-      iteration = 1000,
+      iteration = 30700,
       epsilon = 0.000000001,
       momentum = 0.5,
       learningRate = 0.75,
@@ -115,11 +115,13 @@ class DatasetSatuExperimentDeepNetworkAutoencoder$Test extends FunSuite{
     //      println("-")
     //    }
 //9388 5616
-    assert(datasetTraining.size ==10424 -936)
+    //assert(datasetTraining.size ==10424 -936)
+    assert(datasetTraining.size == 4808)
     assert(datasetTraining(0).size == featuresName.size)
+    println(featuresName.size)
     assert(datasetTesting.size ==936)
     assert(datasetTesting(0).size == featuresName.size)
-
+    println(featuresName.size)
 
 
     //test algoritma

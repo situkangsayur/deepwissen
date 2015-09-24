@@ -13,7 +13,7 @@ import scala.annotation.tailrec
  */
 object DeepNetworkAlgorithm extends AbstractDeepNetwork {
 
-  val file = new PrintStream(new FileOutputStream("result-ds1-dnn.txt"), true)
+  val file = new PrintStream(new FileOutputStream("result-ds1-dnn1-2007.txt"), true)
   /**
    * Run training with given dataset
    * @param dataset dataset
@@ -24,8 +24,8 @@ object DeepNetworkAlgorithm extends AbstractDeepNetwork {
 
     @tailrec
     def iterate(iteration: Int, error: Double): Unit = {
-      if (error < parameter.epsilon) {
-//        if (error < parameter.epsilon || iteration > parameter.iteration) {
+//      if (error < parameter.epsilon) {
+        if (error < parameter.epsilon || iteration > parameter.iteration) {
         // stop iteration
       } else {
         val rmse = math.sqrt(error)
